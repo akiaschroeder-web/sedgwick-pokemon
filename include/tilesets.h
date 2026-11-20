@@ -42,6 +42,7 @@ extern const struct Tileset gTileset_BattleTent;
 extern const struct Tileset gTileset_TrainerHill;
 extern const struct Tileset gTileset_General_Frlg;
 extern const struct Tileset gTileset_PalletTown;
+extern const struct Tileset gTileset_SedgwickAviation;
 extern const struct Tileset gTileset_SedgwickRetail;
 extern const struct Tileset gTileset_SedgwickDowntown;
 extern const struct Tileset gTileset_SedgwickCity;

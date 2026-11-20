@@ -160,6 +160,15 @@ class Canvas:
                                garage='r' if garage else None, windows=0)
         return g2, d1, bottom
 
+    def hangar(self, prefix, x, y, width, door_width=4, roof_rows=2):
+        """Vermilion-roof hangar / plant building with a wide hangar door ('hgr' grey, 'plant' blue)."""
+        import aviation
+        rows = aviation.hangar_plan(width, door_width, roof_rows)
+        for r, row in enumerate(rows):
+            for c, piece in enumerate(row):
+                self.set(x + c, y + r, f'{prefix}_{piece}', walk=False)
+        return y + len(rows) - 1
+
     def place_piece_grid(self, prefix, x, y, w, h, walk=False):
         for r in range(h):
             for c in range(w):

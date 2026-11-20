@@ -3170,3 +3170,25 @@ const u16 gTilesetPalettes_SedgwickRetail[][16] =
     INCGFX_U16("data/tilesets/secondary/sedgwick_retail/palettes/14.pal", ".gbapal"),
     INCGFX_U16("data/tilesets/secondary/sedgwick_retail/palettes/15.pal", ".gbapal"),
 };
+
+const u32 gTilesetTiles_SedgwickAviation[] = INCGFX_U32("data/tilesets/secondary/sedgwick_aviation/tiles.png", ".4bpp.fastSmol", "-num_tiles 238 -Wnum_tiles");
+
+const u16 gTilesetPalettes_SedgwickAviation[][16] =
+{
+    INCGFX_U16("data/tilesets/secondary/sedgwick_aviation/palettes/00.pal", ".gbapal"),
+    INCGFX_U16("data/tilesets/secondary/sedgwick_aviation/palettes/01.pal", ".gbapal"),
+    INCGFX_U16("data/tilesets/secondary/sedgwick_aviation/palettes/02.pal", ".gbapal"),
+    INCGFX_U16("data/tilesets/secondary/sedgwick_aviation/palettes/03.pal", ".gbapal"),
+    INCGFX_U16("data/tilesets/secondary/sedgwick_aviation/palettes/04.pal", ".gbapal"),
+    INCGFX_U16("data/tilesets/secondary/sedgwick_aviation/palettes/05.pal", ".gbapal"),
+    INCGFX_U16("data/tilesets/secondary/sedgwick_aviation/palettes/06.pal", ".gbapal"),
+    INCGFX_U16("data/tilesets/secondary/sedgwick_aviation/palettes/07.pal", ".gbapal"),
+    INCGFX_U16("data/tilesets/secondary/sedgwick_aviation/palettes/08.pal", ".gbapal"),
+    INCGFX_U16("data/tilesets/secondary/sedgwick_aviation/palettes/09.pal", ".gbapal"),
+    INCGFX_U16("data/tilesets/secondary/sedgwick_aviation/palettes/10.pal", ".gbapal"),
+    INCGFX_U16("data/tilesets/secondary/sedgwick_aviation/palettes/11.pal", ".gbapal"),
+    INCGFX_U16("data/tilesets/secondary/sedgwick_aviation/palettes/12.pal", ".gbapal"),
+    INCGFX_U16("data/tilesets/secondary/sedgwick_aviation/palettes/13.pal", ".gbapal"),
+    INCGFX_U16("data/tilesets/secondary/sedgwick_aviation/palettes/14.pal", ".gbapal"),
+    INCGFX_U16("data/tilesets/secondary/sedgwick_aviation/palettes/15.pal", ".gbapal"),
+};

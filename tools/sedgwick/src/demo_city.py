@@ -58,6 +58,7 @@ cv.street_ns(26, 0, 17)
 for y in range(17, 23):
     cv.set(26, y, 'bridge_ns_w'); cv.set(27, y, 'asphalt'); cv.set(28, y, 'asphalt'); cv.set(29, y, 'bridge_ns_e')
 cv.street_ns(26, 23, 24)
+
 for y in (5, 11):
     cv.tall(25, y, 'streetlight')
 
@@ -66,6 +67,9 @@ rows = ['i_shoulder_n', 'i_lane_dash', 'i_lane', 'i_median_n', 'i_median_s', 'i_
 for i, name in enumerate(rows):
     for x in range(W):
         cv.set(x, 24 + i, name)
+    # the street crosses over the interstate on an overpass
+    cv.set(26, 24 + i, f'ovp_w_{name[2:]}'); cv.set(27, 24 + i, 'asphalt')
+    cv.set(28, 24 + i, 'asphalt'); cv.set(29, 24 + i, f'ovp_e_{name[2:]}')
 
 mid = write_map(cv, 'SedgwickCityDemo', 'LAYOUT_SEDGWICK_CITY_DEMO', 'Sedgwick city demo',
                 secondary='gTileset_SedgwickCity')

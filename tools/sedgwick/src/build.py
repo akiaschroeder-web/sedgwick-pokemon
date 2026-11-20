@@ -6,7 +6,7 @@ name -> metatile id index (JSON + C header) for the map generator.
 import json, os, struct, sys
 from PIL import Image
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import lib, street, house2, props, wheat, rural, farm2, commercial, gas, orig, civic, downtown, church, retail, suburb
+import lib, street, house2, props, wheat, rural, farm2, commercial, gas, orig, civic, downtown, church, retail, suburb, aviation
 
 EXP = lib.EXP
 NUM_PRIMARY_TILES = 512
@@ -309,8 +309,13 @@ def city_ts():
         ts.add(name, GRASS_BOTTOM, P_STREET, top, P_PROPS, layer=layer, beh=beh)
     for name, g in {**civic.bridge_pieces(), **civic.footbridge_pieces()}.items():
         ts.add_q(name, W, [(q, P_STREET) for q in quads(g)], layer='COVERED')
-    for name, g in civic.interstate_pieces().items():
+    inter = civic.interstate_pieces()
+    for name, g in inter.items():
         ts.add(name, g, P_STREET)
+    br = civic.bridge_pieces()
+    for row in ('i_shoulder_n', 'i_lane_dash', 'i_lane', 'i_median_n', 'i_median_s', 'i_shoulder_s'):
+        for side, key in (('w', 'bridge_ns_w'), ('e', 'bridge_ns_e')):
+            ts.add(f'ovp_{side}_{row[2:]}', inter[row], P_STREET, br[key], P_STREET, layer='NORMAL')
     for name, g in civic.bank_pieces().items():
         ts.add_q(name, W, [(q, P_NATURE) for q in quads(g)], layer='COVERED')
     park = {**civic.park_props(), **civic.pavilion(4), **civic.ball_diamond()}
@@ -509,6 +514,63 @@ def retail_ts():
     return ts
 
 
+def aviation_ts():
+    ts = Tileset('sedgwick_aviation')
+    P_STREET, P_PROPS, P_SHED, P_PLANT, P_AV = 6, 7, 8, 9, 12
+    BB = [10, 11]
+    ts.palettes[P_STREET] = street.PAL_STREET
+    ts.palettes[P_PROPS] = props.PAL_PROPS
+    ts.palettes[P_SHED] = farm2.PAL_SHED
+    ts.palettes[P_PLANT] = aviation.PAL_PLANT
+    for i, p in enumerate(retail.PALS):
+        ts.palettes[BB[i]] = p
+    ts.palettes[P_AV] = aviation.PAL_AV
+    ts.add('lawn', GRASS_BOTTOM, P_STREET)
+    for name, (g, beh) in street.metatiles().items():
+        if name.startswith(('culdesac', 'bend', 'diag', 'drive', 'center', 'lane', 'crosswalk')):
+            continue
+        ts.add(name, g, P_STREET, beh=beh)
+    for name, (top, layer, beh) in props.metatiles().items():
+        if name.startswith(('chainlink', 'streetlight', 'stop_sign', 'traffic', 'hydrant')):
+            ts.add(name, GRASS_BOTTOM, P_STREET, top, P_PROPS, layer=layer, beh=beh)
+    air = aviation.airfield()
+    for name, g in air.items():
+        ts.add(name, g, P_STREET)
+    for name, g in commercial.parking().items():
+        ts.add(name, g, P_STREET)
+    lawn_q = quads(GRASS_BOTTOM)
+    for prefix, pslot in (('hgr', P_SHED), ('plant', P_PLANT)):
+        k = farm2.kit()
+        k.update(farm2.door_pieces('shed', tall=True))
+        k.update(aviation.hangar_door_pieces(4))
+        for pname, p in k.items():
+            bottom = [(u, pslot) if u is not None else (lawn_q[q], P_STREET) for q, u in enumerate(p['under'])]
+            top = [(t, pslot) if t is not None else (None, 0) for t in p['top']]
+            ts.add_q(f'{prefix}_{pname}', bottom, top, layer=p['layer'], beh=p['beh'])
+    for m in retail.IDS:
+        p = retail.PIECES[m]
+        def conv(g, q):
+            if g == 'LAWN':
+                return (lawn_q[q], P_STREET)
+            if g is None:
+                return (None, 0)
+            pi = retail.ASSIGN[id(g)]
+            return (orig.index_quad(g, retail.PALS[pi]), BB[pi])
+        ts.add_q(f'bb_{m:03x}', [conv(g, q) for q, g in enumerate(p['bottom'])],
+                 [conv(g, q) for q, g in enumerate(p['top'])], layer=p['layer'],
+                 beh='MB_NON_ANIMATED_DOOR' if m == retail.DOOR else 'MB_NORMAL')
+    for name, g in aviation.drawn().items():
+        if name.startswith(('jet', 'cessna')):
+            under = air['apron']
+        elif name == 'gate_arm':
+            under = air['rwy_plain']
+        else:
+            under = GRASS_BOTTOM
+        tall = name.startswith('tower') and name[-1] in '012' or name == 'guard_booth_00'
+        ts.add(name, under, P_STREET, g, P_AV, layer='NORMAL' if tall else 'COVERED')
+    return ts
+
+
 def register_cel_doors(ts):
     """Door animation for the Celadon-style storefront door in each wall colour."""
     C = camel(ts.name)
@@ -626,6 +688,12 @@ if __name__ == '__main__':
     json.dump(index, open(os.path.join(here, '..', f'{ts.name}_metatiles.json'), 'w'), indent=1)
     print(f'{ts.name}: {ntiles} tiles, {len(ts.metatiles)} metatiles, palettes {sorted(ts.palettes)}')
     ts = retail_ts()
+    ntiles, index = ts.write()
+    register(ts, ntiles)
+    write_labels(ts, index)
+    json.dump(index, open(os.path.join(here, '..', f'{ts.name}_metatiles.json'), 'w'), indent=1)
+    print(f'{ts.name}: {ntiles} tiles, {len(ts.metatiles)} metatiles, palettes {sorted(ts.palettes)}')
+    ts = aviation_ts()
     ntiles, index = ts.write()
     register(ts, ntiles)
     write_labels(ts, index)

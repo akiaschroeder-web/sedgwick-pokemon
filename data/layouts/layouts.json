@@ -9369,17 +9369,6 @@
       "layout_version": "emerald"
     },
     {
-      "id": "LAYOUT_SEDGWICK_CITY_DEMO",
-      "name": "SedgwickCityDemo_Layout",
-      "width": 40,
-      "height": 32,
-      "primary_tileset": "gTileset_General",
-      "secondary_tileset": "gTileset_SedgwickCity",
-      "border_filepath": "data/layouts/SedgwickCityDemo/border.bin",
-      "blockdata_filepath": "data/layouts/SedgwickCityDemo/map.bin",
-      "layout_version": "emerald"
-    },
-    {
       "id": "LAYOUT_SEDGWICK_DOWNTOWN_DEMO",
       "name": "SedgwickDowntownDemo_Layout",
       "width": 50,
@@ -9399,6 +9388,28 @@
       "secondary_tileset": "gTileset_SedgwickResidential",
       "border_filepath": "data/layouts/SedgwickSuburbDemo/border.bin",
       "blockdata_filepath": "data/layouts/SedgwickSuburbDemo/map.bin",
+      "layout_version": "emerald"
+    },
+    {
+      "id": "LAYOUT_SEDGWICK_AVIATION_DEMO",
+      "name": "SedgwickAviationDemo_Layout",
+      "width": 44,
+      "height": 30,
+      "primary_tileset": "gTileset_General",
+      "secondary_tileset": "gTileset_SedgwickAviation",
+      "border_filepath": "data/layouts/SedgwickAviationDemo/border.bin",
+      "blockdata_filepath": "data/layouts/SedgwickAviationDemo/map.bin",
+      "layout_version": "emerald"
+    },
+    {
+      "id": "LAYOUT_SEDGWICK_CITY_DEMO",
+      "name": "SedgwickCityDemo_Layout",
+      "width": 40,
+      "height": 32,
+      "primary_tileset": "gTileset_General",
+      "secondary_tileset": "gTileset_SedgwickCity",
+      "border_filepath": "data/layouts/SedgwickCityDemo/border.bin",
+      "blockdata_filepath": "data/layouts/SedgwickCityDemo/map.bin",
       "layout_version": "emerald"
     }
   ]

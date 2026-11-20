@@ -1607,3 +1607,14 @@ const struct Tileset gTileset_SedgwickRetail =
     .metatileAttributes = gMetatileAttributes_SedgwickRetail,
     .callback = NULL,
 };
+
+const struct Tileset gTileset_SedgwickAviation =
+{
+    .isCompressed = TRUE,
+    .isSecondary = TRUE,
+    .tiles = gTilesetTiles_SedgwickAviation,
+    .palettes = gTilesetPalettes_SedgwickAviation,
+    .metatiles = gMetatiles_SedgwickAviation,
+    .metatileAttributes = gMetatileAttributes_SedgwickAviation,
+    .callback = NULL,
+};
