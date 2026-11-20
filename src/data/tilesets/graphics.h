@@ -3038,3 +3038,25 @@ const u16 ALIGNED(4) gTilesetPalettes_General_Frlg[][16] =
 const u32 gTilesetTiles_General_Frlg[] = INCGFX_U32("data/tilesets/primary/general_frlg/tiles.png", ".4bpp.smol");
 
 #endif // IS_FRLG
+
+const u32 gTilesetTiles_SedgwickResidential[] = INCGFX_U32("data/tilesets/secondary/sedgwick_residential/tiles.png", ".4bpp.fastSmol", "-num_tiles 358 -Wnum_tiles");
+
+const u16 gTilesetPalettes_SedgwickResidential[][16] =
+{
+    INCGFX_U16("data/tilesets/secondary/sedgwick_residential/palettes/00.pal", ".gbapal"),
+    INCGFX_U16("data/tilesets/secondary/sedgwick_residential/palettes/01.pal", ".gbapal"),
+    INCGFX_U16("data/tilesets/secondary/sedgwick_residential/palettes/02.pal", ".gbapal"),
+    INCGFX_U16("data/tilesets/secondary/sedgwick_residential/palettes/03.pal", ".gbapal"),
+    INCGFX_U16("data/tilesets/secondary/sedgwick_residential/palettes/04.pal", ".gbapal"),
+    INCGFX_U16("data/tilesets/secondary/sedgwick_residential/palettes/05.pal", ".gbapal"),
+    INCGFX_U16("data/tilesets/secondary/sedgwick_residential/palettes/06.pal", ".gbapal"),
+    INCGFX_U16("data/tilesets/secondary/sedgwick_residential/palettes/07.pal", ".gbapal"),
+    INCGFX_U16("data/tilesets/secondary/sedgwick_residential/palettes/08.pal", ".gbapal"),
+    INCGFX_U16("data/tilesets/secondary/sedgwick_residential/palettes/09.pal", ".gbapal"),
+    INCGFX_U16("data/tilesets/secondary/sedgwick_residential/palettes/10.pal", ".gbapal"),
+    INCGFX_U16("data/tilesets/secondary/sedgwick_residential/palettes/11.pal", ".gbapal"),
+    INCGFX_U16("data/tilesets/secondary/sedgwick_residential/palettes/12.pal", ".gbapal"),
+    INCGFX_U16("data/tilesets/secondary/sedgwick_residential/palettes/13.pal", ".gbapal"),
+    INCGFX_U16("data/tilesets/secondary/sedgwick_residential/palettes/14.pal", ".gbapal"),
+    INCGFX_U16("data/tilesets/secondary/sedgwick_residential/palettes/15.pal", ".gbapal"),
+};
