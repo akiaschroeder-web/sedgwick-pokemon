@@ -84,44 +84,77 @@ def bus_shelter():
 
 
 def car(paint, dark, kind='sedan'):
-    """2 x 1, facing east: Pokemon-style 3/4 view (roof seen from above, side below)."""
-    P = Pic(2, 1)
+    """2 x 2, facing west, drawn to match FRLG's moving truck (SS Anne dock): side view
+    with a sliver of roof, big pale windows, dark outline, skirt and hubbed wheels."""
+    P = Pic(2, 2)
+    glass, glint = (ML, WH) if paint != WH else (MM, ML)
+    hi = WH if paint not in (WH, ML) else (WH if paint == ML else ML)
     if kind == 'sedan':
-        P.rect(3, 4, 28, 12, paint)            # body
-        P.rect(3, 9, 28, 12, dark)
-        P.rect(9, 1, 22, 6, paint)             # cabin roof
-        P.rect(9, 3, 22, 6, WH if paint != WH else MM)   # windows band
-        P.rect(15, 3, 16, 6, paint)
-        P.rect(27, 6, 28, 7, YL)               # headlight
-        P.rect(3, 6, 3, 7, RD if paint != RD else RDD)   # tail light
-        outline = [(2, 4, 2, 12), (29, 4, 29, 12), (3, 13, 28, 13), (3, 3, 8, 3), (23, 3, 28, 3), (9, 0, 22, 0),
-                   (8, 1, 8, 2), (23, 1, 23, 2)]
-    else:   # pickup: cab at the front, open bed behind
-        P.rect(2, 5, 29, 12, paint)
-        P.rect(2, 9, 29, 12, dark)
-        P.rect(17, 1, 26, 6, paint)
-        P.rect(18, 3, 25, 6, WH if paint != WH else MM)
-        P.rect(4, 6, 15, 8, dark)              # bed
-        P.rect(28, 7, 29, 8, YL)
-        outline = [(1, 5, 1, 12), (30, 5, 30, 12), (2, 13, 29, 13), (2, 4, 16, 4), (27, 4, 29, 4), (17, 0, 26, 0),
-                   (16, 1, 16, 3), (27, 1, 27, 3)]
-    for x0, y0, x1, y1 in outline:
-        P.rect(x0, y0, x1, y1, O)
-    for wx in (7, 23):                         # wheels
-        P.rect(wx - 2, 11, wx + 2, 14, BK)
-        P.rect(wx - 1, 12, wx, 12, MM)
-    P.rect(3, 15, 28, 15, SH)
+        P.rect(1, 18, 30, 23, paint)                       # body sides
+        P.rect(1, 22, 30, 25, dark)                        # lower body
+        P.rect(2, 18, 29, 18, hi)                          # beltline glint
+        for y in range(10, 18):                            # cabin: slanted windscreen and rear glass
+            t = y - 10
+            x0, x1 = 10 - t * 4 // 7, 21 + t * 4 // 7
+            P.rect(x0, y, x1, y, paint if y <= 11 else glass)
+        P.rect(10, 10, 21, 10, hi)                         # roof seen from above
+        P.rect(15, 12, 16, 17, paint)                      # B pillar
+        P.rect(8, 12, 9, 13, glint); P.rect(18, 12, 19, 12, glint)
+        P.rect(1, 20, 2, 21, YL)                           # headlight (front = west)
+        P.rect(29, 20, 30, 21, RD if paint != RD else RDD) # tail light
+        P.rect(1, 24, 4, 25, MM); P.rect(27, 24, 30, 25, MM)   # bumpers
+        wheels = (7, 24)
+    else:
+        P.rect(1, 17, 30, 23, paint)
+        P.rect(1, 22, 30, 25, dark)
+        P.rect(2, 17, 15, 17, hi)
+        for y in range(9, 17):                             # cab well forward, upright back
+            t = y - 9
+            x0 = 9 - t * 4 // 7
+            P.rect(x0, y, 15, y, paint if y <= 10 else glass)
+        P.rect(9, 9, 15, 9, hi)
+        P.rect(12, 11, 12, 16, paint)
+        P.rect(7, 11, 8, 12, glint)
+        P.rect(17, 15, 30, 17, paint); P.rect(17, 15, 30, 15, hi)   # bed rail
+        P.rect(18, 16, 29, 17, dark)                       # bed seen over the side
+        P.rect(1, 19, 2, 20, YL)
+        P.rect(29, 18, 30, 19, RD if paint != RD else RDD)
+        P.rect(1, 24, 4, 25, MM); P.rect(27, 24, 30, 25, MM)
+        wheels = (7, 24)
+    for wx in wheels:                                      # wheel wells and tyres
+        for y in range(22, 30):
+            for x in range(wx - 4, wx + 5):
+                if (x - wx) ** 2 + ((y - 26) * 1.15) ** 2 <= 15:
+                    P.px(x, y, BK)
+        P.rect(wx - 1, 25, wx, 27, MM); P.px(wx - 1, 25, ML)   # hub
+    g = [row[:] for row in P.p]
+    for y in range(P.h):                                   # outline the silhouette
+        for x in range(P.w):
+            if g[y][x] and g[y][x] != BK and any(not (0 <= x + dx < P.w and 0 <= y + dy < P.h) or not g[y + dy][x + dx]
+                                                  for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1))):
+                P.px(x, y, O)
+    for x in range(3, 29):
+        if not P.p[30][x]:
+            P.px(x, 30, SH)
     return P.p
 
 
+VEHICLES = {'sedan': ('red', 'white', 'silver', 'black'), 'pickup': ('white', 'green')}
+
+
 def vehicles():
+    """name -> 16x16 grid: '<kind>_<colour>_<w|e>_<col><row>'. Row 1 sits in the lane,
+    row 0 (roof) on the tile above it."""
     out = {}
     paints = {'red': (RD, RDD), 'green': (GN, GND), 'white': (WH, ML), 'black': (BK, O), 'silver': (ML, MM)}
-    for name, (p, d) in paints.items():
-        for kind in ('sedan', 'pickup'):
+    for kind, colours in VEHICLES.items():
+        for name in colours:
+            p, d = paints[name]
             g = car(p, d, kind)
-            out[f'{kind}_{name}_0'] = [row[0:16] for row in g]
-            out[f'{kind}_{name}_1'] = [row[16:32] for row in g]
+            for facing, gg in (('w', g), ('e', [row[::-1] for row in g])):
+                for r in range(2):
+                    for c in range(2):
+                        out[f'{kind}_{name}_{facing}_{c}{r}'] = [row[c * 16:(c + 1) * 16] for row in gg[r * 16:(r + 1) * 16]]
     return out
 
 
@@ -129,5 +162,4 @@ def all_pieces():
     out = {}
     out.update(water_tower())
     out.update(bus_shelter())
-    out.update(vehicles())
     return out

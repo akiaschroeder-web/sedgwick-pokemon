@@ -23,8 +23,8 @@ cv.shed(33, 1, 'charcoal', 'tan')
 cv.place_piece_grid('water_tower', 37, 1, 2, 4)
 
 # cars parked along the north curb lane
-for x, car in ((8, 'sedan_red'), (19, 'pickup_white'), (24, 'sedan_silver'), (33, 'pickup_green')):
-    cv.set(x, 10, f'{car}_0', walk=False); cv.set(x + 1, 10, f'{car}_1', walk=False)
+for x, car, f in ((8, 'sedan_red', 'e'), (19, 'pickup_white', 'e'), (24, 'sedan_silver', 'w'), (33, 'pickup_green', 'e')):
+    cv.car(x, 10, car, f, curb=True)
 
 # bus stop on the south side
 cv.place_piece_grid('bus_shelter', 3, 13, 2, 2)

@@ -174,8 +174,9 @@ def golf():
 
 
 def conservatory():
-    """4 x 3 glass conservatory (props palette): curved glass roof seen from above."""
-    W, H = 64, 48
+    """5 x 3 glass conservatory (props palette): curved glass roof seen from above and a
+    framed glass door centred on the middle column (conservatory_22), resting on the ground."""
+    W, H = 80, 48
     g = [[0] * W for _ in range(H)]
     O, L, M, D, WH = 1, 2, 3, 4, 6
     def r(x0, y0, x1, y1, v):
@@ -192,20 +193,26 @@ def conservatory():
                 v = M
             g[y][x] = v
     r(2, 30, W - 3, 32, D)
-    r(2, 33, W - 3, 44, L)
+    r(2, 33, W - 3, 47, L)
     for x in range(6, W - 6, 6):
-        r(x, 33, x, 44, M)
-    r(27, 35, 36, 44, D)                 # doorway
-    # outline the silhouette
+        if not 33 <= x <= 46:
+            r(x, 33, x, 47, M)
+    # outline the silhouette (the wall runs to the tile bottom, like Pokemon building fronts)
     s = [row[:] for row in g]
     for y in range(H):
         for x in range(W):
             if s[y][x] and any(not (0 <= x + dx < W and 0 <= y + dy < H) or not s[y + dy][x + dx]
                                for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1))):
                 g[y][x] = O
-    r(2, 45, W - 3, 46, 15)
+    # door: dark frame, two glass leaves, open at the bottom so it meets the ground
+    r(34, 34, 45, 47, O)
+    r(35, 35, 44, 47, D)
+    r(36, 36, 39, 44, WH); r(40, 36, 43, 44, WH)
+    r(36, 36, 39, 37, L); r(40, 36, 43, 37, L)
+    r(39, 36, 40, 47, O)
+    r(35, 45, 44, 47, M)                 # kick plates
     return {f'conservatory_{c}{rr}': [row[c * 16:(c + 1) * 16] for row in g[rr * 16:(rr + 1) * 16]]
-            for rr in range(3) for c in range(4)}
+            for rr in range(3) for c in range(5)}
 
 
 def zoo_gate():

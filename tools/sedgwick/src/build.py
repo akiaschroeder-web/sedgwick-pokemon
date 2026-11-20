@@ -130,14 +130,25 @@ def residential():
     asphalt = [[street.asph_px(x, y) for x in range(16)] for y in range(16)]
     for name, g in suburb.all_pieces().items():
         tall_top = name.startswith('water_tower') and name[-1] in '012'
-        under = asphalt if name.startswith(('sedan', 'pickup')) else GRASS_BOTTOM   # parked at the curb
-        ts.add(name, under, P_STREET, g, P_PROPS, layer='NORMAL' if tall_top else 'COVERED')
+        ts.add(name, GRASS_BOTTOM, P_STREET, g, P_PROPS, layer='NORMAL' if tall_top else 'COVERED')
+    add_vehicles(ts, P_STREET, P_PROPS)
     lawn_q = quads(GRASS_BOTTOM)
     for name, qs in church.pieces().items():
         for roof, slot in ROOF_SLOTS.items():
             top = [(q, slot) if q is not None else (None, 0) for q in qs]
             ts.add_q(f'church_{name}_{roof}', [(lq, P_STREET) for lq in lawn_q], top, layer='NORMAL')
     return ts
+
+
+def add_vehicles(ts, p_street, p_props):
+    """Cars/pickups (2x2). Roof row also comes over the curb edge ('_curb') for parking
+    along a street; both rows over plain asphalt for lots."""
+    asphalt = [[street.asph_px(x, y) for x in range(16)] for y in range(16)]
+    curb = street.metatiles()['road_edge_n'][0]
+    for name, g in suburb.vehicles().items():
+        ts.add(name, asphalt, p_street, g, p_props, layer='COVERED')
+        if name.endswith('0'):
+            ts.add(name + '_curb', curb, p_street, g, p_props, layer='COVERED')
 
 
 def add_houses(ts, roof_slots, wall_slots, lawn_slot):
@@ -295,8 +306,9 @@ def commercial_ts():
     return ts
 
 
-def city_ts():
-    ts = Tileset('sedgwick_city')
+def city_ts(name='sedgwick_city', extras=True, landmark=False):
+    """extras: zoo/golf/canal/cemetery pieces. landmark: the Keeper of the Plains (custom/landmark.png)."""
+    ts = Tileset(name)
     P_STREET, P_PROPS, P_NATURE = 6, 7, 8
     ts.palettes[P_STREET] = street.PAL_STREET
     ts.palettes[P_PROPS] = props.PAL_PROPS
@@ -330,7 +342,7 @@ def city_ts():
         ts.add(name, g, P_STREET)
     slot = {'street': P_STREET, 'props': P_PROPS, 'nature': P_NATURE}
     golf = nature.golf()
-    for name, (g, pk, layer, over) in nature.city_pieces().items():
+    for name, (g, pk, layer, over) in (nature.city_pieces() if extras else {}).items():
         if over is None:
             ts.add(name, g, slot[pk], layer=layer)
         elif over == 'water':
@@ -338,9 +350,12 @@ def city_ts():
         elif over == 'golf_green':
             ts.add(name, golf['golf_green'], P_NATURE, g, slot[pk], layer=layer)
         else:
-            ts.add(name, GRASS_BOTTOM, P_STREET, g, slot[pk], layer=layer)
-    pieces, packed, origin = civic.landmark_from_png(
-        os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'custom', 'landmark.png'), plaza)
+            ts.add(name, GRASS_BOTTOM, P_STREET, g, slot[pk], layer=layer,
+                   beh='MB_NON_ANIMATED_DOOR' if name == 'conservatory_22' else 'MB_NORMAL')
+    pieces = None
+    if landmark:
+        pieces, packed, origin = civic.landmark_from_png(
+            os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'custom', 'landmark.png'), plaza)
     if pieces:
         pals, assign = packed
         slots = [9, 10, 11, 12][:len(pals)]
@@ -482,8 +497,7 @@ def retail_ts():
         if name.startswith(('chainlink', 'privacy', 'mailbox', 'rr_')):
             continue
         ts.add(name, GRASS_BOTTOM, P_STREET, top, P_PROPS, layer=layer, beh=beh)
-    for name, g in suburb.vehicles().items():
-        ts.add(name, [[street.asph_px(x, y) for x in range(16)] for y in range(16)], P_STREET, g, P_PROPS, layer='COVERED')
+    add_vehicles(ts, P_STREET, P_PROPS)
     lawn_q = quads(GRASS_BOTTOM)
     base = commercial.BASE_PALS
     for m in commercial.IDS:
@@ -688,12 +702,12 @@ if __name__ == '__main__':
         register_doors(ts, index, walls)
         json.dump(index, open(os.path.join(here, '..', f'{ts.name}_metatiles.json'), 'w'), indent=1)
         print(f'{ts.name}: {ntiles} tiles, {len(ts.metatiles)} metatiles, palettes {sorted(ts.palettes)}')
-    ts = city_ts()
-    ntiles, index = ts.write()
-    register(ts, ntiles)
-    write_labels(ts, index)
-    json.dump(index, open(os.path.join(here, '..', f'{ts.name}_metatiles.json'), 'w'), indent=1)
-    print(f'{ts.name}: {ntiles} tiles, {len(ts.metatiles)} metatiles, palettes {sorted(ts.palettes)}')
+    for ts in (city_ts(), city_ts('sedgwick_confluence', extras=False, landmark=True)):
+        ntiles, index = ts.write()
+        register(ts, ntiles)
+        write_labels(ts, index)
+        json.dump(index, open(os.path.join(here, '..', f'{ts.name}_metatiles.json'), 'w'), indent=1)
+        print(f'{ts.name}: {ntiles} tiles, {len(ts.metatiles)} metatiles, palettes {sorted(ts.palettes)}')
     ts = downtown_ts()
     ntiles, index = ts.write()
     register(ts, ntiles)

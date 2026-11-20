@@ -1618,3 +1618,14 @@ const struct Tileset gTileset_SedgwickAviation =
     .metatileAttributes = gMetatileAttributes_SedgwickAviation,
     .callback = NULL,
 };
+
+const struct Tileset gTileset_SedgwickConfluence =
+{
+    .isCompressed = TRUE,
+    .isSecondary = TRUE,
+    .tiles = gTilesetTiles_SedgwickConfluence,
+    .palettes = gTilesetPalettes_SedgwickConfluence,
+    .metatiles = gMetatiles_SedgwickConfluence,
+    .metatileAttributes = gMetatileAttributes_SedgwickConfluence,
+    .callback = NULL,
+};

@@ -4,7 +4,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from compose import Canvas, write_map
 
 W, H = 40, 32
-cv = Canvas(W, H, tileset='sedgwick_city')
+cv = Canvas(W, H, tileset='sedgwick_confluence')
 
 # Arkansas River (E-W): bank row 17, water 18-21, bank row 22
 for x in range(W):
@@ -30,7 +30,7 @@ for r in range(6):
 # the project's own landmark sprite, centred on the plaza (see custom/README.txt)
 import json
 lay_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'custom', 'landmark_layout.json')
-if os.path.exists(lay_path) and 'landmark_0_5' in cv.ids or any(k.startswith('landmark_') for k in cv.ids):
+if os.path.exists(lay_path) and any(k.startswith('landmark_') for k in cv.ids):
     lay = json.load(open(lay_path))
     ox, oy = lay['origin']
     for name in lay['pieces']:
@@ -72,5 +72,5 @@ for i, name in enumerate(rows):
     cv.set(28, 24 + i, 'asphalt'); cv.set(29, 24 + i, f'ovp_e_{name[2:]}')
 
 mid = write_map(cv, 'SedgwickCityDemo', 'LAYOUT_SEDGWICK_CITY_DEMO', 'Sedgwick city demo',
-                secondary='gTileset_SedgwickCity')
+                secondary='gTileset_SedgwickConfluence')
 print(mid)

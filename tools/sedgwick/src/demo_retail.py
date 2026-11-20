@@ -15,9 +15,8 @@ for y in range(6, 20):
 for x in range(1, 16):
     cv.set(x, 8, 'lot_stalls_n'); cv.set(x, 11, 'lot_stalls_s'); cv.set(x, 12, 'lot_stalls_n'); cv.set(x, 15, 'lot_stalls_s')
     cv.set(x, 16, 'lot_stalls_n')
-for x, car in ((2, 'sedan_red'), (6, 'pickup_white'), (11, 'sedan_black'), (4, 'sedan_silver')):
-    y = 8 if x != 4 else 12
-    cv.set(x, y, f'{car}_0', walk=False); cv.set(x + 1, y, f'{car}_1', walk=False)
+for x, y, car, f in ((2, 10, 'sedan_red', 'w'), (6, 10, 'pickup_white', 'e'), (11, 10, 'sedan_black', 'w'), (4, 14, 'sedan_silver', 'e')):
+    cv.car(x, y, car, f)
 cv.set(8, 20, 'drive_apron_l'); cv.set(9, 20, 'drive_apron_r')
 
 # fast food

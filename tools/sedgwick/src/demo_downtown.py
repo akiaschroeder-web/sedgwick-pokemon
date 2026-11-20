@@ -39,7 +39,7 @@ cv.place_ids(downtown.tan_plan(9, 1), 37, 20, 'rb_{:03x}', doors={downtown.TAN_D
 for r in range(5):
     for c in range(8):
         cv.set(37 + c, 26 + r, f'field_{c}{r}')
-for x in (5, 24, 44):
+for x in (5, 24, 36):
     cv.tall(x, 14, 'streetlight')
 
 mid = write_map(cv, 'SedgwickDowntownDemo', 'LAYOUT_SEDGWICK_DOWNTOWN_DEMO', 'Sedgwick downtown demo',

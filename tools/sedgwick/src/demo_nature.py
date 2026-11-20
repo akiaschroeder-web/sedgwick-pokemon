@@ -43,7 +43,8 @@ for r, y in enumerate(range(13, 18, 2)):
         cv.set(x, y, 'cross_stone' if (x + r) % 4 == 1 else 'headstone', walk=False)
 
 # botanical conservatory and zoo gate
-cv.place_piece_grid('conservatory', 7, 13, 4, 3)
+cv.place_piece_grid('conservatory', 7, 13, 5, 3)
+cv.set(9, 15, 'conservatory_22', walk=True)      # door
 cv.place_piece_grid('zoo_gate', 34, 13, 3, 2)
 
 # windbreak along the south edge

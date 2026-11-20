@@ -189,6 +189,13 @@ class Canvas:
         self.set(x, y_street_edge, 'drive_apron_l')
         self.set(x + 1, y_street_edge, 'drive_apron_r')
 
+    def car(self, x, y, name, facing='w', curb=False):
+        """Parked 2x2 vehicle: wheels in row y (the lane), roof in row y-1.
+        curb=True when row y-1 is the street's north edge."""
+        for c in range(2):
+            self.set(x + c, y - 1, f'{name}_{facing}_{c}0' + ('_curb' if curb else ''), walk=False)
+            self.set(x + c, y, f'{name}_{facing}_{c}1', walk=False)
+
     def tall(self, x, y, base):
         """Two-tile prop: base_top at y-1, base_bottom at y."""
         self.set(x, y - 1, base + '_top', walk=False)
