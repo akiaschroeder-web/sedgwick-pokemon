@@ -37,12 +37,15 @@ class Source:
             if self.frlg:
                 a = struct.unpack('<I', self.atS[i * 4:i * 4 + 4])[0]
                 layer = (a >> 29) & 3
+                self.last_beh = None          # FRLG behaviours use a different numbering
             else:
                 a = struct.unpack('<H', self.atS[i * 2:i * 2 + 2])[0]
                 layer = (a >> 12) & 0xF
+                self.last_beh = a & 0xFF
         else:
             e = struct.unpack('<8H', self.mtP[m * 16:m * 16 + 16])
             layer = 0
+            self.last_beh = 0
         return e, layer
 
     def quad_rgb(self, v):
@@ -120,3 +123,32 @@ def pack(pieces, max_colors=15):
 def index_quad(g, pal):
     lut = {c: i for i, c in enumerate(pal) if i}
     return [[0 if c is None else lut[c] for c in row] for row in g]
+
+
+def piece_indexed(src, m, palmap, ground_pals=()):
+    """Like Source.piece but keeps the original 4bpp indices: each quad becomes
+    (8x8 index grid, our palette slot) using palmap {source palette: our slot}.
+    Ground palettes become 'LAWN'. Use when a source palette is copied whole."""
+    e, layer = src.entries(m)
+    def grid(v):
+        t, hf, vf, pl = v & 0x3ff, v >> 10 & 1, v >> 11 & 1, v >> 12
+        g = src.tp[t] if t < src.NT else src.ts[t - src.NT]
+        g = [list(r) for r in g]
+        if hf:
+            g = [r[::-1] for r in g]
+        if vf:
+            g = g[::-1]
+        return g, pl
+    bottom, top = [], []
+    for q in range(4):
+        tg, tp = grid(e[4 + q])
+        top_empty = all(v == 0 for r in tg for v in r)
+        top_opaque = all(v != 0 for r in tg for v in r)
+        bg, bp = grid(e[q])
+        if top_opaque or bp in ground_pals:
+            bottom.append('LAWN')
+        else:
+            bottom.append((bg, palmap[bp]))
+        top.append(None if top_empty else (tg, palmap[tp]))
+    return dict(bottom=bottom, top=top, layer=['NORMAL', 'COVERED', 'SPLIT'][min(layer, 2)],
+                beh=getattr(src, 'last_beh', 0) or 0)

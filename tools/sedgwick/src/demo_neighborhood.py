@@ -4,7 +4,7 @@ import os, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from compose import Canvas, write_map
 
-W, H = 38, 28
+W, H = 38, 30
 cv = Canvas(W, H)
 
 # --- streets
@@ -43,8 +43,9 @@ for x in range(1, 7):
     cv.set(x, 1, 'chainlink_h', walk=False)
 for x in range(8, 14):
     cv.set(x, 1, 'privacy_h', walk=False)
-for x in (4, 12, 20, 28, 36):
+for x in (4, 10, 26, 32):
     cv.tall(x, 25, 'power_pole')
+cv.church(14, 23, width=8, roof='charcoal', wall='white')
 
 mid = write_map(cv, 'SedgwickDemo', 'LAYOUT_SEDGWICK_DEMO', 'Sedgwick demo')
 print(mid, W, H, len(cv.signs), 'mailboxes')

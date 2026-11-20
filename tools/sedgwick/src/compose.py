@@ -101,6 +101,39 @@ class Canvas:
                 self.signs.append((mx, my, address))
         return garage_cols, door, y + len(rows) - 1
 
+    def church(self, x, y, width=8, roof='charcoal', wall='white'):
+        """Two-storey Pallet-style body with a centred steeple; (x, y) is the top of
+        the steeple, the house roof starts two rows lower. Returns the door position."""
+        import house2
+        rows = house2.plan(width, 2, None, windows=width)
+        # centre the door under the steeple, windows either side
+        inner = width - 2
+        door_col = width // 2 - 1
+        lower = ['wall_l'] + ['wall_sid'] * inner + ['wall_r']
+        lower[door_col] = 'wall_door'
+        i = 1
+        while i + 1 < door_col:
+            lower[i], lower[i + 1] = 'wall_win_a', 'wall_win_b'
+            i += 2
+        i = door_col + 1
+        while i + 1 < width - 1:
+            lower[i], lower[i + 1] = 'wall_win_a', 'wall_win_b'
+            i += 2
+        rows[-1] = lower
+        door = None
+        for r, row in enumerate(rows):
+            for c, piece in enumerate(row):
+                variant = roof if piece.startswith('roof') else wall
+                walk = piece == 'wall_door'
+                self.set(x + c, y + 2 + r, f'h_{piece}_{variant}', walk=walk)
+                if walk:
+                    door = (x + c, y + 2 + r)
+        sx = x + width // 2 - 1
+        for r in range(4):
+            for c in range(2):
+                self.set(sx + c, y + r, f'church_steeple_{c}{r}_{roof}', walk=False)
+        return door
+
     def driveway(self, x, y_top, y_street_edge):
         for y in range(y_top, y_street_edge):
             self.set(x, y, 'drive_l')
@@ -141,6 +174,16 @@ class Canvas:
                 if walk:
                     doors_xy.append((x + c, y + r))
         return y + len(rows) - 1, doors_xy
+
+    def place_ids(self, rows, x, y, fmt, doors=()):
+        """Place a grid of source metatile ids (None = leave the ground) using a name
+        format such as 'rb_{:03x}'. Door ids are walkable; everything else blocks."""
+        for r, row in enumerate(rows):
+            for c, m in enumerate(row):
+                if m is None:
+                    continue
+                self.set(x + c, y + r, fmt.format(m), walk=m in doors)
+        return y + len(rows) - 1
 
     def block(self, prefix, x, y, walk=False):
         """Place a multi-tile building whose pieces are named prefix_<col><row>."""

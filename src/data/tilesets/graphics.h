@@ -3039,7 +3039,7 @@ const u32 gTilesetTiles_General_Frlg[] = INCGFX_U32("data/tilesets/primary/gener
 
 #endif // IS_FRLG
 
-const u32 gTilesetTiles_SedgwickResidential[] = INCGFX_U32("data/tilesets/secondary/sedgwick_residential/tiles.png", ".4bpp.fastSmol", "-num_tiles 322 -Wnum_tiles");
+const u32 gTilesetTiles_SedgwickResidential[] = INCGFX_U32("data/tilesets/secondary/sedgwick_residential/tiles.png", ".4bpp.fastSmol", "-num_tiles 347 -Wnum_tiles");
 
 const u16 gTilesetPalettes_SedgwickResidential[][16] =
 {
@@ -3125,4 +3125,26 @@ const u16 gTilesetPalettes_SedgwickCity[][16] =
     INCGFX_U16("data/tilesets/secondary/sedgwick_city/palettes/13.pal", ".gbapal"),
     INCGFX_U16("data/tilesets/secondary/sedgwick_city/palettes/14.pal", ".gbapal"),
     INCGFX_U16("data/tilesets/secondary/sedgwick_city/palettes/15.pal", ".gbapal"),
+};
+
+const u32 gTilesetTiles_SedgwickDowntown[] = INCGFX_U32("data/tilesets/secondary/sedgwick_downtown/tiles.png", ".4bpp.fastSmol", "-num_tiles 355 -Wnum_tiles");
+
+const u16 gTilesetPalettes_SedgwickDowntown[][16] =
+{
+    INCGFX_U16("data/tilesets/secondary/sedgwick_downtown/palettes/00.pal", ".gbapal"),
+    INCGFX_U16("data/tilesets/secondary/sedgwick_downtown/palettes/01.pal", ".gbapal"),
+    INCGFX_U16("data/tilesets/secondary/sedgwick_downtown/palettes/02.pal", ".gbapal"),
+    INCGFX_U16("data/tilesets/secondary/sedgwick_downtown/palettes/03.pal", ".gbapal"),
+    INCGFX_U16("data/tilesets/secondary/sedgwick_downtown/palettes/04.pal", ".gbapal"),
+    INCGFX_U16("data/tilesets/secondary/sedgwick_downtown/palettes/05.pal", ".gbapal"),
+    INCGFX_U16("data/tilesets/secondary/sedgwick_downtown/palettes/06.pal", ".gbapal"),
+    INCGFX_U16("data/tilesets/secondary/sedgwick_downtown/palettes/07.pal", ".gbapal"),
+    INCGFX_U16("data/tilesets/secondary/sedgwick_downtown/palettes/08.pal", ".gbapal"),
+    INCGFX_U16("data/tilesets/secondary/sedgwick_downtown/palettes/09.pal", ".gbapal"),
+    INCGFX_U16("data/tilesets/secondary/sedgwick_downtown/palettes/10.pal", ".gbapal"),
+    INCGFX_U16("data/tilesets/secondary/sedgwick_downtown/palettes/11.pal", ".gbapal"),
+    INCGFX_U16("data/tilesets/secondary/sedgwick_downtown/palettes/12.pal", ".gbapal"),
+    INCGFX_U16("data/tilesets/secondary/sedgwick_downtown/palettes/13.pal", ".gbapal"),
+    INCGFX_U16("data/tilesets/secondary/sedgwick_downtown/palettes/14.pal", ".gbapal"),
+    INCGFX_U16("data/tilesets/secondary/sedgwick_downtown/palettes/15.pal", ".gbapal"),
 };

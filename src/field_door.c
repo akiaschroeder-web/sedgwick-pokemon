@@ -320,6 +320,10 @@ static const u8 sDoorAnimPalettes_GeneralFrlg[] = {2, 2, 2, 2, 2, 2, 2, 2};
 static const u8 sDoorAnimPalettes_SlidingSingle[] = {3, 3, 3, 3, 3, 3, 3, 3};
 static const u8 sDoorAnimPalettes_SlidingDouble[] = {3, 3, 3, 3, 3, 3, 3, 3};
 static const u8 sDoorAnimPalettes_Pallet[] = {8, 8, 8, 8, 8, 8, 8, 8};
+// Sedgwick door palettes (downtown): SedgwickDowntown
+static const u8 sDoorAnimPalettes_SedgwickSedgwickDowntown_RustboroGray[] = {8, 8, 8, 8, 8, 8, 8, 8};
+static const u8 sDoorAnimPalettes_SedgwickSedgwickDowntown_RustboroTan[] = {9, 9, 9, 9, 9, 9, 9, 9};
+// end Sedgwick door palettes (downtown): SedgwickDowntown
 // Sedgwick storefront door palettes
 static const u8 sDoorAnimPalettes_SedgwickStorefront_Mint[] = {8, 8, 8, 8, 8, 8, 8, 8};
 static const u8 sDoorAnimPalettes_SedgwickStorefront_Brick[] = {8, 8, 8, 8, 8, 8, 8, 8};
@@ -1109,6 +1113,32 @@ static const struct DoorGraphics sDoorAnimGraphicsTable[] =
         .palettes = sDoorAnimPalettes_SedgwickStorefront_Beige
     },
     // end Sedgwick storefront doors: SedgwickCommercial
+    // Sedgwick doors: SedgwickDowntown
+    {
+        .metatileNum = METATILE_SedgwickDowntown_Rb21f,
+        .tileset = &gTileset_SedgwickDowntown,
+        .sound = DOOR_SOUND_NORMAL,
+        .size = DOOR_SIZE_1x2,
+        .tiles = sDoorAnimTiles_RustboroGray,
+        .palettes = sDoorAnimPalettes_SedgwickSedgwickDowntown_RustboroGray
+    },
+    {
+        .metatileNum = METATILE_SedgwickDowntown_Rb22f,
+        .tileset = &gTileset_SedgwickDowntown,
+        .sound = DOOR_SOUND_NORMAL,
+        .size = DOOR_SIZE_1x2,
+        .tiles = sDoorAnimTiles_RustboroTan,
+        .palettes = sDoorAnimPalettes_SedgwickSedgwickDowntown_RustboroTan
+    },
+    {
+        .metatileNum = METATILE_SedgwickDowntown_Bf28a,
+        .tileset = &gTileset_SedgwickDowntown,
+        .sound = DOOR_SOUND_NORMAL,
+        .size = DOOR_SIZE_1x2,
+        .tiles = sDoorAnimTiles_BattleDome,
+        .palettes = sDoorAnimPalettes_BattleDome
+    },
+    // end Sedgwick doors: SedgwickDowntown
     {},
 };
 

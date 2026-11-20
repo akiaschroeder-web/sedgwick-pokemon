@@ -6,7 +6,7 @@ name -> metatile id index (JSON + C header) for the map generator.
 import json, os, struct, sys
 from PIL import Image
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import lib, street, house2, props, wheat, rural, farm2, commercial, gas, orig, civic
+import lib, street, house2, props, wheat, rural, farm2, commercial, gas, orig, civic, downtown, church
 
 EXP = lib.EXP
 NUM_PRIMARY_TILES = 512
@@ -67,7 +67,7 @@ class Tileset:
             g, p = item
             return self.tile_ref(g, p) if g is not None else 0
         e = [ref(i) for i in bottom] + [ref(i) for i in top]
-        attr = BEHAVIOR[beh] | (LAYER[layer] << 12)
+        attr = (beh if isinstance(beh, int) else BEHAVIOR[beh]) | (LAYER[layer] << 12)
         self.metatiles.append((name, e, attr))
 
     def write(self):
@@ -127,6 +127,11 @@ def residential():
     for name, (top, layer, beh) in props.metatiles().items():
         ts.add(name, GRASS_BOTTOM, P_STREET, top, P_PROPS, layer=layer, beh=beh)
     add_houses(ts, ROOF_SLOTS, WALL_SLOTS, P_STREET)
+    lawn_q = quads(GRASS_BOTTOM)
+    for name, qs in church.pieces().items():
+        for roof, slot in ROOF_SLOTS.items():
+            top = [(q, slot) if q is not None else (None, 0) for q in qs]
+            ts.add_q(f'church_{name}_{roof}', [(lq, P_STREET) for lq in lawn_q], top, layer='NORMAL')
     return ts
 
 
@@ -335,6 +340,97 @@ def city_ts():
     return ts
 
 
+DT_CEL = {'brick': 11, 'beige': 12}
+
+
+def downtown_ts():
+    ts = Tileset('sedgwick_downtown')
+    P_STREET, P_PROPS = 6, 7
+    ts.palettes[P_STREET] = street.PAL_STREET
+    ts.palettes[P_PROPS] = props.PAL_PROPS
+    ts.palettes[downtown.SLOT_GRAY] = downtown.PAL_GRAY
+    ts.palettes[downtown.SLOT_TAN] = downtown.PAL_TAN
+    ts.palettes[10] = commercial.BASE_PALS[commercial.OTHER_PAL]
+    for v, slot in DT_CEL.items():
+        ts.palettes[slot] = commercial.wall_palette(v)
+    ts.add('lawn', GRASS_BOTTOM, P_STREET)
+    for name, (g, beh) in street.metatiles().items():
+        if name.startswith(('culdesac', 'bend', 'diag', 'drive')):
+            continue
+        ts.add(name, g, P_STREET, beh=beh)
+    for name, (top, layer, beh) in props.metatiles().items():
+        if name.startswith(('chainlink', 'privacy', 'mailbox', 'power_pole', 'rr_')):
+            continue
+        ts.add(name, GRASS_BOTTOM, P_STREET, top, P_PROPS, layer=layer, beh=beh)
+    lawn_q = quads(GRASS_BOTTOM)
+    def add_indexed(name, p):
+        bottom = [(lawn_q[q], P_STREET) if b == 'LAWN' else b for q, b in enumerate(p['bottom'])]
+        top = [(None, 0) if t is None else t for t in p['top']]
+        ts.add_q(name, bottom, top, layer=p['layer'], beh=p['beh'])
+    for m in downtown.all_rb_ids():
+        add_indexed(f'rb_{m:03x}', downtown.rb_piece(m))
+    for m in sorted({m for row in downtown.ARENA for m in row if m}):
+        add_indexed(f'bf_{m:03x}', downtown.bf_piece(m))
+    for name, g in downtown.sports_field().items():
+        ts.add(name, GRASS_BOTTOM, P_STREET, g, P_PROPS, layer='COVERED')
+    base = commercial.BASE_PALS
+    for m in commercial.IDS:
+        p = commercial.PIECES[m]
+        for v, wslot in DT_CEL.items():
+            def conv(g, q):
+                if g == 'LAWN':
+                    return (lawn_q[q], P_STREET)
+                if g is None:
+                    return (None, 0)
+                pi = commercial.quad_palette(g)
+                return (orig.index_quad(g, base[pi]), wslot if pi == commercial.WALL_PAL else 10)
+            ts.add_q(f'cel_{m:03x}_{v}', [conv(g, q) for q, g in enumerate(p['bottom'])],
+                     [conv(g, q) for q, g in enumerate(p['top'])], layer=p['layer'],
+                     beh='MB_ANIMATED_DOOR' if m == commercial.DOOR else 'MB_NORMAL')
+    return ts
+
+
+def register_downtown_doors(ts):
+    """Rustboro tower/tan doors and the Battle Dome door keep their own animations."""
+    C = camel(ts.name)
+    path = f'{EXP}/src/field_door.c'
+    s = open(path).read()
+    entries = [(f'rb_{downtown.TOWER_DOOR:03x}', 'RustboroGray', [downtown.SLOT_GRAY] * 8),
+               (f'rb_{downtown.TAN_DOOR:03x}', 'RustboroTan', [downtown.SLOT_TAN] * 8),
+               ('bf_28a', 'BattleDome', None)]
+    pals = ''
+    body = ''
+    for name, gfx, slots in entries:
+        if slots:
+            pname = f'sDoorAnimPalettes_Sedgwick{C}_{gfx}'
+            pals += f'static const u8 {pname}[] = {{{", ".join(map(str, slots))}}};\n'
+        else:
+            pname = f'sDoorAnimPalettes_{gfx}'
+        body += ('    {\n'
+                 f'        .metatileNum = METATILE_{C}_{camel(name)},\n'
+                 f'        .tileset = &gTileset_{C},\n'
+                 '        .sound = DOOR_SOUND_NORMAL,\n'
+                 '        .size = DOOR_SIZE_1x2,\n'
+                 f'        .tiles = sDoorAnimTiles_{gfx},\n'
+                 f'        .palettes = {pname}\n'
+                 '    },\n')
+    start, end = f'    // Sedgwick doors: {C}\n', f'    // end Sedgwick doors: {C}\n'
+    block = start + body + end
+    if start in s:
+        a = s.index(start); b = s.index(end) + len(end); s = s[:a] + block + s[b:]
+    else:
+        t = s.index('    {},\n};', s.index('sDoorAnimGraphicsTable[] ='))
+        s = s[:t] + block + s[t:]
+    pstart, pend = f'// Sedgwick door palettes (downtown): {C}\n', f'// end Sedgwick door palettes (downtown): {C}\n'
+    pblock = pstart + pals + pend
+    if pstart in s:
+        a = s.index(pstart); b = s.index(pend) + len(pend); s = s[:a] + pblock + s[b:]
+    else:
+        anchor = 'static const u8 sDoorAnimPalettes_Pallet[] = {8, 8, 8, 8, 8, 8, 8, 8};\n'
+        s = s.replace(anchor, anchor + pblock)
+    open(path, 'w').write(s)
+
+
 def register_cel_doors(ts):
     """Door animation for the Celadon-style storefront door in each wall colour."""
     C = camel(ts.name)
@@ -442,6 +538,13 @@ if __name__ == '__main__':
     ntiles, index = ts.write()
     register(ts, ntiles)
     write_labels(ts, index)
+    json.dump(index, open(os.path.join(here, '..', f'{ts.name}_metatiles.json'), 'w'), indent=1)
+    print(f'{ts.name}: {ntiles} tiles, {len(ts.metatiles)} metatiles, palettes {sorted(ts.palettes)}')
+    ts = downtown_ts()
+    ntiles, index = ts.write()
+    register(ts, ntiles)
+    write_labels(ts, index)
+    register_downtown_doors(ts)
     json.dump(index, open(os.path.join(here, '..', f'{ts.name}_metatiles.json'), 'w'), indent=1)
     print(f'{ts.name}: {ntiles} tiles, {len(ts.metatiles)} metatiles, palettes {sorted(ts.palettes)}')
     ts = commercial_ts()
