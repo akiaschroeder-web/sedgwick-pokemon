@@ -3105,7 +3105,7 @@ const u16 gTilesetPalettes_SedgwickCommercial[][16] =
     INCGFX_U16("data/tilesets/secondary/sedgwick_commercial/palettes/15.pal", ".gbapal"),
 };
 
-const u32 gTilesetTiles_SedgwickCity[] = INCGFX_U32("data/tilesets/secondary/sedgwick_city/tiles.png", ".4bpp.fastSmol", "-num_tiles 425 -Wnum_tiles");
+const u32 gTilesetTiles_SedgwickCity[] = INCGFX_U32("data/tilesets/secondary/sedgwick_city/tiles.png", ".4bpp.fastSmol", "-num_tiles 348 -Wnum_tiles");
 
 const u16 gTilesetPalettes_SedgwickCity[][16] =
 {
