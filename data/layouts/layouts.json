@@ -9323,6 +9323,17 @@
       "border_filepath": "data/layouts/OneIsland_KindleRoad_EmberSpa_Frlg/border.bin",
       "blockdata_filepath": "data/layouts/OneIsland_KindleRoad_EmberSpa_Frlg/map.bin",
       "layout_version": "frlg"
+    },
+    {
+      "id": "LAYOUT_SEDGWICK_DEMO",
+      "name": "SedgwickDemo_Layout",
+      "width": 36,
+      "height": 27,
+      "primary_tileset": "gTileset_General",
+      "secondary_tileset": "gTileset_SedgwickResidential",
+      "border_filepath": "data/layouts/SedgwickDemo/border.bin",
+      "blockdata_filepath": "data/layouts/SedgwickDemo/map.bin",
+      "layout_version": "emerald"
     }
   ]
 }

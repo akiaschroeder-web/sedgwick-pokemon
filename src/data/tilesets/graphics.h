@@ -3039,7 +3039,7 @@ const u32 gTilesetTiles_General_Frlg[] = INCGFX_U32("data/tilesets/primary/gener
 
 #endif // IS_FRLG
 
-const u32 gTilesetTiles_SedgwickResidential[] = INCGFX_U32("data/tilesets/secondary/sedgwick_residential/tiles.png", ".4bpp.fastSmol", "-num_tiles 358 -Wnum_tiles");
+const u32 gTilesetTiles_SedgwickResidential[] = INCGFX_U32("data/tilesets/secondary/sedgwick_residential/tiles.png", ".4bpp.fastSmol", "-num_tiles 357 -Wnum_tiles");
 
 const u16 gTilesetPalettes_SedgwickResidential[][16] =
 {
