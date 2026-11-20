@@ -320,7 +320,7 @@ static const u8 sDoorAnimPalettes_SlidingSingle[] = {3, 3, 3, 3, 3, 3, 3, 3};
 static const u8 sDoorAnimPalettes_SlidingDouble[] = {3, 3, 3, 3, 3, 3, 3, 3};
 static const u8 sDoorAnimPalettes_Pallet[] = {8, 8, 8, 8, 8, 8, 8, 8};
 // Sedgwick door palettes: SedgwickRural
-static const u8 sDoorAnimPalettes_SedgwickHouse_SedgwickRural_White[] = {11, 11, 11, 11, 11, 11, 11, 11};
+static const u8 sDoorAnimPalettes_SedgwickHouse_SedgwickRural_White[] = {10, 10, 10, 10, 10, 10, 10, 10};
 // end Sedgwick door palettes: SedgwickRural
 // Sedgwick door palettes: SedgwickResidential
 static const u8 sDoorAnimPalettes_SedgwickHouse_SedgwickResidential_White[] = {11, 11, 11, 11, 11, 11, 11, 11};

@@ -3061,7 +3061,7 @@ const u16 gTilesetPalettes_SedgwickResidential[][16] =
     INCGFX_U16("data/tilesets/secondary/sedgwick_residential/palettes/15.pal", ".gbapal"),
 };
 
-const u32 gTilesetTiles_SedgwickRural[] = INCGFX_U32("data/tilesets/secondary/sedgwick_rural/tiles.png", ".4bpp.fastSmol", "-num_tiles 377 -Wnum_tiles");
+const u32 gTilesetTiles_SedgwickRural[] = INCGFX_U32("data/tilesets/secondary/sedgwick_rural/tiles.png", ".4bpp.fastSmol", "-num_tiles 368 -Wnum_tiles");
 
 const u16 gTilesetPalettes_SedgwickRural[][16] =
 {
