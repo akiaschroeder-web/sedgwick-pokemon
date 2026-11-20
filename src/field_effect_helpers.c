@@ -14,6 +14,7 @@
 #include "wild_encounter_ow.h"
 #include "constants/event_objects.h"
 #include "constants/field_effects.h"
+#include "constants/metatile_behaviors.h"
 #include "constants/rgb.h"
 #include "constants/songs.h"
 #include "constants/species.h"
@@ -431,13 +432,25 @@ void UpdateShadowFieldEffect(struct Sprite *sprite)
 #define sCurrentMap  data[5]
 #define sObjectMoved data[7]
 
+extern const struct SpritePalette gSpritePalette_WheatGrass;
+extern const struct SpriteTemplate gFieldEffectObjectTemplate_WheatGrass;
+
 u32 FldEff_TallGrass(void)
 {
     u8 spriteId;
     s16 x = gFieldEffectArguments[0];
     s16 y = gFieldEffectArguments[1];
+    const struct SpriteTemplate *template = gFieldEffectObjectTemplatePointers[FLDEFFOBJ_TALL_GRASS];
+
+    // Wheat fields reuse all tall grass logic but draw a golden rustle
+    if (MapGridGetMetatileBehaviorAt(x, y) == MB_TALL_WHEAT)
+    {
+        FieldEffect_LoadFadedPalette((struct SpritePalette *)&gSpritePalette_WheatGrass, COLOR_MAP_DARK_CONTRAST);
+        template = &gFieldEffectObjectTemplate_WheatGrass;
+    }
+
     SetSpritePosToOffsetMapCoords(&x, &y, 8, 8);
-    spriteId = CreateSpriteAtEndUnchecked(gFieldEffectObjectTemplatePointers[FLDEFFOBJ_TALL_GRASS], x, y, 0);
+    spriteId = CreateSpriteAtEndUnchecked(template, x, y, 0);
     if (spriteId != MAX_SPRITES)
     {
         struct Sprite *sprite = &gSprites[spriteId];

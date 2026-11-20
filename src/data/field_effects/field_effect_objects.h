@@ -137,6 +137,22 @@ const struct SpriteTemplate gFieldEffectObjectTemplate_TallGrass = {
     .callback = UpdateTallGrassFieldEffect,
 };
 
+// Sedgwick County: golden version of the tall grass rustle, used on MB_TALL_WHEAT
+const struct SpritePalette gSpritePalette_WheatGrass = {gFieldEffectObjectPalette_WheatGrass, FLDEFF_PAL_TAG_WHEAT_GRASS};
+
+static const struct SpriteFrameImage sPicTable_WheatGrass[] = {
+    overworld_ascending_frames(gFieldEffectObjectPic_WheatGrass, 2, 2),
+};
+
+const struct SpriteTemplate gFieldEffectObjectTemplate_WheatGrass = {
+    .tileTag = TAG_NONE,
+    .paletteTag = FLDEFF_PAL_TAG_WHEAT_GRASS,
+    .oam = &gObjectEventBaseOam_16x16,
+    .anims = sAnimTable_TallGrass,
+    .images = sPicTable_WheatGrass,
+    .callback = UpdateTallGrassFieldEffect,
+};
+
 static const struct SpriteFrameImage sPicTable_Ripple[] = {
     overworld_ascending_frames(gFieldEffectObjectPic_Ripple, 2, 2),
 };
