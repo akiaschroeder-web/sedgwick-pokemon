@@ -187,6 +187,7 @@ gStdScripts_End::
 	.include "data/maps/Underwater_Route129/scripts.inc"
 	.include "data/maps/Underwater_Route105/scripts.inc"
 	.include "data/maps/Underwater_Route125/scripts.inc"
+	.include "data/maps/SedgwickCityDemo/scripts.inc"
 	.include "data/maps/SedgwickCommercialDemo/scripts.inc"
 	.include "data/maps/SedgwickRuralDemo/scripts.inc"
 	.include "data/maps/SedgwickDemo/scripts.inc"

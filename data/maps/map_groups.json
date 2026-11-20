@@ -1165,6 +1165,7 @@
   "gMapGroup_Sedgwick": [
     "SedgwickDemo",
     "SedgwickRuralDemo",
-    "SedgwickCommercialDemo"
+    "SedgwickCommercialDemo",
+    "SedgwickCityDemo"
   ]
 }
