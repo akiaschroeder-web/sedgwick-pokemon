@@ -20,6 +20,8 @@ class Canvas:
         self.ids['water'] = 0x170          # Hoenn calm water from the primary tileset
         self.cells = [[('lawn', True)] * w for _ in range(h)]
         self.signs = []   # (x, y, text)
+        self.warps = []   # (x, y, dest_map, dest_warp_id)
+        self.tileset = tileset
 
     def set(self, x, y, name, walk=True):
         if name.startswith('prim:'):           # raw Emerald primary metatile, e.g. 'prim:1d4' (Hoenn tree)
@@ -168,7 +170,7 @@ class Canvas:
         rows = aviation.hangar_plan(width, door_width, roof_rows)
         for r, row in enumerate(rows):
             for c, piece in enumerate(row):
-                self.set(x + c, y + r, f'{prefix}_{piece}', walk=False)
+                self.set(x + c, y + r, f'{prefix}_{piece}', walk=piece in aviation.WALK_IN)
         return y + len(rows) - 1
 
     def tree_row(self, x0, x1, y):
@@ -247,6 +249,28 @@ class Canvas:
                 c, r = int(name[-2]), int(name[-1])
                 self.set(x + c, y + r, name, walk=walk)
 
+    # ---- doors
+    def door_cells(self, x0, y0, x1, y1):
+        """Cells in the rectangle whose metatile has a door behaviour (read from the built tileset)."""
+        at = open(f'{EXP}/data/tilesets/secondary/{self.tileset}/metatile_attributes.bin', 'rb').read()
+        out = []
+        for y in range(max(0, y0), min(self.h, y1 + 1)):
+            for x in range(max(0, x0), min(self.w, x1 + 1)):
+                name = self.cells[y][x][0]
+                if name.startswith('prim:') or name == 'water':
+                    continue
+                i = self.ids[name] - 512
+                if 0 <= i and struct.unpack('<H', at[i * 2:i * 2 + 2])[0] & 0xFF in (0x60, 0x69):
+                    out.append((x, y))
+        return out
+
+    def link_doors(self, x0, y0, x1, y1, dest_map, dest_warp=0):
+        """Every door in the rectangle warps into dest_map (its mats send the player back here)."""
+        cells = self.door_cells(x0, y0, x1, y1)
+        for x, y in cells:
+            self.warps.append((x, y, dest_map, dest_warp))
+        return cells
+
     # ---- output
     def blockdata(self):
         out = bytearray()
@@ -292,7 +316,9 @@ def write_map(cv, map_name, layout_id, title, group='gMapGroup_Sedgwick', second
           'requires_flash': False, 'weather': 'WEATHER_SUNNY', 'map_type': 'MAP_TYPE_TOWN',
           'allow_cycling': True, 'allow_escaping': False, 'allow_running': True,
           'show_map_name': True, 'battle_scene': 'MAP_BATTLE_SCENE_NORMAL', 'connections': None,
-          'object_events': [], 'warp_events': [], 'coord_events': [], 'bg_events': bg}
+          'object_events': [],
+          'warp_events': [{'x': x, 'y': y, 'elevation': 0, 'dest_map': m, 'dest_warp_id': str(w)} for x, y, m, w in cv.warps],
+          'coord_events': [], 'bg_events': bg}
     json.dump(mj, open(f'{mdir}/map.json', 'w'), indent=2)
     open(f'{mdir}/scripts.inc', 'w').write(''.join(scripts))
 

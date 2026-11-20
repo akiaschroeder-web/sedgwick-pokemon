@@ -42,6 +42,8 @@ for r in range(5):
 for x in (5, 24, 36):
     cv.tall(x, 14, 'streetlight')
 
+# doors into the batch-5 interiors (interiors.py)
+cv.link_doors(19, 22, 29, H - 1, 'MAP_SEDGWICK_SCHOOL')
 mid = write_map(cv, 'SedgwickDowntownDemo', 'LAYOUT_SEDGWICK_DOWNTOWN_DEMO', 'Sedgwick downtown demo',
                 secondary='gTileset_SedgwickDowntown')
 print(mid)

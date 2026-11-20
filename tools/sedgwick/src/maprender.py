@@ -12,6 +12,8 @@ def ts_dir(sym):
     s=re.sub(r'(?<!^)(?<!_)(?=[A-Z])','_',name).lower()
     for base in ('primary','secondary'):
         p=f'{EXP}/data/tilesets/{base}/{s}'
+        if not os.path.isdir(p) and not os.path.isdir(p+'_frlg'):
+            p=f'{EXP}/data/tilesets/{base}/'+re.sub(r'(\d+)$', r'_\1', s)
         if os.path.isdir(p): return p
         if os.path.isdir(p+'_frlg'): return p+'_frlg'
     raise FileNotFoundError(s)

@@ -47,5 +47,8 @@ for x in (4, 10, 26, 32):
     cv.tall(x, 25, 'power_pole')
 cv.church(14, 23, width=8, roof='charcoal', wall='white')
 
+# doors into the batch-5 interiors (interiors.py)
+cv.link_doors(12, 20, 23, H - 1, 'MAP_SEDGWICK_CHURCH')
+cv.link_doors(0, 0, W - 1, 19, 'MAP_SEDGWICK_RANCH_HOUSE_1F')
 mid = write_map(cv, 'SedgwickDemo', 'LAYOUT_SEDGWICK_DEMO', 'Sedgwick demo')
 print(mid, W, H, len(cv.signs), 'mailboxes')

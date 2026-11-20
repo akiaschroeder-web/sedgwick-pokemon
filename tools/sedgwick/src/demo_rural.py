@@ -50,6 +50,8 @@ for x in range(1, 8):
 cv.set(2, 10, 'cow_holstein', walk=False); cv.set(5, 10, 'cow_angus', walk=False)
 cv.tree_row(0, 10, 0)
 
+# doors into the batch-5 interiors (interiors.py)
+cv.link_doors(0, 0, W - 1, H - 1, 'MAP_SEDGWICK_FARMHOUSE')
 mid = write_map(cv, 'SedgwickRuralDemo', 'LAYOUT_SEDGWICK_RURAL_DEMO', 'Sedgwick rural demo',
                 secondary='gTileset_SedgwickRural')
 print(mid)

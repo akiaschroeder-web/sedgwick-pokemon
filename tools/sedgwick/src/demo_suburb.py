@@ -33,5 +33,7 @@ cv.place_piece_grid('bus_shelter', 3, 13, 2, 2)
 for i, (roof, wall) in enumerate((('charcoal', 'white'), ('brown', 'tan'), ('charcoal', 'tan'), ('brown', 'white'))):
     cv.house(8 + i * 8, 16, 6, roof, wall, garage=None, windows=2)
 
+# doors into the batch-5 interiors (interiors.py)
+cv.link_doors(0, 0, W - 1, H - 1, 'MAP_SEDGWICK_RANCH_HOUSE_1F')
 mid = write_map(cv, 'SedgwickSuburbDemo', 'LAYOUT_SEDGWICK_SUBURB_DEMO', 'Sedgwick suburb demo')
 print(mid)

@@ -15,7 +15,71 @@
   "battle_scene": "MAP_BATTLE_SCENE_NORMAL",
   "connections": null,
   "object_events": [],
-  "warp_events": [],
+  "warp_events": [
+    {
+      "x": 2,
+      "y": 6,
+      "elevation": 0,
+      "dest_map": "MAP_SEDGWICK_RANCH_HOUSE_1F",
+      "dest_warp_id": "0"
+    },
+    {
+      "x": 6,
+      "y": 6,
+      "elevation": 0,
+      "dest_map": "MAP_SEDGWICK_RANCH_HOUSE_1F",
+      "dest_warp_id": "0"
+    },
+    {
+      "x": 13,
+      "y": 6,
+      "elevation": 0,
+      "dest_map": "MAP_SEDGWICK_RANCH_HOUSE_1F",
+      "dest_warp_id": "0"
+    },
+    {
+      "x": 17,
+      "y": 6,
+      "elevation": 0,
+      "dest_map": "MAP_SEDGWICK_RANCH_HOUSE_1F",
+      "dest_warp_id": "0"
+    },
+    {
+      "x": 24,
+      "y": 6,
+      "elevation": 0,
+      "dest_map": "MAP_SEDGWICK_RANCH_HOUSE_1F",
+      "dest_warp_id": "0"
+    },
+    {
+      "x": 9,
+      "y": 18,
+      "elevation": 0,
+      "dest_map": "MAP_SEDGWICK_RANCH_HOUSE_1F",
+      "dest_warp_id": "0"
+    },
+    {
+      "x": 17,
+      "y": 18,
+      "elevation": 0,
+      "dest_map": "MAP_SEDGWICK_RANCH_HOUSE_1F",
+      "dest_warp_id": "0"
+    },
+    {
+      "x": 25,
+      "y": 18,
+      "elevation": 0,
+      "dest_map": "MAP_SEDGWICK_RANCH_HOUSE_1F",
+      "dest_warp_id": "0"
+    },
+    {
+      "x": 33,
+      "y": 18,
+      "elevation": 0,
+      "dest_map": "MAP_SEDGWICK_RANCH_HOUSE_1F",
+      "dest_warp_id": "0"
+    }
+  ],
   "coord_events": [],
   "bg_events": [
     {

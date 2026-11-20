@@ -69,8 +69,11 @@ def hangar_door_pieces(width=4, kind='shed'):
         out[f'wallM_hangar{c}'] = dict(top=[q(1, 0), q(1, 1), q(2, 0), q(2, 1)], under=[None] * 4,
                                        layer='COVERED', beh='MB_NORMAL')
         out[f'wallD_hangar{c}'] = dict(top=[q(3, 0), q(3, 1), q(4, 0), q(4, 1)], under=[None] * 4,
-                                       layer='COVERED', beh='MB_NORMAL')
+                                       layer='COVERED', beh='MB_NON_ANIMATED_DOOR' if f'wallD_hangar{c}' in WALK_IN else 'MB_NORMAL')
     return out
+
+
+WALK_IN = ('wallD_hangar1', 'wallD_hangar2')     # the two middle door leaves: walk in here
 
 
 def hangar_plan(width, door_width=4, roof_rows=2):

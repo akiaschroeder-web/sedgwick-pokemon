@@ -52,6 +52,8 @@ cv.cel_block(1, 20, 2, storeys=1, color='brick', doors=(1,))
 # Second office block across the cross street
 cv.cel_block(30, 20, 2, storeys=1, color='mint', ac=(1,), doors=(0,))
 
+# doors into the batch-5 interiors (interiors.py)
+cv.link_doors(0, 19, 6, 26, 'MAP_SEDGWICK_GAS_STATION')
 mid = write_map(cv, 'SedgwickCommercialDemo', 'LAYOUT_SEDGWICK_COMMERCIAL_DEMO', 'Sedgwick commercial demo',
                 secondary='gTileset_SedgwickCommercial')
 print(mid)

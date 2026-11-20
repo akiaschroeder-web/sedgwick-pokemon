@@ -54,6 +54,8 @@ for y in range(0, 12):
     if y not in (5, 6):
         cv.set(0, y, 'chainlink_v', walk=False)
 
+# doors into the batch-5 interiors (interiors.py)
+cv.link_doors(27, 0, W - 1, H - 1, 'MAP_SEDGWICK_HANGAR')
 mid = write_map(cv, 'SedgwickAviationDemo', 'LAYOUT_SEDGWICK_AVIATION_DEMO', 'Sedgwick aviation demo',
                 secondary='gTileset_SedgwickAviation')
 print(mid)

@@ -37,6 +37,8 @@ for c in range(5):
 cv.set(37, 11, 'gas_sign_00', walk=False); cv.set(37, 12, 'gas_sign_01', walk=False)
 cv.set(32, 20, 'drive_apron_l'); cv.set(33, 20, 'drive_apron_r')
 
+# doors into the batch-5 interiors (interiors.py)
+cv.link_doors(0, 0, 16, 7, 'MAP_SEDGWICK_BIG_BOX_STORE')
 mid = write_map(cv, 'SedgwickRetailDemo', 'LAYOUT_SEDGWICK_RETAIL_DEMO', 'Sedgwick retail demo',
                 secondary='gTileset_SedgwickRetail')
 print(mid)

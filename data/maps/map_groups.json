@@ -75,7 +75,8 @@
     "gMapGroup_IndoorTwoIslandRoute_Frlg",
     "gMapGroup_IndoorSixIslandRoute_Frlg",
     "gMapGroup_IndoorSevenIslandRoute_Frlg",
-    "gMapGroup_Sedgwick"
+    "gMapGroup_Sedgwick",
+    "gMapGroup_SedgwickIndoor"
   ],
   "gMapGroup_TownsAndRoutes": [
     "PetalburgCity",
@@ -1172,5 +1173,15 @@
     "SedgwickRetailDemo",
     "SedgwickAviationDemo",
     "SedgwickNatureDemo"
+  ],
+  "gMapGroup_SedgwickIndoor": [
+    "SedgwickRanchHouse_1F",
+    "SedgwickRanchHouse_B1F",
+    "SedgwickFarmhouse",
+    "SedgwickGasStation",
+    "SedgwickBigBoxStore",
+    "SedgwickSchool",
+    "SedgwickChurch",
+    "SedgwickHangar"
   ]
 }
