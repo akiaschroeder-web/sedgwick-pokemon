@@ -6,7 +6,7 @@ name -> metatile id index (JSON + C header) for the map generator.
 import json, os, struct, sys
 from PIL import Image
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import lib, street, house2, props, wheat, rural, farm2, commercial, gas, orig, civic, downtown, church, retail, suburb, aviation
+import lib, street, house2, props, wheat, rural, farm2, commercial, gas, orig, civic, downtown, church, retail, suburb, aviation, nature
 
 EXP = lib.EXP
 NUM_PRIMARY_TILES = 512
@@ -190,6 +190,9 @@ def rural_ts():
             top = [[PROPS_TO_ROAD.get(v, 0) if v else 0 for v in row] for row in top]
             ts.add(name, grass_road, P_ROAD, top, P_ROAD, layer=layer, beh=beh)
     add_houses(ts, RURAL_ROOF, RURAL_WALL, P_ROAD)
+    for name, g in nature.rural_pieces().items():
+        layer = 'NORMAL' if name.startswith('pumpjack') and name.endswith('0') else 'COVERED'
+        ts.add(name, grass_road, P_ROAD, g, P_ROAD, layer=layer)
     # farm buildings from Vermilion's warehouse-roof art
     for prefix, kind, pslot in (('barn', 'barn', P_BARN), ('shed', 'shed', P_SHED)):
         k = farm2.kit()
@@ -325,6 +328,17 @@ def city_ts():
     plaza = civic.plaza_pieces()
     for name, g in plaza.items():
         ts.add(name, g, P_STREET)
+    slot = {'street': P_STREET, 'props': P_PROPS, 'nature': P_NATURE}
+    golf = nature.golf()
+    for name, (g, pk, layer, over) in nature.city_pieces().items():
+        if over is None:
+            ts.add(name, g, slot[pk], layer=layer)
+        elif over == 'water':
+            ts.add_q(name, W, [(q, slot[pk]) if any(v for r in q for v in r) else (None, 0) for q in quads(g)], layer=layer)
+        elif over == 'golf_green':
+            ts.add(name, golf['golf_green'], P_NATURE, g, slot[pk], layer=layer)
+        else:
+            ts.add(name, GRASS_BOTTOM, P_STREET, g, slot[pk], layer=layer)
     pieces, packed, origin = civic.landmark_from_png(
         os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'custom', 'landmark.png'), plaza)
     if pieces:

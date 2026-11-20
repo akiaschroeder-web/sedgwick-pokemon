@@ -40,6 +40,15 @@ for y in range(19, 26):
         cv.set(x, y, 'soybeans_n' if y == 19 else 'soybeans' if y < 23 else 'plowed')
 for x in (3, 20, 34):
     cv.tall(x, 16, 'power_pole')
+# oil lease, cattle pen and a windbreak along the farmstead
+cv.place_piece_grid('pumpjack', 36, 14, 2, 2) if False else None
+for c in range(2):
+    for r in range(2):
+        cv.set(26 + c, 9 + r, f'pumpjack_{c}{r}', walk=False)
+for x in range(1, 8):
+    cv.set(x, 9, 'corral_h', walk=False)
+cv.set(2, 10, 'cow_holstein', walk=False); cv.set(5, 10, 'cow_angus', walk=False)
+cv.tree_row(0, 10, 0)
 
 mid = write_map(cv, 'SedgwickRuralDemo', 'LAYOUT_SEDGWICK_RURAL_DEMO', 'Sedgwick rural demo',
                 secondary='gTileset_SedgwickRural')

@@ -22,6 +22,8 @@ class Canvas:
         self.signs = []   # (x, y, text)
 
     def set(self, x, y, name, walk=True):
+        if name.startswith('prim:'):           # raw Emerald primary metatile, e.g. 'prim:1d4' (Hoenn tree)
+            self.ids.setdefault(name, int(name[5:], 16))
         if 0 <= x < self.w and 0 <= y < self.h:
             assert name in self.ids, name
             self.cells[y][x] = (name, walk)
@@ -168,6 +170,12 @@ class Canvas:
             for c, piece in enumerate(row):
                 self.set(x + c, y + r, f'{prefix}_{piece}', walk=False)
         return y + len(rows) - 1
+
+    def tree_row(self, x0, x1, y):
+        """A windbreak of Hoenn trees (primary tileset): tops on row y, trunks on y + 1."""
+        for x in range(x0, x1, 2):
+            self.set(x, y, 'prim:1d4', walk=False); self.set(x + 1, y, 'prim:1d5', walk=False)
+            self.set(x, y + 1, 'prim:1e4', walk=False); self.set(x + 1, y + 1, 'prim:1e5', walk=False)
 
     def place_piece_grid(self, prefix, x, y, w, h, walk=False):
         for r in range(h):

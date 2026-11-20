@@ -9325,17 +9325,6 @@
       "layout_version": "frlg"
     },
     {
-      "id": "LAYOUT_SEDGWICK_RETAIL_DEMO",
-      "name": "SedgwickRetailDemo_Layout",
-      "width": 40,
-      "height": 26,
-      "primary_tileset": "gTileset_General",
-      "secondary_tileset": "gTileset_SedgwickRetail",
-      "border_filepath": "data/layouts/SedgwickRetailDemo/border.bin",
-      "blockdata_filepath": "data/layouts/SedgwickRetailDemo/map.bin",
-      "layout_version": "emerald"
-    },
-    {
       "id": "LAYOUT_SEDGWICK_DEMO",
       "name": "SedgwickDemo_Layout",
       "width": 38,
@@ -9369,6 +9358,17 @@
       "layout_version": "emerald"
     },
     {
+      "id": "LAYOUT_SEDGWICK_CITY_DEMO",
+      "name": "SedgwickCityDemo_Layout",
+      "width": 40,
+      "height": 32,
+      "primary_tileset": "gTileset_General",
+      "secondary_tileset": "gTileset_SedgwickCity",
+      "border_filepath": "data/layouts/SedgwickCityDemo/border.bin",
+      "blockdata_filepath": "data/layouts/SedgwickCityDemo/map.bin",
+      "layout_version": "emerald"
+    },
+    {
       "id": "LAYOUT_SEDGWICK_DOWNTOWN_DEMO",
       "name": "SedgwickDowntownDemo_Layout",
       "width": 50,
@@ -9391,6 +9391,17 @@
       "layout_version": "emerald"
     },
     {
+      "id": "LAYOUT_SEDGWICK_RETAIL_DEMO",
+      "name": "SedgwickRetailDemo_Layout",
+      "width": 40,
+      "height": 26,
+      "primary_tileset": "gTileset_General",
+      "secondary_tileset": "gTileset_SedgwickRetail",
+      "border_filepath": "data/layouts/SedgwickRetailDemo/border.bin",
+      "blockdata_filepath": "data/layouts/SedgwickRetailDemo/map.bin",
+      "layout_version": "emerald"
+    },
+    {
       "id": "LAYOUT_SEDGWICK_AVIATION_DEMO",
       "name": "SedgwickAviationDemo_Layout",
       "width": 44,
@@ -9402,14 +9413,14 @@
       "layout_version": "emerald"
     },
     {
-      "id": "LAYOUT_SEDGWICK_CITY_DEMO",
-      "name": "SedgwickCityDemo_Layout",
+      "id": "LAYOUT_SEDGWICK_NATURE_DEMO",
+      "name": "SedgwickNatureDemo_Layout",
       "width": 40,
-      "height": 32,
+      "height": 28,
       "primary_tileset": "gTileset_General",
       "secondary_tileset": "gTileset_SedgwickCity",
-      "border_filepath": "data/layouts/SedgwickCityDemo/border.bin",
-      "blockdata_filepath": "data/layouts/SedgwickCityDemo/map.bin",
+      "border_filepath": "data/layouts/SedgwickNatureDemo/border.bin",
+      "blockdata_filepath": "data/layouts/SedgwickNatureDemo/map.bin",
       "layout_version": "emerald"
     }
   ]
