@@ -9345,6 +9345,17 @@
       "border_filepath": "data/layouts/SedgwickRuralDemo/border.bin",
       "blockdata_filepath": "data/layouts/SedgwickRuralDemo/map.bin",
       "layout_version": "emerald"
+    },
+    {
+      "id": "LAYOUT_SEDGWICK_COMMERCIAL_DEMO",
+      "name": "SedgwickCommercialDemo_Layout",
+      "width": 40,
+      "height": 26,
+      "primary_tileset": "gTileset_General",
+      "secondary_tileset": "gTileset_SedgwickCommercial",
+      "border_filepath": "data/layouts/SedgwickCommercialDemo/border.bin",
+      "blockdata_filepath": "data/layouts/SedgwickCommercialDemo/map.bin",
+      "layout_version": "emerald"
     }
   ]
 }

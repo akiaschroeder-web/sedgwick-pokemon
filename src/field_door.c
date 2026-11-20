@@ -155,6 +155,7 @@ static const u8 sDoorAnimTiles_GeneralFrlg[] = INCGFX_U8("graphics/door_anims/ge
 static const u8 sDoorAnimTiles_SlidingSingle[] = INCGFX_U8("graphics/door_anims/sliding_single.png", ".4bpp");
 static const u8 sDoorAnimTiles_SlidingDouble[] = INCGFX_U8("graphics/door_anims/sliding_double.png", ".4bpp");
 static const u8 sDoorAnimTiles_Pallet[] = INCGFX_U8("graphics/door_anims/pallet.png", ".4bpp");
+static const u8 sDoorAnimTiles_SedgwickStorefront[] = INCGFX_U8("graphics/door_anims/sedgwick_storefront.png", ".4bpp");
 static const u8 sDoorAnimTiles_SedgwickHouse[] = INCGFX_U8("graphics/door_anims/sedgwick_house.png", ".4bpp");
 static const u8 sDoorAnimTiles_OaksLab[] = INCGFX_U8("graphics/door_anims/oaks_lab.png", ".4bpp");
 static const u8 sDoorAnimTiles_Viridian[] = INCGFX_U8("graphics/door_anims/viridian.png", ".4bpp");
@@ -319,6 +320,11 @@ static const u8 sDoorAnimPalettes_GeneralFrlg[] = {2, 2, 2, 2, 2, 2, 2, 2};
 static const u8 sDoorAnimPalettes_SlidingSingle[] = {3, 3, 3, 3, 3, 3, 3, 3};
 static const u8 sDoorAnimPalettes_SlidingDouble[] = {3, 3, 3, 3, 3, 3, 3, 3};
 static const u8 sDoorAnimPalettes_Pallet[] = {8, 8, 8, 8, 8, 8, 8, 8};
+// Sedgwick storefront door palettes
+static const u8 sDoorAnimPalettes_SedgwickStorefront_Mint[] = {8, 8, 8, 8, 8, 8, 8, 8};
+static const u8 sDoorAnimPalettes_SedgwickStorefront_Brick[] = {8, 8, 8, 8, 8, 8, 8, 8};
+static const u8 sDoorAnimPalettes_SedgwickStorefront_Beige[] = {8, 8, 8, 8, 8, 8, 8, 8};
+// end Sedgwick storefront door palettes
 // Sedgwick door palettes: SedgwickRural
 static const u8 sDoorAnimPalettes_SedgwickHouse_SedgwickRural_White[] = {10, 10, 10, 10, 10, 10, 10, 10};
 // end Sedgwick door palettes: SedgwickRural
@@ -1077,6 +1083,32 @@ static const struct DoorGraphics sDoorAnimGraphicsTable[] =
         .palettes = sDoorAnimPalettes_SedgwickHouse_SedgwickRural_White
     },
     // end Sedgwick County houses: SedgwickRural
+    // Sedgwick storefront doors: SedgwickCommercial
+    {
+        .metatileNum = METATILE_SedgwickCommercial_Cel03dMint,
+        .tileset = &gTileset_SedgwickCommercial,
+        .sound = DOOR_SOUND_NORMAL,
+        .size = DOOR_SIZE_1x1,
+        .tiles = sDoorAnimTiles_SedgwickStorefront,
+        .palettes = sDoorAnimPalettes_SedgwickStorefront_Mint
+    },
+    {
+        .metatileNum = METATILE_SedgwickCommercial_Cel03dBrick,
+        .tileset = &gTileset_SedgwickCommercial,
+        .sound = DOOR_SOUND_NORMAL,
+        .size = DOOR_SIZE_1x1,
+        .tiles = sDoorAnimTiles_SedgwickStorefront,
+        .palettes = sDoorAnimPalettes_SedgwickStorefront_Brick
+    },
+    {
+        .metatileNum = METATILE_SedgwickCommercial_Cel03dBeige,
+        .tileset = &gTileset_SedgwickCommercial,
+        .sound = DOOR_SOUND_NORMAL,
+        .size = DOOR_SIZE_1x1,
+        .tiles = sDoorAnimTiles_SedgwickStorefront,
+        .palettes = sDoorAnimPalettes_SedgwickStorefront_Beige
+    },
+    // end Sedgwick storefront doors: SedgwickCommercial
     {},
 };
 
