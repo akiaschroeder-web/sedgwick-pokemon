@@ -9327,12 +9327,23 @@
     {
       "id": "LAYOUT_SEDGWICK_DEMO",
       "name": "SedgwickDemo_Layout",
-      "width": 36,
-      "height": 27,
+      "width": 38,
+      "height": 28,
       "primary_tileset": "gTileset_General",
       "secondary_tileset": "gTileset_SedgwickResidential",
       "border_filepath": "data/layouts/SedgwickDemo/border.bin",
       "blockdata_filepath": "data/layouts/SedgwickDemo/map.bin",
+      "layout_version": "emerald"
+    },
+    {
+      "id": "LAYOUT_SEDGWICK_RURAL_DEMO",
+      "name": "SedgwickRuralDemo_Layout",
+      "width": 40,
+      "height": 27,
+      "primary_tileset": "gTileset_General",
+      "secondary_tileset": "gTileset_SedgwickRural",
+      "border_filepath": "data/layouts/SedgwickRuralDemo/border.bin",
+      "blockdata_filepath": "data/layouts/SedgwickRuralDemo/map.bin",
       "layout_version": "emerald"
     }
   ]

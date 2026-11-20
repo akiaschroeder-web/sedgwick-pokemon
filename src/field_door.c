@@ -155,6 +155,7 @@ static const u8 sDoorAnimTiles_GeneralFrlg[] = INCGFX_U8("graphics/door_anims/ge
 static const u8 sDoorAnimTiles_SlidingSingle[] = INCGFX_U8("graphics/door_anims/sliding_single.png", ".4bpp");
 static const u8 sDoorAnimTiles_SlidingDouble[] = INCGFX_U8("graphics/door_anims/sliding_double.png", ".4bpp");
 static const u8 sDoorAnimTiles_Pallet[] = INCGFX_U8("graphics/door_anims/pallet.png", ".4bpp");
+static const u8 sDoorAnimTiles_SedgwickHouse[] = INCGFX_U8("graphics/door_anims/sedgwick_house.png", ".4bpp");
 static const u8 sDoorAnimTiles_OaksLab[] = INCGFX_U8("graphics/door_anims/oaks_lab.png", ".4bpp");
 static const u8 sDoorAnimTiles_Viridian[] = INCGFX_U8("graphics/door_anims/viridian.png", ".4bpp");
 static const u8 sDoorAnimTiles_Pewter[] = INCGFX_U8("graphics/door_anims/pewter.png", ".4bpp");
@@ -318,6 +319,13 @@ static const u8 sDoorAnimPalettes_GeneralFrlg[] = {2, 2, 2, 2, 2, 2, 2, 2};
 static const u8 sDoorAnimPalettes_SlidingSingle[] = {3, 3, 3, 3, 3, 3, 3, 3};
 static const u8 sDoorAnimPalettes_SlidingDouble[] = {3, 3, 3, 3, 3, 3, 3, 3};
 static const u8 sDoorAnimPalettes_Pallet[] = {8, 8, 8, 8, 8, 8, 8, 8};
+// Sedgwick door palettes: SedgwickRural
+static const u8 sDoorAnimPalettes_SedgwickHouse_SedgwickRural_White[] = {11, 11, 11, 11, 11, 11, 11, 11};
+// end Sedgwick door palettes: SedgwickRural
+// Sedgwick door palettes: SedgwickResidential
+static const u8 sDoorAnimPalettes_SedgwickHouse_SedgwickResidential_White[] = {11, 11, 11, 11, 11, 11, 11, 11};
+static const u8 sDoorAnimPalettes_SedgwickHouse_SedgwickResidential_Tan[] = {12, 12, 12, 12, 12, 12, 12, 12};
+// end Sedgwick door palettes: SedgwickResidential
 static const u8 sDoorAnimPalettes_OaksLab[] = {10, 10, 10, 10, 10, 10, 10, 10};
 static const u8 sDoorAnimPalettes_Viridian[] = {8, 8, 8, 8, 8, 8, 8, 8};
 static const u8 sDoorAnimPalettes_Pewter[] = {8, 8, 8, 8, 8, 8, 8, 8};
@@ -1041,6 +1049,34 @@ static const struct DoorGraphics sDoorAnimGraphicsTable[] =
         .palettes = sDoorAnimPalettes_TrainerTowerRoofElevator
     },
 #endif // !IS_FRLG
+    // Sedgwick County houses: SedgwickResidential
+    {
+        .metatileNum = METATILE_SedgwickResidential_HWallDoorWhite,
+        .tileset = &gTileset_SedgwickResidential,
+        .sound = DOOR_SOUND_NORMAL,
+        .size = DOOR_SIZE_1x1,
+        .tiles = sDoorAnimTiles_SedgwickHouse,
+        .palettes = sDoorAnimPalettes_SedgwickHouse_SedgwickResidential_White
+    },
+    {
+        .metatileNum = METATILE_SedgwickResidential_HWallDoorTan,
+        .tileset = &gTileset_SedgwickResidential,
+        .sound = DOOR_SOUND_NORMAL,
+        .size = DOOR_SIZE_1x1,
+        .tiles = sDoorAnimTiles_SedgwickHouse,
+        .palettes = sDoorAnimPalettes_SedgwickHouse_SedgwickResidential_Tan
+    },
+    // end Sedgwick County houses: SedgwickResidential
+    // Sedgwick County houses: SedgwickRural
+    {
+        .metatileNum = METATILE_SedgwickRural_HWallDoorWhite,
+        .tileset = &gTileset_SedgwickRural,
+        .sound = DOOR_SOUND_NORMAL,
+        .size = DOOR_SIZE_1x1,
+        .tiles = sDoorAnimTiles_SedgwickHouse,
+        .palettes = sDoorAnimPalettes_SedgwickHouse_SedgwickRural_White
+    },
+    // end Sedgwick County houses: SedgwickRural
     {},
 };
 

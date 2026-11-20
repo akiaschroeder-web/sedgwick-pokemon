@@ -411,3 +411,6 @@ const u16 gMetatileAttributes_HallOfFame[] = INCBIN_U16("data/tilesets/secondary
 
 const u16 gMetatiles_SedgwickResidential[] = INCBIN_U16("data/tilesets/secondary/sedgwick_residential/metatiles.bin");
 const u16 gMetatileAttributes_SedgwickResidential[] = INCBIN_U16("data/tilesets/secondary/sedgwick_residential/metatile_attributes.bin");
+
+const u16 gMetatiles_SedgwickRural[] = INCBIN_U16("data/tilesets/secondary/sedgwick_rural/metatiles.bin");
+const u16 gMetatileAttributes_SedgwickRural[] = INCBIN_U16("data/tilesets/secondary/sedgwick_rural/metatile_attributes.bin");

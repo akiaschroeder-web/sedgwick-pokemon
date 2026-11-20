@@ -34,18 +34,25 @@ SedgwickDemo_EventScript_Mailbox5::
 	end
 
 SedgwickDemo_Text_Mailbox5:
-	.string "1201 CENTRAL AVE$"
+	.string "1236 ELM ST$"
 
 SedgwickDemo_EventScript_Mailbox6::
 	msgbox SedgwickDemo_Text_Mailbox6, MSGBOX_SIGN
 	end
 
 SedgwickDemo_Text_Mailbox6:
-	.string "1209 CENTRAL AVE$"
+	.string "1201 CENTRAL AVE$"
 
 SedgwickDemo_EventScript_Mailbox7::
 	msgbox SedgwickDemo_Text_Mailbox7, MSGBOX_SIGN
 	end
 
 SedgwickDemo_Text_Mailbox7:
+	.string "1209 CENTRAL AVE$"
+
+SedgwickDemo_EventScript_Mailbox8::
+	msgbox SedgwickDemo_Text_Mailbox8, MSGBOX_SIGN
+	end
+
+SedgwickDemo_Text_Mailbox8:
 	.string "1221 CENTRAL AVE$"
