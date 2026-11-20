@@ -6,7 +6,7 @@ name -> metatile id index (JSON + C header) for the map generator.
 import json, os, struct, sys
 from PIL import Image
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import lib, street, house2, props, wheat, rural, farm2, commercial, gas, orig, civic, downtown, church
+import lib, street, house2, props, wheat, rural, farm2, commercial, gas, orig, civic, downtown, church, retail, suburb
 
 EXP = lib.EXP
 NUM_PRIMARY_TILES = 512
@@ -14,7 +14,7 @@ NUM_PRIMARY_METATILES = 512
 MAX_SECONDARY_TILES = 512
 MAX_SECONDARY_METATILES = 512
 LAYER = {'NORMAL': 0, 'COVERED': 1, 'SPLIT': 2}
-BEHAVIOR = {'MB_NORMAL': 0, 'MB_TALL_GRASS': 2, 'MB_TALL_WHEAT': 4, 'MB_ANIMATED_DOOR': 0x69}
+BEHAVIOR = {'MB_NORMAL': 0, 'MB_TALL_GRASS': 2, 'MB_TALL_WHEAT': 4, 'MB_ANIMATED_DOOR': 0x69, 'MB_NON_ANIMATED_DOOR': 0x60}
 
 GRASS_BOTTOM = [[street.grass_px(x, y) for x in range(16)] for y in range(16)]
 
@@ -127,6 +127,11 @@ def residential():
     for name, (top, layer, beh) in props.metatiles().items():
         ts.add(name, GRASS_BOTTOM, P_STREET, top, P_PROPS, layer=layer, beh=beh)
     add_houses(ts, ROOF_SLOTS, WALL_SLOTS, P_STREET)
+    asphalt = [[street.asph_px(x, y) for x in range(16)] for y in range(16)]
+    for name, g in suburb.all_pieces().items():
+        tall_top = name.startswith('water_tower') and name[-1] in '012'
+        under = asphalt if name.startswith(('sedan', 'pickup')) else GRASS_BOTTOM   # parked at the curb
+        ts.add(name, under, P_STREET, g, P_PROPS, layer='NORMAL' if tall_top else 'COVERED')
     lawn_q = quads(GRASS_BOTTOM)
     for name, qs in church.pieces().items():
         for roof, slot in ROOF_SLOTS.items():
@@ -431,6 +436,79 @@ def register_downtown_doors(ts):
     open(path, 'w').write(s)
 
 
+RT_CEL = {'beige': 9}
+
+
+def retail_ts():
+    ts = Tileset('sedgwick_retail')
+    P_STREET, P_PROPS, P_CEL, P_GAS = 6, 7, 8, 12
+    ts.palettes[P_STREET] = street.PAL_STREET
+    ts.palettes[P_PROPS] = props.PAL_PROPS
+    ts.palettes[P_CEL] = commercial.BASE_PALS[commercial.OTHER_PAL]
+    for v, slot in RT_CEL.items():
+        ts.palettes[slot] = commercial.wall_palette(v)
+    BB = [10, 11]
+    assert len(retail.PALS) <= 2
+    for i, p in enumerate(retail.PALS):
+        ts.palettes[BB[i]] = p
+    ts.palettes[P_GAS] = gas.PAL_GAS
+    ts.add('lawn', GRASS_BOTTOM, P_STREET)
+    for name, (g, beh) in street.metatiles().items():
+        if name.startswith(('culdesac', 'bend', 'diag')):
+            continue
+        ts.add(name, g, P_STREET, beh=beh)
+    for name, g in commercial.parking().items():
+        ts.add(name, g, P_STREET)
+    for name, (top, layer, beh) in props.metatiles().items():
+        if name.startswith(('chainlink', 'privacy', 'mailbox', 'rr_')):
+            continue
+        ts.add(name, GRASS_BOTTOM, P_STREET, top, P_PROPS, layer=layer, beh=beh)
+    for name, g in suburb.vehicles().items():
+        ts.add(name, [[street.asph_px(x, y) for x in range(16)] for y in range(16)], P_STREET, g, P_PROPS, layer='COVERED')
+    lawn_q = quads(GRASS_BOTTOM)
+    base = commercial.BASE_PALS
+    for m in commercial.IDS:
+        p = commercial.PIECES[m]
+        for v, wslot in RT_CEL.items():
+            def conv(g, q):
+                if g == 'LAWN':
+                    return (lawn_q[q], P_STREET)
+                if g is None:
+                    return (None, 0)
+                pi = commercial.quad_palette(g)
+                return (orig.index_quad(g, base[pi]), wslot if pi == commercial.WALL_PAL else P_CEL)
+            ts.add_q(f'cel_{m:03x}_{v}', [conv(g, q) for q, g in enumerate(p['bottom'])],
+                     [conv(g, q) for q, g in enumerate(p['top'])], layer=p['layer'],
+                     beh='MB_ANIMATED_DOOR' if m == commercial.DOOR else 'MB_NORMAL')
+    for m in retail.IDS:
+        p = retail.PIECES[m]
+        def conv(g, q):
+            if g == 'LAWN':
+                return (lawn_q[q], P_STREET)
+            if g is None:
+                return (None, 0)
+            pi = retail.ASSIGN[id(g)]
+            return (orig.index_quad(g, retail.PALS[pi]), BB[pi])
+        ts.add_q(f'bb_{m:03x}', [conv(g, q) for q, g in enumerate(p['bottom'])],
+                 [conv(g, q) for q, g in enumerate(p['top'])], layer=p['layer'],
+                 beh='MB_NON_ANIMATED_DOOR' if m == retail.DOOR else 'MB_NORMAL')
+    pad_g = gas.pad()
+    ts.add('gas_pad', pad_g, P_GAS)
+    top, pumps = gas.canopy(5)
+    for name, g in top.items():
+        ts.add(name, pad_g, P_GAS, g, P_GAS, layer='NORMAL')
+    for name, g in pumps.items():
+        ts.add(name, g, P_GAS)
+    for name, g in gas.price_sign().items():
+        ts.add(name, GRASS_BOTTOM, P_STREET, g, P_GAS, layer='NORMAL' if name.endswith('0') else 'COVERED')
+    for name, g in retail.fastfood().items():
+        if name.startswith('ff_sign'):
+            ts.add(name, GRASS_BOTTOM, P_STREET, g, P_GAS, layer='NORMAL' if name.endswith('0') else 'COVERED')
+        else:
+            ts.add(name, GRASS_BOTTOM, P_STREET, g, P_GAS, layer='NORMAL' if name[-1] in '01' else 'COVERED')
+    return ts
+
+
 def register_cel_doors(ts):
     """Door animation for the Celadon-style storefront door in each wall colour."""
     C = camel(ts.name)
@@ -545,6 +623,12 @@ if __name__ == '__main__':
     register(ts, ntiles)
     write_labels(ts, index)
     register_downtown_doors(ts)
+    json.dump(index, open(os.path.join(here, '..', f'{ts.name}_metatiles.json'), 'w'), indent=1)
+    print(f'{ts.name}: {ntiles} tiles, {len(ts.metatiles)} metatiles, palettes {sorted(ts.palettes)}')
+    ts = retail_ts()
+    ntiles, index = ts.write()
+    register(ts, ntiles)
+    write_labels(ts, index)
     json.dump(index, open(os.path.join(here, '..', f'{ts.name}_metatiles.json'), 'w'), indent=1)
     print(f'{ts.name}: {ntiles} tiles, {len(ts.metatiles)} metatiles, palettes {sorted(ts.palettes)}')
     ts = commercial_ts()

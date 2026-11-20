@@ -134,6 +134,37 @@ class Canvas:
                 self.set(sx + c, y + r, f'church_steeple_{c}{r}_{roof}', walk=False)
         return door
 
+    def small_building(self, x, y, mids, roof='brown', wall='tan'):
+        """Ranch-height outbuilding from the house kit: roof0, roof2, wall row."""
+        W = len(mids) + 2
+        rows = [['roof0_l'] + ['roof0_m'] * len(mids) + ['roof0_r'],
+                ['roof2_l'] + ['roof2_m'] * len(mids) + ['roof2_r'],
+                ['wall_l'] + list(mids) + ['wall_r']]
+        for r, row in enumerate(rows):
+            for c, piece in enumerate(row):
+                variant = roof if piece.startswith('roof') else wall
+                self.set(x + c, y + r, f'h_{piece}_{variant}', walk=False)
+        return y + 2
+
+    def detached_garage(self, x, y, roof='brown', wall='tan'):
+        return self.small_building(x, y, ['wall_gar_a', 'wall_gar_b'], roof, wall)
+
+    def shed(self, x, y, roof='charcoal', wall='white'):
+        return self.small_building(x, y, ['wall_sid'], roof, wall)
+
+    def split_level(self, x, y, roof='red', wall='white', garage=True):
+        """Two-storey half on the left, ranch half on the right, sharing a ground line.
+        (x, y) is the top of the two-storey roof; returns (garage_cols, door, bottom_row)."""
+        g1, d1, bottom = self.house(x, y, 4, roof, wall, storeys=2, garage=None, windows=1)
+        g2, d2, _ = self.house(x + 4, y + 2, 6 if garage else 4, roof, wall, storeys=1,
+                               garage='r' if garage else None, windows=0)
+        return g2, d1, bottom
+
+    def place_piece_grid(self, prefix, x, y, w, h, walk=False):
+        for r in range(h):
+            for c in range(w):
+                self.set(x + c, y + r, f'{prefix}_{c}{r}', walk=walk)
+
     def driveway(self, x, y_top, y_street_edge):
         for y in range(y_top, y_street_edge):
             self.set(x, y, 'drive_l')
