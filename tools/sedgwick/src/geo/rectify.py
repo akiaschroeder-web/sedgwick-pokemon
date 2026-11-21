@@ -32,6 +32,8 @@ def detect(F, min_len=20, tol=2.5):
         return None
     a0 = max(tilted, key=tilted.get)
     ang = sum(a * v for a, v in votes.items() if abs(a - a0) <= tol) / sum(v for a, v in votes.items() if abs(a - a0) <= tol)
+    if abs(ang) < 2:
+        return None
     pts = []
     for r in F['roads']:
         if r['cls'] not in ('street', 'service', 'alley'):

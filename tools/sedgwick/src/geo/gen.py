@@ -19,7 +19,10 @@ TILESETS = ['sedgwick_residential', 'sedgwick_rural', 'sedgwick_commercial', 'se
 RES, RUR = 0, 1
 
 # ground classes
-G_LAWN, G_FIELD, G_WOOD, G_WATER, G_PARK, G_PARKING, G_CEMETERY, G_MEADOW, G_FARMYARD, G_DITCH = range(10)
+G_LAWN, G_FIELD, G_WOOD, G_WATER, G_PARK, G_PARKING, G_CEMETERY, G_MEADOW, G_FARMYARD, G_DITCH, G_PRAIRIE = range(11)
+# NLCD 2025 land cover classes -> ground (None = keep the default)
+NLCD_GROUND = {11: G_WATER, 31: G_MEADOW, 41: G_WOOD, 42: G_WOOD, 43: G_WOOD, 52: G_PRAIRIE, 71: G_PRAIRIE,
+               81: G_MEADOW, 82: G_FIELD, 90: G_WOOD, 95: G_PRAIRIE}
 # road classes (core cells)
 R_NONE, R_STREET, R_MAIN, R_HWY, R_GRAVEL, R_ALLEY = range(6)
 WIDTH = {'street': 2, 'service': 2, 'highway': 3, 'gravel': 2, 'alley': 1, 'track': 1, 'motorway': 4}
@@ -34,12 +37,28 @@ def box_dilate(m, r):
     return s > 0
 
 
+def vnoise(H, W, ox, oy, cell, seed):
+    """Smooth value noise in [0, 1) on world coordinates (stable across map edges)."""
+    gx0, gy0 = ox // cell, oy // cell
+    gw, gh = (ox + W) // cell - gx0 + 2, (oy + H) // cell - gy0 + 2
+    g = np.array([[(zlib.crc32(f'{seed},{gx0 + i},{gy0 + j}'.encode()) & 0xffff) / 65536.0 for i in range(gw)]
+                  for j in range(gh)])
+    ys, xs = np.mgrid[0:H, 0:W]
+    fx, fy = (xs + ox) / cell - gx0, (ys + oy) / cell - gy0
+    ix, iy = fx.astype(int), fy.astype(int)
+    tx, ty = fx - ix, fy - iy
+    tx, ty = tx * tx * (3 - 2 * tx), ty * ty * (3 - 2 * ty)
+    a, b = g[iy, ix], g[iy, ix + 1]
+    c, d = g[iy + 1, ix], g[iy + 1, ix + 1]
+    return (a * (1 - tx) + b * tx) * (1 - ty) + (c * (1 - tx) + d * tx) * ty
+
+
 def h32(*a):
     return zlib.crc32(repr(a).encode()) & 0xffffffff
 
 
 class Gen:
-    def __init__(self, F, town_rings):
+    def __init__(self, F, town_rings, land=None, canopy=None):
         self.F = F
         x0, y0, x1, y1 = F['bbox']
         self.ox, self.oy = x0, y0
@@ -68,6 +87,7 @@ class Gen:
         self.signs = []
         self.stats = {}
         self.houses = []
+        self.land, self.canopy = land, canopy        # NLCD grids on this map's tiles (or None)
         self.civic_done = []
 
     # ------------------------------------------------------------ helpers
@@ -112,7 +132,18 @@ class Gen:
         cls = {'farmland': G_FIELD, 'meadow': G_MEADOW, 'farmyard': G_FARMYARD, 'park': G_PARK,
                'cemetery': G_CEMETERY, 'wood': G_WOOD, 'parking': G_PARKING, 'water': G_WATER}
         self.field_id = np.zeros((self.H, self.W), np.int32)
+        have = None
+        if self.land is not None:
+            # satellite land cover first; OSM land use only adds what it maps precisely
+            have = self.land != 250
+            for code, gc in NLCD_GROUND.items():
+                m = (self.land == code)
+                if gc != G_WATER and gc != G_WOOD:
+                    m &= ~self.zone
+                self.ground[m] = gc
         for k in order:
+            if have is not None and k in ('farmland', 'meadow'):
+                continue
             for a in self.F['areas']:
                 if a['cls'] != k:
                     continue
@@ -393,8 +424,13 @@ class Gen:
             for x in range(0, self.W - 1, 2):
                 g = self.ground[y, x]
                 hs = h32(x + self.ox, y + self.oy)
-                want = (g == G_WOOD) or (g == G_LAWN and self.zone[y, x] and hs % 41 == 0) \
-                    or (g == G_PARK and hs % 17 == 0) or (g == G_CEMETERY and hs % 9 == 0)
+                if self.canopy is not None and self.canopy[y, x] <= 100:
+                    # tree canopy %: dense where the satellite sees trees, none where it doesn't
+                    c = int(self.canopy[y, x])
+                    want = (g == G_WOOD and c >= 15) or (g not in (G_FIELD, G_WATER, G_PARKING) and hs % 100 < c * 0.9)
+                else:
+                    want = (g == G_WOOD) or (g == G_LAWN and self.zone[y, x] and hs % 41 == 0) \
+                        or (g == G_PARK and hs % 17 == 0) or (g == G_CEMETERY and hs % 9 == 0)
                 if want and free[y:y + 2, x:x + 2].all() and all((x + i, y + j) not in self.obj for i in range(2) for j in range(2)):
                     for (i, j), m in zip(((0, 0), (1, 0), (0, 1), (1, 1)), ('1d4', '1d5', '1e4', '1e5')):
                         self.put(x + i, y + j, RES if self.zone[y, x] else RUR, 'prim:' + m, False)
@@ -420,6 +456,11 @@ class Gen:
         names[(g == G_PARKING) & (tsg == RES)] = 'asphalt'
         names[(g == G_PARKING) & (tsg == RUR)] = 'gravel'
         names[g == G_WATER] = 'prim:170'
+        # prairie / pasture grass: short with drifts of tall grass (wild encounters)
+        pr = (g == G_PRAIRIE) & (tsg == RUR)
+        if pr.any():
+            nz = 0.65 * vnoise(H, W, self.ox, self.oy, 14, 'grass') + 0.35 * vnoise(H, W, self.ox, self.oy, 5, 'grass2')
+            names[pr & (nz > 0.56)] = 'prim:00d'
         # crops: one crop per field, edges where the field ends
         crop = names == 'CROP'
         ring = self.road_ring()
