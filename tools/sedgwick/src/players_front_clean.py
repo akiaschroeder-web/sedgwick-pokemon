@@ -155,12 +155,21 @@ def dump(g):
             print(f'{y:2d}  ' + row)
 
 
+FINAL = f'{EXP}/tools/sedgwick/custom/source/{{}}_front_final.png'
+
+
 def install():
-    """Run after players_front_import.install(): overwrite the imported pictures with the cleaned ones."""
+    """Run after players_front_import.install(): overwrite the imported pictures with the cleaned
+    ones. A hand-finished picture in custom/source/<who>_front_final.png wins over the pipeline
+    (the girl's is the artist's own fix)."""
+    import os, shutil
     import players_front_import as pi
     for who in ('boy', 'girl'):
-        g = clean(who)
-        pi.save(g, BOY_PAL if who == 'boy' else GIRL_PAL, f'{FRONT}/sedgwick_{who}.png')
+        dest = f'{FRONT}/sedgwick_{who}.png'
+        if os.path.exists(FINAL.format(who)):
+            shutil.copyfile(FINAL.format(who), dest)
+            continue
+        pi.save(clean(who), BOY_PAL if who == 'boy' else GIRL_PAL, dest)
 
 
 if __name__ == '__main__':
