@@ -119,11 +119,17 @@ def girl_fixes(g):
                 g[y][x] = 11
             elif v == 4:
                 g[y][x] = 7
-    # her left eye was lost under the bangs in the shrink: mirror the right one (white outside,
-    # pupil toward the nose, outline on the outer side), and a one-pixel mouth like the boy's
-    for (x, y), v in {(28, 14): 1, (28, 15): 1, (27, 14): 12, (27, 15): 12, (26, 14): 1,
-                      (29, 14): 15, (30, 14): 15, (30, 17): 14}.items():
-        g[y][x] = v
+    # face: the boy's eyes and mouth, pixel for pixel (lash, white, pupil | 3 skin | pupil,
+    # white, lash; mouth one skin-shade pixel three rows below, centred)
+    face = {14: [1, 12, 1, 15, 15, 15, 1, 12, 1],
+            15: [14, 12, 1, 15, 15, 15, 1, 12, 1],
+            16: [14, 15, 15, 15, 15, 15, 15, 15, 14]}
+    for y, row in face.items():
+        for i, v in enumerate(row):
+            g[y][26 + i] = v
+    g[17][30] = 14
+    for x, v in ((31, 4), (32, 5), (33, 4)):                  # bangs closed above the right eye
+        g[13][x] = v
     for x, y in ((21, 36), (22, 36), (21, 37), (22, 37)):     # Poke Ball emblem on the flap
         if g[y][x] not in (0, 1):
             g[y][x] = 9 if y == 36 else 12
