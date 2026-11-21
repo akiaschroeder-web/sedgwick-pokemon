@@ -15,7 +15,8 @@ from PIL import Image, ImageDraw
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 TSDIR = os.path.join(HERE, '..', '..')
-TILESETS = ['sedgwick_residential', 'sedgwick_rural', 'sedgwick_commercial', 'sedgwick_downtown']
+TILESETS = ['sedgwick_residential', 'sedgwick_rural', 'sedgwick_commercial', 'sedgwick_downtown', 'sedgwick_metro']
+METRO = 4
 RES, RUR = 0, 1
 
 # ground classes
@@ -29,6 +30,13 @@ WIDTH = {'street': 2, 'service': 2, 'highway': 3, 'gravel': 2, 'alley': 1, 'trac
 RCLS = {'street': R_STREET, 'service': R_STREET, 'highway': R_HWY, 'gravel': R_GRAVEL, 'alley': R_ALLEY,
         'track': R_GRAVEL, 'motorway': R_HWY}
 CROPS = ['wheat', 'wheat', 'soybeans', 'corn', 'stubble', 'plowed', 'wheat', 'soybeans']
+
+
+def box_mean(a, r):
+    a = a.astype(np.float32)
+    c = np.pad(a, ((r + 1, r), (r + 1, r)), mode='edge').cumsum(0).cumsum(1)
+    s = c[2 * r + 1:, 2 * r + 1:] - c[:-2 * r - 1, 2 * r + 1:] - c[2 * r + 1:, :-2 * r - 1] + c[:-2 * r - 1, :-2 * r - 1]
+    return s / (2 * r + 1) ** 2
 
 
 def box_dilate(m, r):
@@ -87,7 +95,16 @@ class Gen:
         lu = self.poly_mask([self.local(a['poly']) for a in F['areas'] if a['cls'] in ('residential', 'commercial')])
         if land is not None:
             lu &= dev
-        self.zone = (limits & dev) | lu
+        self.metro = np.zeros((H, W), bool)
+        if land is not None:
+            # dense built-up land is town even where the city-limits outline is missing
+            # (Wichita's boundary relation doesn't close in the extract) or unincorporated
+            dense = box_mean(np.isin(land, (22, 23, 24)), 20) > 0.3
+            self.zone = ((limits | dense) & dev) | lu
+            # downtown core: mostly high-intensity development (NLCD 23/24) all around
+            self.metro = self.zone & (box_mean(np.isin(land, (23, 24)), 40) > 0.5)
+        else:
+            self.zone = (limits & dev) | lu
         self.ground = np.full((H, W), G_FIELD, np.uint8)
         self.ground[self.zone] = G_LAWN
         self.road = np.zeros((H, W), np.uint8)
@@ -262,6 +279,31 @@ class Gen:
             self.bulbs.append((x0, y0, kind))
             self.reserved[y0 - 1:y0 + 7, x0 - 1:x0 + 7] = True
 
+    GRAVEL_TO_PAVED = {'gravel': 'asphalt', 'gravel_edge_n': 'road_edge_n_paved', 'gravel_edge_s': 'road_edge_s_paved',
+                       'gravel_edge_w': 'road_edge_w_paved', 'gravel_edge_e': 'road_edge_e_paved',
+                       'gravel_inner_nw': 'block_corner_nw_paved', 'gravel_inner_ne': 'block_corner_ne_paved',
+                       'gravel_inner_sw': 'block_corner_sw_paved', 'gravel_inner_se': 'block_corner_se_paved',
+                       'gravel_corner_nw': 'road_edge_n_paved', 'gravel_corner_ne': 'road_edge_n_paved',
+                       'gravel_corner_sw': 'road_edge_s_paved', 'gravel_corner_se': 'road_edge_s_paved',
+                       'hwy_asphalt': 'asphalt', 'hwy_edge_n': 'road_edge_n_paved', 'hwy_edge_s': 'road_edge_s_paved',
+                       'hwy_edge_w': 'road_edge_w_paved', 'hwy_edge_e': 'road_edge_e_paved',
+                       'hwy_center_h': 'center_yellow_h', 'hwy_center_v': 'center_yellow_v',
+                       'hwy_center_dash_h': 'lane_dash_h', 'hwy_center_dash_v': 'lane_dash_v'}
+
+    def metro_surface(self, tsg, names):
+        """Downtown: cobblestone instead of lawn, curbs paved through, streets in the metro set."""
+        ids = self.ids[METRO]
+        for y, x in zip(*np.nonzero(self.metro)):
+            n = names[y, x]
+            if n == 'lawn':
+                names[y, x], tsg[y, x] = 'sf_2e9', METRO
+                continue
+            n = self.GRAVEL_TO_PAVED.get(n, n)
+            for cand in (n + '_paved', n):
+                if cand in ids and not cand.startswith('sf_'):
+                    names[y, x], tsg[y, x] = cand, METRO
+                    break
+
     def stamp_bulbs(self, tsg, names):
         import math as m
         for x0, y0, kind in self.bulbs:
@@ -308,7 +350,7 @@ class Gen:
             if any(k in t for k in ('amenity', 'shop', 'office', 'leisure', 'craft')):
                 continue
             x, y = int(a['x'] - self.ox), int(a['y'] - self.oy)
-            if not (0 <= x < self.W and 0 <= y < self.H) or not self.zone[y, x]:
+            if not (0 <= x < self.W and 0 <= y < self.H) or not self.zone[y, x] or self.metro[y, x]:
                 continue
             dirs = self.street_dirs(x, y)
             if not dirs:
@@ -475,7 +517,7 @@ class Gen:
         """Houses on empty residential frontage where the address data has gaps.
         Real address points were placed first, so these only take what's left."""
         core = (self.road == R_STREET)
-        ok = self.zone & (self.ground == G_LAWN)
+        ok = self.zone & (self.ground == G_LAWN) & ~self.metro
         H, W = self.H, self.W
         n = 0
         cand = []
@@ -515,6 +557,11 @@ class Gen:
             w, h = x1 - x0, y1 - y0
             if w < 3 or h < 2 or x0 < 1 or y0 < 1 or x1 >= self.W - 1 or y1 >= self.H - 1:
                 continue
+            cy, cx = min((y0 + y1) // 2, self.H - 1), min((x0 + x1) // 2, self.W - 1)
+            if self.metro[cy, cx]:
+                if self.metro_building(x0, y0, w, h, b['tags'], h32(b['id'])):
+                    n += 1
+                continue
             if not self.zone[min(y1, self.H - 1), min(x1, self.W - 1)]:
                 ts = RUR
             else:
@@ -530,6 +577,132 @@ class Gen:
             self.flat_building(x0, y0, w, h, ts, h32(b['id']))
             n += 1
         self.stats['buildings'] = n
+
+    def metro_building(self, x0, y0, w, h, tags, hs):
+        """Saffron-style city building on an OSM footprint: the Silph tower for big or
+        tall footprints, yellow apartment blocks for mid-size, green-roof shophouses for
+        small ones. Bottom edge sits on the footprint's south edge; taller buildings rise
+        north of it (the Gen 3 view)."""
+        import saffron
+        try:
+            levels = int(float(tags.get('building:levels', '0')))
+        except ValueError:
+            levels = 0
+        area = w * h
+        if not levels:
+            levels = 12 if area > 1400 else 8 if area > 800 else 4 if area > 250 else 3 if area > 90 else 2
+        bottom = y0 + h - 1
+        plans = []
+        if levels >= 6 and w >= 9:
+            n = max(1, min(3, w // 11))
+            floors = max(2, min(levels, 14))
+            plans = [saffron.tower_plan(floors) for _ in range(n)]
+            gap = (w - 9 * n) // (n + 1)
+        elif w >= 5:
+            units = max(1, w // 5)
+            floors = max(1, min(max(levels - 1, h - 4), 6))      # fill the footprint's depth
+            plans = [saffron.apt_plan(units, floors)]
+            gap = (w - 5 * units) // 2
+        elif w >= 4:
+            plans = [saffron.house_plan(max(1, w // 4), hs % max(1, w // 4))]
+            gap = 0
+        else:
+            return False
+        x = x0 + max(0, gap)
+        placed = False
+        for plan in plans:
+            pw, ph = len(plan[0]), len(plan)
+            top = bottom - ph + 1
+            if top < 1 or x + pw >= self.W - 1:
+                x += pw + gap
+                continue
+            area_ok = not self.blocked[top:bottom + 1, x:x + pw].any() and \
+                all((x + c, top + r) not in self.obj for r in range(ph) for c in range(pw))
+            if not area_ok:
+                # too tall for the space north of it: drop floors until it fits
+                while ph > 6 and (self.blocked[top:bottom + 1, x:x + pw].any()):
+                    plan = plan[:3] + plan[4:] if len(plan) > 8 else plan
+                    if len(plan) == ph:
+                        break
+                    ph = len(plan); top = bottom - ph + 1
+                area_ok = not self.blocked[top:bottom + 1, x:x + pw].any() and \
+                    all((x + c, top + r) not in self.obj for r in range(ph) for c in range(pw))
+            if area_ok:
+                for r, row in enumerate(plan):
+                    for c, m in enumerate(row):
+                        self.put(x + c, top + r, METRO, f'sf_{m:03x}', m in saffron.DOORS)
+                self.occupied[top - 1:bottom + 2, x - 1:x + pw + 1] = True
+                placed = True
+            x += pw + gap
+        return placed
+
+    def metro_infill(self):
+        """Downtown frontage the data leaves empty gets Saffron shophouses and apartment
+        blocks set right behind the sidewalk (street to their south)."""
+        import saffron
+        core = self.road > 0
+        n = 0
+        ys, xs = np.nonzero(core & self.metro)
+        for y, x in sorted(zip(ys.tolist(), xs.tolist())):
+            if x % 3 or y < 10 or core[y - 1, x]:
+                continue
+            edge = y - 1                         # sidewalk ring row above the street
+            if self.road[edge, x] or not self.metro[edge, x]:
+                continue
+            hs = h32('metro', x + self.ox, y + self.oy)
+            kind = hs % 3
+            if kind == 0:
+                plan = saffron.house_plan(1 + (hs >> 3) % 3, (hs >> 5) % 3)
+            else:
+                plan = saffron.apt_plan(1 + (hs >> 3) % 3, 1 + (hs >> 6) % 3)
+            pw, ph = len(plan[0]), len(plan)
+            bottom = edge - 1
+            top = bottom - ph + 1
+            if top < 1 or x + pw >= self.W:
+                continue
+            if self.blocked[top:bottom + 1, x:x + pw].any() or self.occupied[top:bottom + 1, x:x + pw].any():
+                continue
+            if any((x + c, top + r) in self.obj for r in range(ph) for c in range(pw)):
+                continue
+            if not self.metro[top:bottom + 1, x:x + pw].all():
+                continue
+            for r, row in enumerate(plan):
+                for c, m in enumerate(row):
+                    self.put(x + c, top + r, METRO, f'sf_{m:03x}', m in saffron.DOORS)
+            self.occupied[top - 1:bottom + 1, x:x + pw + 1] = True
+            n += 1
+        # then pack the rest of each block in rows, Saffron style
+        H, W = self.H, self.W
+        bad = self.blocked | self.occupied | ~self.metro
+        for (x_, y_) in self.obj:
+            bad[y_, x_] = True
+        for phase in (0, 4):
+            for bottom in range(10 + phase, H - 1, 8):
+                if not self.metro[bottom].any():
+                    continue
+                x = 0
+                while x < W - 6:
+                    if bad[bottom, x]:
+                        x += 1
+                        continue
+                    hs = h32('fill', x + self.ox, bottom + self.oy)
+                    if hs % 4 == 0:
+                        plan = saffron.house_plan(1 + (hs >> 3) % 2, (hs >> 5) % 2)
+                    else:
+                        plan = saffron.apt_plan(1 + (hs >> 3) % 2, 1 + (hs >> 6) % 2)
+                    pw, ph = len(plan[0]), len(plan)
+                    top = bottom - ph + 1
+                    if top >= 1 and x + pw < W and not bad[top - 1:bottom + 2, x - 1 if x else 0:x + pw + 1].any():
+                        for r, row in enumerate(plan):
+                            for c, m in enumerate(row):
+                                self.put(x + c, top + r, METRO, f'sf_{m:03x}', m in saffron.DOORS)
+                        bad[top - 1:bottom + 2, max(0, x - 1):x + pw + 1] = True
+                        self.occupied[top - 1:bottom + 2, max(0, x - 1):x + pw + 1] = True
+                        n += 1
+                        x += pw + 1
+                    else:
+                        x += 1
+        self.stats['metro_infill'] = n
 
     def flat_building(self, x, y, w, h, ts, hs):
         """Large footprint from the house kit: roof rows fill the depth, wall row at the bottom."""
@@ -581,6 +754,7 @@ class Gen:
                          [1.0, 0.30, 0.35, 0.30, 0.12, 0.08, 0.12], 0.0)
         f = np.where(g == G_WOOD, 1.0, np.maximum(base, np.minimum(1.0, c * 1.4)))
         f[np.isin(g, (G_FIELD, G_WATER, G_PARKING, G_FARMYARD))] = 0
+        f[self.metro] = np.minimum(f[self.metro], 0.04)          # a few street trees downtown
         want = u > 1 - f
         n = 0
         slot = np.zeros((H // 2, W // 2), bool)
@@ -769,6 +943,7 @@ class Gen:
                 else:
                     names[y, x] = 'road_edge_s'
         self.stamp_bulbs(tsg, names)
+        self.metro_surface(tsg, names)
         # rail over everything below it
         for y, x in zip(*np.nonzero(self.rail)):
             horiz = (x > 0 and self.rail[y, x - 1]) or (x < W - 1 and self.rail[y, x + 1])
@@ -827,6 +1002,7 @@ class Gen:
             detail.backyard(self, h)
             detail.front_tree(self, h)
         self.pass_buildings()
+        self.metro_infill()
         detail.farmsteads(self)
         self.pass_trees()
         tsg, names, walk = self.resolve()

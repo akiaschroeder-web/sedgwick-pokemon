@@ -159,6 +159,7 @@ def furniture(G, tsg, names):
     """Streetlights on block corners, power poles along country roads."""
     H, W = names.shape
     lamp_at = {'block_corner_sw': (-1, 1), 'block_corner_se': (1, 1), 'block_corner_nw': (-1, -1), 'block_corner_ne': (1, -1)}
+    lamp_at.update({k + '_paved': v for k, v in list(lamp_at.items())})
     n_lamp = n_pole = 0
     for (y, x) in zip(*np.nonzero(np.isin(names, list(lamp_at)))):
         if h32(x, y, 'lamp') % 3:
@@ -170,11 +171,17 @@ def furniture(G, tsg, names):
         lx, ly = x + dx, y + dy
         if dy > 0:
             ly += 1           # lamp base sits on the lower tile
-        if 1 <= ly < H and 0 <= lx < W and names[ly, lx] == 'lawn' and names[ly - 1, lx] == 'lawn' \
-                and (lx, ly) not in G.obj and (lx, ly - 1) not in G.obj:
+        if not (1 <= ly < H and 0 <= lx < W) or (lx, ly) in G.obj or (lx, ly - 1) in G.obj:
+            continue
+        if names[ly, lx] == 'lawn' and names[ly - 1, lx] == 'lawn':
             names[ly - 1, lx], names[ly, lx] = 'streetlight_top', 'streetlight_bottom'
             tsg[ly - 1, lx] = tsg[ly, lx] = RES
-            n_lamp += 1
+        elif names[ly, lx] == 'sf_2e9' and names[ly - 1, lx] == 'sf_2e9':
+            names[ly - 1, lx], names[ly, lx] = 'streetlight_top_paved', 'streetlight_bottom_paved'
+            tsg[ly - 1, lx] = tsg[ly, lx] = 4
+        else:
+            continue
+        n_lamp += 1
     # power poles: every 24 tiles on the lawn strip beside gravel and highway roads
     edge_names = ('gravel_edge_n', 'hwy_edge_n')
     for (y, x) in zip(*np.nonzero(np.isin(names, edge_names))):

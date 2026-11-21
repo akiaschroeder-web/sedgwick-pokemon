@@ -1629,3 +1629,14 @@ const struct Tileset gTileset_SedgwickConfluence =
     .metatileAttributes = gMetatileAttributes_SedgwickConfluence,
     .callback = NULL,
 };
+
+const struct Tileset gTileset_SedgwickMetro =
+{
+    .isCompressed = TRUE,
+    .isSecondary = TRUE,
+    .tiles = gTilesetTiles_SedgwickMetro,
+    .palettes = gTilesetPalettes_SedgwickMetro,
+    .metatiles = gMetatiles_SedgwickMetro,
+    .metatileAttributes = gMetatileAttributes_SedgwickMetro,
+    .callback = NULL,
+};

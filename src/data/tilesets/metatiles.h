@@ -432,3 +432,6 @@ const u16 gMetatileAttributes_SedgwickAviation[] = INCBIN_U16("data/tilesets/sec
 
 const u16 gMetatiles_SedgwickConfluence[] = INCBIN_U16("data/tilesets/secondary/sedgwick_confluence/metatiles.bin");
 const u16 gMetatileAttributes_SedgwickConfluence[] = INCBIN_U16("data/tilesets/secondary/sedgwick_confluence/metatile_attributes.bin");
+
+const u16 gMetatiles_SedgwickMetro[] = INCBIN_U16("data/tilesets/secondary/sedgwick_metro/metatiles.bin");
+const u16 gMetatileAttributes_SedgwickMetro[] = INCBIN_U16("data/tilesets/secondary/sedgwick_metro/metatile_attributes.bin");

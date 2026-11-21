@@ -152,3 +152,33 @@ def piece_indexed(src, m, palmap, ground_pals=()):
         top.append(None if top_empty else (tg, palmap[tp]))
     return dict(bottom=bottom, top=top, layer=['NORMAL', 'COVERED', 'SPLIT'][min(layer, 2)],
                 beh=getattr(src, 'last_beh', 0) or 0)
+
+
+def merge_close_colors(pieces, max_pals, max_colors=15):
+    """Merge the closest colour pairs (in place) until the pieces pack into max_pals
+    palettes. Near-duplicate shades in FRLG art make this nearly invisible."""
+    import math
+    def quads():
+        for p in pieces:
+            for L in (p['bottom'], p['top']):
+                for g in L:
+                    if g not in (None, 'LAWN'):
+                        yield g
+    while True:
+        pals, _ = pack(pieces, max_colors)
+        if len(pals) <= max_pals:
+            return
+        cols = sorted({c for g in quads() for r in g for c in r if c is not None})
+        best = None
+        for i in range(len(cols)):
+            for j in range(i + 1, len(cols)):
+                d = math.dist(cols[i], cols[j])
+                if best is None or d < best[0]:
+                    best = (d, cols[i], cols[j])
+        _, a, b = best
+        keep = tuple((x + y) // 2 for x, y in zip(a, b))
+        for g in quads():
+            for r in g:
+                for k, c in enumerate(r):
+                    if c == a or c == b:
+                        r[k] = keep

@@ -65,6 +65,8 @@ def pass_elevators(G):
             continue
         p = G.local(r['pts'])
         mx, my = p[len(p) // 2]
+        if not (0 <= int(my) < G.H and 0 <= int(mx) < G.W) or G.metro[int(my), int(mx)] or G.zone[int(my), int(mx)] and G.land is not None and G.land[int(my), int(mx)] in (23, 24):
+            continue
         s = spot(G, int(mx), int(my), 6, 7, 16)
         if s:
             for c in range(6):
@@ -81,6 +83,8 @@ def pass_civic(G):
         t = p['tags']
         x, y = int(p['x'] - G.ox), int(p['y'] - G.oy)
         if not (20 <= x < G.W - 20 and 20 <= y < G.H - 20):
+            continue
+        if G.metro[y, x]:
             continue
         hs = h32(t.get('name', ''), x, y)
         kind = t.get('amenity') or t.get('shop') or t.get('man_made') or t.get('office')
@@ -123,7 +127,7 @@ def pass_downtown(G):
         t = p['tags']
         if any(k in t for k in ('shop', 'amenity', 'office', 'craft')):
             x, y = int(p['x'] - G.ox), int(p['y'] - G.oy)
-            if 0 <= x < G.W and 0 <= y < G.H:
+            if 0 <= x < G.W and 0 <= y < G.H and not G.metro[y, x]:
                 row = G.road[y, max(0, x - 25):x + 25]
                 if (row == R_MAIN).any():
                     pts.append(y)

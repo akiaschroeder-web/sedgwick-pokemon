@@ -429,6 +429,53 @@ def downtown_ts():
     return ts
 
 
+def metro_ts():
+    """Downtown Wichita: streets with fully paved curbs, Saffron's cobblestone and buildings."""
+    import saffron
+    ts = Tileset('sedgwick_metro')
+    P_STREET, P_PROPS = 6, 7
+    ts.palettes[P_STREET] = street.PAL_STREET
+    ts.palettes[P_PROPS] = props.PAL_PROPS
+    ts.add('lawn', GRASS_BOTTOM, P_STREET)
+    grass = {street.GL, street.GR, street.G3, street.G4}
+    def paved(g):
+        return [[street.conc_px(x, y) if v in grass else v for x, v in enumerate(row)] for y, row in enumerate(g)]
+    for name, (g, beh) in street.metatiles().items():
+        if name.startswith(('culdesacN', 'culdesacE', 'culdesacW', 'bend', 'diag21', 'drive')):
+            continue
+        ts.add(name, g, P_STREET, beh=beh)
+        if name.startswith(('road_edge', 'block_corner', 'diag45', 'culdesac')):
+            ts.add(name + '_paved', paved(g), P_STREET, beh=beh)
+    for name, g in commercial.parking().items():
+        ts.add(name, g, P_STREET)
+    for name, (top, layer, beh) in props.metatiles().items():
+        if name.startswith(('chainlink', 'privacy', 'mailbox', 'power_pole', 'rr_')):
+            continue
+        ts.add(name, GRASS_BOTTOM, P_STREET, top, P_PROPS, layer=layer, beh=beh)
+        sw = [[street.conc_px(x, y) for x in range(16)] for y in range(16)]
+        ts.add(name + '_paved', sw, P_STREET, top, P_PROPS, layer=layer, beh=beh)
+    # Saffron pieces: repack their colours into slots 8-12
+    pieces = {m: saffron.SRC.piece(m, ground_pals=()) for m in saffron.ids()}
+    orig.merge_close_colors(list(pieces.values()), 5)
+    pals, assign = orig.pack(list(pieces.values()))
+    assert len(pals) <= 5, f'Saffron needs {len(pals)} palettes'
+    for k, pl in enumerate(pals):
+        ts.palettes[8 + k] = pl
+    lawn_q = quads(GRASS_BOTTOM)
+    def conv(g, q):
+        if g == 'LAWN':
+            return (lawn_q[q], P_STREET)
+        if g is None:
+            return (None, 0)
+        pi = assign[id(g)]
+        return (orig.index_quad(g, pals[pi]), 8 + pi)
+    for m, p in pieces.items():
+        ts.add_q(f'sf_{m:03x}', [conv(g, q) for q, g in enumerate(p['bottom'])],
+                 [conv(g, q) for q, g in enumerate(p['top'])], layer=p['layer'],
+                 beh='MB_NON_ANIMATED_DOOR' if m in saffron.DOORS else 'MB_NORMAL')
+    return ts
+
+
 def register_downtown_doors(ts):
     """Rustboro tower/tan doors and the Battle Dome door keep their own animations."""
     C = camel(ts.name)
@@ -713,6 +760,12 @@ if __name__ == '__main__':
     register(ts, ntiles)
     write_labels(ts, index)
     register_downtown_doors(ts)
+    json.dump(index, open(os.path.join(here, '..', f'{ts.name}_metatiles.json'), 'w'), indent=1)
+    print(f'{ts.name}: {ntiles} tiles, {len(ts.metatiles)} metatiles, palettes {sorted(ts.palettes)}')
+    ts = metro_ts()
+    ntiles, index = ts.write()
+    register(ts, ntiles)
+    write_labels(ts, index)
     json.dump(index, open(os.path.join(here, '..', f'{ts.name}_metatiles.json'), 'w'), indent=1)
     print(f'{ts.name}: {ntiles} tiles, {len(ts.metatiles)} metatiles, palettes {sorted(ts.palettes)}')
     ts = retail_ts()
