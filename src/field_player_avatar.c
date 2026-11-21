@@ -1608,6 +1608,13 @@ enum Gender GetPlayerAvatarGenderByGraphicsId(u16 gfxId)
     case OBJ_EVENT_GFX_GREEN_FISH:
     case OBJ_EVENT_GFX_GREEN_VS_SEEKER:
     case OBJ_EVENT_GFX_GREEN_VS_SEEKER_BIKE:
+// sedgwick players begin
+    case OBJ_EVENT_GFX_SEDGWICK_GIRL_NORMAL:
+    case OBJ_EVENT_GFX_SEDGWICK_GIRL_BIKE:
+    case OBJ_EVENT_GFX_SEDGWICK_GIRL_SURF:
+    case OBJ_EVENT_GFX_SEDGWICK_GIRL_FIELD_MOVE:
+    case OBJ_EVENT_GFX_SEDGWICK_GIRL_FISH:
+// sedgwick players end
         return FEMALE;
     default:
         return MALE;

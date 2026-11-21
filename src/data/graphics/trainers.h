@@ -483,6 +483,12 @@ const u8 gTrainerBackPic_OldMan[] = INCGFX_U8("graphics/trainers/back_pics/old_m
 
 const u16 gTrainerBackPicPalette_Red[] = INCGFX_U16("graphics/trainers/back_pics/red.png", ".gbapal");
 const u16 gTrainerBackPicPalette_Leaf[] = INCGFX_U16("graphics/trainers/back_pics/leaf.png", ".gbapal");
+// sedgwick players begin
+const u8 gTrainerBackPic_SedgwickBoy[] = INCGFX_U8("graphics/trainers/back_pics/sedgwick_boy.png", ".4bpp");
+const u16 gTrainerBackPicPalette_SedgwickBoy[] = INCGFX_U16("graphics/trainers/back_pics/sedgwick_boy.png", ".gbapal");
+const u8 gTrainerBackPic_SedgwickGirl[] = INCGFX_U8("graphics/trainers/back_pics/sedgwick_girl.png", ".4bpp");
+const u16 gTrainerBackPicPalette_SedgwickGirl[] = INCGFX_U16("graphics/trainers/back_pics/sedgwick_girl.png", ".gbapal");
+// sedgwick players end
 const u16 gTrainerBackPicPalette_Pokedude[] = INCGFX_U16("graphics/trainers/back_pics/pokedude.png", ".gbapal");
 const u16 gTrainerBackPicPalette_OldMan[] = INCGFX_U16("graphics/trainers/back_pics/old_man.png", ".gbapal");
 
@@ -593,12 +599,12 @@ const struct TrainerPicInfo gTrainerPicInfo[TRAINER_PIC_COUNT] =
     [TRAINER_PIC_BRENDAN] =
     {
         .frontPic = TRAINER_FRONT_PIC(gTrainerFrontPic_Brendan, gTrainerPalette_Brendan),
-        .backPic = TRAINER_BACK_PIC(4, gTrainerBackPic_Brendan, gTrainerPalette_Brendan, sBackAnims_Hoenn),
+        .backPic = TRAINER_BACK_PIC(5, gTrainerBackPic_SedgwickBoy, gTrainerBackPicPalette_SedgwickBoy, sBackAnims_Kanto),
     },
     [TRAINER_PIC_MAY] =
     {
         .frontPic = TRAINER_FRONT_PIC(gTrainerFrontPic_May, gTrainerPalette_May),
-        .backPic = TRAINER_BACK_PIC(4, gTrainerBackPic_May, gTrainerPalette_May, sBackAnims_Hoenn),
+        .backPic = TRAINER_BACK_PIC(5, gTrainerBackPic_SedgwickGirl, gTrainerBackPicPalette_SedgwickGirl, sBackAnims_Kanto),
     },
     [TRAINER_PIC_RED] =
     {

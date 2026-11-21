@@ -56,36 +56,65 @@ HEAD = {
 }
 
 
+def recolor(d, rel, x, v):
+    """Leaf's index v at row rel below the top of her hat."""
+    if rel <= 8:                                   # hat (only reached in odd poses): hair
+        return {9: 4, 10: 1, 12: 4, 11: 1}.get(v, v)
+    if rel <= 11:                                  # face, hair at the sides
+        return v
+    if rel <= 14:                                  # maroon jacket, yellow stripe, cream bag
+        v = {6: 5, 5: 7, 7: 7, 13: 9, 14: 10}.get(v, v)
+        return 13 if rel == 13 and v in (5, 7) else v
+    if rel == 15:                                  # shorts
+        return {6: 8, 13: 9, 14: 10}.get(v, v)
+    if rel == 16:                                  # black socks
+        return {5: 12, 3: 12, 2: 12, 13: 9, 14: 10}.get(v, v)
+    return {10: 5, 9: 7, 12: 8, 3: 12, 2: 12, 6: 8}.get(v, v)   # maroon boots
+
+
+def fallback(fr, y, x, rel):
+    return recolor(None, rel, x, fr[y][x]) if rel > 8 else {9: 4, 10: 1, 12: 4, 11: 1}.get(fr[y][x], fr[y][x])
+
+
+def post(fr, d, flip, ox, oy):
+    """Tie the bow on a fallback-edited head: the two bow rows go above its top."""
+    top = next((y for y in range(len(fr)) if any(fr[y][ox:ox + 16])), None)
+    if top is None or top < 2:
+        return
+    rows = HEAD[d][:2]
+    if flip:
+        rows = [r[::-1] for r in rows]
+    for i, r in enumerate(rows):
+        for x, c in enumerate(r):
+            if c != '.' and fr[top - 2 + i][ox + x] == 0:
+                fr[top - 2 + i][ox + x] = HEX.index(c)
+
+
 def walking():
     src = load(f'{PEOPLE}/leaf/green_normal.png')
     out = copy.deepcopy(src)
     for f in range(9):
         fr = out[f]
-        t = top_row(src[f])                    # top of Leaf's hat
+        t = top_row(src[f])
         key = 'down' if f in DOWN else ('up' if f in UP else 'left')
-        rows = HEAD[key]
-        base = t - 2                           # bow sits two rows above where the hat started
-        for i, r in enumerate(rows):
+        for i, r in enumerate(HEAD[key]):
             assert len(r) == 16, (key, i, r)
-            fr[base + i] = [HEX.index(c) if c != '.' else 0 for c in r]
+            fr[t - 2 + i] = [HEX.index(c) if c != '.' else 0 for c in r]
         for y in range(t + 9, 32):
-            rel = y - t
             for x in range(16):
-                v = fr[y][x]
-                if rel <= 11:                          # face, hair at the sides
-                    pass
-                elif rel <= 14:                        # maroon jacket, yellow stripe, cream bag
-                    v = {6: 5, 5: 7, 7: 7, 13: 9, 14: 10}.get(v, v)
-                    if rel == 13 and v in (5, 7):
-                        v = 13
-                elif rel == 15:                        # shorts
-                    v = {6: 8, 13: 9, 14: 10}.get(v, v)
-                elif rel == 16:                        # black socks
-                    v = {5: 12, 3: 12, 2: 12, 13: 9, 14: 10}.get(v, v)
-                else:                                  # maroon boots
-                    v = {10: 5, 9: 7, 12: 8, 3: 12, 2: 12, 6: 8}.get(v, v)
-                fr[y][x] = v
+                fr[y][x] = recolor(key, y - t, x, fr[y][x])
     return out
+
+
+def character():
+    src = load(f'{PEOPLE}/leaf/green_normal.png')
+    new = walking()
+    templates, heads = {}, {}
+    for f, d in {0: 'down', 1: 'up', 2: 'left'}.items():
+        t = top_row(src[f])
+        templates[d] = [src[f][t + r] for r in range(9)]
+        heads[d] = ([src[f][t + r] for r in range(-2, 12)], [new[f][t + r] for r in range(-2, 12)])
+    return templates, heads, -2, recolor, fallback, post
 
 
 if __name__ == '__main__':

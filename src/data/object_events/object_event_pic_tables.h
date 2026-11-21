@@ -2494,3 +2494,106 @@ static const struct SpriteFrameImage sPicTable_MomFrlg[] = {
 };
 
 #endif // IS_FRLG
+
+// sedgwick players begin
+static const struct SpriteFrameImage sPicTable_SedgwickBoyNormal[] = {
+    overworld_frame(gObjectEventPic_SedgwickBoyNormal, 2, 4, 0),
+    overworld_frame(gObjectEventPic_SedgwickBoyNormal, 2, 4, 1),
+    overworld_frame(gObjectEventPic_SedgwickBoyNormal, 2, 4, 2),
+    overworld_frame(gObjectEventPic_SedgwickBoyNormal, 2, 4, 3),
+    overworld_frame(gObjectEventPic_SedgwickBoyNormal, 2, 4, 4),
+    overworld_frame(gObjectEventPic_SedgwickBoyNormal, 2, 4, 5),
+    overworld_frame(gObjectEventPic_SedgwickBoyNormal, 2, 4, 6),
+    overworld_frame(gObjectEventPic_SedgwickBoyNormal, 2, 4, 7),
+    overworld_frame(gObjectEventPic_SedgwickBoyNormal, 2, 4, 8),
+    overworld_frame(gObjectEventPic_SedgwickBoySurfRun, 2, 4, 3),
+    overworld_frame(gObjectEventPic_SedgwickBoySurfRun, 2, 4, 4),
+    overworld_frame(gObjectEventPic_SedgwickBoySurfRun, 2, 4, 5),
+    overworld_frame(gObjectEventPic_SedgwickBoySurfRun, 2, 4, 6),
+    overworld_frame(gObjectEventPic_SedgwickBoySurfRun, 2, 4, 7),
+    overworld_frame(gObjectEventPic_SedgwickBoySurfRun, 2, 4, 8),
+    overworld_frame(gObjectEventPic_SedgwickBoySurfRun, 2, 4, 9),
+    overworld_frame(gObjectEventPic_SedgwickBoySurfRun, 2, 4, 10),
+    overworld_frame(gObjectEventPic_SedgwickBoySurfRun, 2, 4, 11),
+    overworld_frame(gObjectEventPic_SedgwickBoySurfRun, 2, 4, 12),
+    overworld_frame(gObjectEventPic_SedgwickBoySurfRun, 2, 4, 13),
+};
+
+static const struct SpriteFrameImage sPicTable_SedgwickBoyBike[] = {
+    overworld_ascending_frames(gObjectEventPic_SedgwickBoyBike, 4, 4),
+};
+
+static const struct SpriteFrameImage sPicTable_SedgwickBoySurf[] = {
+    overworld_frame(gObjectEventPic_SedgwickBoySurfRun, 2, 4, 0),
+    overworld_frame(gObjectEventPic_SedgwickBoySurfRun, 2, 4, 1),
+    overworld_frame(gObjectEventPic_SedgwickBoySurfRun, 2, 4, 2),
+    overworld_frame(gObjectEventPic_SedgwickBoySurfRun, 2, 4, 0),
+    overworld_frame(gObjectEventPic_SedgwickBoySurfRun, 2, 4, 0),
+    overworld_frame(gObjectEventPic_SedgwickBoySurfRun, 2, 4, 1),
+    overworld_frame(gObjectEventPic_SedgwickBoySurfRun, 2, 4, 1),
+    overworld_frame(gObjectEventPic_SedgwickBoySurfRun, 2, 4, 2),
+    overworld_frame(gObjectEventPic_SedgwickBoySurfRun, 2, 4, 2),
+    overworld_frame(gObjectEventPic_SedgwickBoySurfRun, 2, 4, 0),
+    overworld_frame(gObjectEventPic_SedgwickBoySurfRun, 2, 4, 1),
+    overworld_frame(gObjectEventPic_SedgwickBoySurfRun, 2, 4, 2),
+};
+
+static const struct SpriteFrameImage sPicTable_SedgwickBoyItem[] = {
+    overworld_ascending_frames(gObjectEventPic_SedgwickBoyItem, 2, 4),
+};
+
+static const struct SpriteFrameImage sPicTable_SedgwickBoyFish[] = {
+    overworld_ascending_frames(gObjectEventPic_SedgwickBoyFish, 4, 4),
+};
+
+static const struct SpriteFrameImage sPicTable_SedgwickGirlNormal[] = {
+    overworld_frame(gObjectEventPic_SedgwickGirlNormal, 2, 4, 0),
+    overworld_frame(gObjectEventPic_SedgwickGirlNormal, 2, 4, 1),
+    overworld_frame(gObjectEventPic_SedgwickGirlNormal, 2, 4, 2),
+    overworld_frame(gObjectEventPic_SedgwickGirlNormal, 2, 4, 3),
+    overworld_frame(gObjectEventPic_SedgwickGirlNormal, 2, 4, 4),
+    overworld_frame(gObjectEventPic_SedgwickGirlNormal, 2, 4, 5),
+    overworld_frame(gObjectEventPic_SedgwickGirlNormal, 2, 4, 6),
+    overworld_frame(gObjectEventPic_SedgwickGirlNormal, 2, 4, 7),
+    overworld_frame(gObjectEventPic_SedgwickGirlNormal, 2, 4, 8),
+    overworld_frame(gObjectEventPic_SedgwickGirlSurfRun, 2, 4, 3),
+    overworld_frame(gObjectEventPic_SedgwickGirlSurfRun, 2, 4, 4),
+    overworld_frame(gObjectEventPic_SedgwickGirlSurfRun, 2, 4, 5),
+    overworld_frame(gObjectEventPic_SedgwickGirlSurfRun, 2, 4, 6),
+    overworld_frame(gObjectEventPic_SedgwickGirlSurfRun, 2, 4, 7),
+    overworld_frame(gObjectEventPic_SedgwickGirlSurfRun, 2, 4, 8),
+    overworld_frame(gObjectEventPic_SedgwickGirlSurfRun, 2, 4, 9),
+    overworld_frame(gObjectEventPic_SedgwickGirlSurfRun, 2, 4, 10),
+    overworld_frame(gObjectEventPic_SedgwickGirlSurfRun, 2, 4, 11),
+    overworld_frame(gObjectEventPic_SedgwickGirlSurfRun, 2, 4, 12),
+    overworld_frame(gObjectEventPic_SedgwickGirlSurfRun, 2, 4, 13),
+};
+
+static const struct SpriteFrameImage sPicTable_SedgwickGirlBike[] = {
+    overworld_ascending_frames(gObjectEventPic_SedgwickGirlBike, 4, 4),
+};
+
+static const struct SpriteFrameImage sPicTable_SedgwickGirlSurf[] = {
+    overworld_frame(gObjectEventPic_SedgwickGirlSurfRun, 2, 4, 0),
+    overworld_frame(gObjectEventPic_SedgwickGirlSurfRun, 2, 4, 1),
+    overworld_frame(gObjectEventPic_SedgwickGirlSurfRun, 2, 4, 2),
+    overworld_frame(gObjectEventPic_SedgwickGirlSurfRun, 2, 4, 0),
+    overworld_frame(gObjectEventPic_SedgwickGirlSurfRun, 2, 4, 0),
+    overworld_frame(gObjectEventPic_SedgwickGirlSurfRun, 2, 4, 1),
+    overworld_frame(gObjectEventPic_SedgwickGirlSurfRun, 2, 4, 1),
+    overworld_frame(gObjectEventPic_SedgwickGirlSurfRun, 2, 4, 2),
+    overworld_frame(gObjectEventPic_SedgwickGirlSurfRun, 2, 4, 2),
+    overworld_frame(gObjectEventPic_SedgwickGirlSurfRun, 2, 4, 0),
+    overworld_frame(gObjectEventPic_SedgwickGirlSurfRun, 2, 4, 1),
+    overworld_frame(gObjectEventPic_SedgwickGirlSurfRun, 2, 4, 2),
+};
+
+static const struct SpriteFrameImage sPicTable_SedgwickGirlItem[] = {
+    overworld_ascending_frames(gObjectEventPic_SedgwickGirlItem, 2, 4),
+};
+
+static const struct SpriteFrameImage sPicTable_SedgwickGirlFish[] = {
+    overworld_ascending_frames(gObjectEventPic_SedgwickGirlFish, 4, 4),
+};
+
+// sedgwick players end

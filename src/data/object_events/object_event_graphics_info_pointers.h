@@ -236,6 +236,16 @@ extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_RubySapphir
 extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_RubySapphireMay;
 extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_Lugia;
 extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_HoOh;
+extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_SedgwickBoyNormal;
+extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_SedgwickBoyBike;
+extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_SedgwickBoySurf;
+extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_SedgwickBoyFieldMove;
+extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_SedgwickBoyFish;
+extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_SedgwickGirlNormal;
+extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_SedgwickGirlBike;
+extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_SedgwickGirlSurf;
+extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_SedgwickGirlFieldMove;
+extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_SedgwickGirlFish;
 extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_RedNormal;
 extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_RedBike;
 extern const struct ObjectEventGraphicsInfo gObjectEventGraphicsInfo_RedSurf;
@@ -645,6 +655,18 @@ const struct ObjectEventGraphicsInfo *const gObjectEventGraphicsInfoPointers[NUM
     [OBJ_EVENT_GFX_OW_MON] =                   &gObjectEventGraphicsInfo_Follower,
     [OBJ_EVENT_GFX_LIGHT_SPRITE] =             &gObjectEventGraphicsInfo_BallLight,
     [OBJ_EVENT_GFX_APRICORN_TREE] =            &gObjectEventGraphicsInfo_ApricornTree,
+// sedgwick players begin
+    [OBJ_EVENT_GFX_SEDGWICK_BOY_NORMAL] = &gObjectEventGraphicsInfo_SedgwickBoyNormal,
+    [OBJ_EVENT_GFX_SEDGWICK_BOY_BIKE] = &gObjectEventGraphicsInfo_SedgwickBoyBike,
+    [OBJ_EVENT_GFX_SEDGWICK_BOY_SURF] = &gObjectEventGraphicsInfo_SedgwickBoySurf,
+    [OBJ_EVENT_GFX_SEDGWICK_BOY_FIELD_MOVE] = &gObjectEventGraphicsInfo_SedgwickBoyFieldMove,
+    [OBJ_EVENT_GFX_SEDGWICK_BOY_FISH] = &gObjectEventGraphicsInfo_SedgwickBoyFish,
+    [OBJ_EVENT_GFX_SEDGWICK_GIRL_NORMAL] = &gObjectEventGraphicsInfo_SedgwickGirlNormal,
+    [OBJ_EVENT_GFX_SEDGWICK_GIRL_BIKE] = &gObjectEventGraphicsInfo_SedgwickGirlBike,
+    [OBJ_EVENT_GFX_SEDGWICK_GIRL_SURF] = &gObjectEventGraphicsInfo_SedgwickGirlSurf,
+    [OBJ_EVENT_GFX_SEDGWICK_GIRL_FIELD_MOVE] = &gObjectEventGraphicsInfo_SedgwickGirlFieldMove,
+    [OBJ_EVENT_GFX_SEDGWICK_GIRL_FISH] = &gObjectEventGraphicsInfo_SedgwickGirlFish,
+// sedgwick players end
 #if IS_FRLG
     [OBJ_EVENT_GFX_RED_NORMAL] =               &gObjectEventGraphicsInfo_RedNormal,
     [OBJ_EVENT_GFX_RED_BIKE] =                 &gObjectEventGraphicsInfo_RedBike,

@@ -635,3 +635,18 @@ const u16 gObjectEventPic_PidgeyOld[] = INCGFX_U16("graphics/object_events/pics/
 const u16 gObjectEventPic_ClefairyOld[] = INCGFX_U16("graphics/object_events/pics/pokemon_old/clefairy.png", ".4bpp", "-mwidth 2 -mheight 2");
 
 #endif // IS_FRLG
+
+// sedgwick players begin
+const u16 gObjectEventPic_SedgwickBoyNormal[] = INCGFX_U16("graphics/object_events/pics/people/sedgwick/boy/normal.png", ".4bpp", "-mwidth 2 -mheight 4");
+const u16 gObjectEventPic_SedgwickBoySurfRun[] = INCGFX_U16("graphics/object_events/pics/people/sedgwick/boy/surf_run.png", ".4bpp", "-mwidth 2 -mheight 4");
+const u16 gObjectEventPic_SedgwickBoyBike[] = INCGFX_U16("graphics/object_events/pics/people/sedgwick/boy/bike.png", ".4bpp", "-mwidth 4 -mheight 4");
+const u16 gObjectEventPic_SedgwickBoyFish[] = INCGFX_U16("graphics/object_events/pics/people/sedgwick/boy/fish.png", ".4bpp", "-mwidth 4 -mheight 4");
+const u16 gObjectEventPic_SedgwickBoyItem[] = INCGFX_U16("graphics/object_events/pics/people/sedgwick/boy/item.png", ".4bpp", "-mwidth 2 -mheight 4");
+const u16 gObjectEventPal_SedgwickBoy[] = INCGFX_U16("graphics/object_events/palettes/sedgwick_boy.pal", ".gbapal");
+const u16 gObjectEventPic_SedgwickGirlNormal[] = INCGFX_U16("graphics/object_events/pics/people/sedgwick/girl/normal.png", ".4bpp", "-mwidth 2 -mheight 4");
+const u16 gObjectEventPic_SedgwickGirlSurfRun[] = INCGFX_U16("graphics/object_events/pics/people/sedgwick/girl/surf_run.png", ".4bpp", "-mwidth 2 -mheight 4");
+const u16 gObjectEventPic_SedgwickGirlBike[] = INCGFX_U16("graphics/object_events/pics/people/sedgwick/girl/bike.png", ".4bpp", "-mwidth 4 -mheight 4");
+const u16 gObjectEventPic_SedgwickGirlFish[] = INCGFX_U16("graphics/object_events/pics/people/sedgwick/girl/fish.png", ".4bpp", "-mwidth 4 -mheight 4");
+const u16 gObjectEventPic_SedgwickGirlItem[] = INCGFX_U16("graphics/object_events/pics/people/sedgwick/girl/item.png", ".4bpp", "-mwidth 2 -mheight 4");
+const u16 gObjectEventPal_SedgwickGirl[] = INCGFX_U16("graphics/object_events/palettes/sedgwick_girl.pal", ".gbapal");
+// sedgwick players end
