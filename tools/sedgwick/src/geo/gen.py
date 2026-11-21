@@ -215,7 +215,10 @@ class Gen:
         self.motor = np.zeros((self.H, self.W), bool)     # interstate carriageways
         self.ovp = np.zeros((self.H, self.W), bool)       # roads crossing over them
         later = []
+        stubs = self.isolated_service()
         for i, r in enumerate(self.F['roads']):
+            if i in stubs:
+                continue
             c = r['cls']
             if c in ('driveway',) or c not in WIDTH:
                 continue
@@ -267,6 +270,31 @@ class Gen:
             def f(x, y):
                 self.rail[y, x] = True
             self.brush_line(p, 1, f)
+
+    def isolated_service(self):
+        """Service ways (lot drives) that touch no real street, directly or through other
+        service ways: drawn alone they read as a road to nowhere."""
+        roads = self.F['roads']
+        im = Image.new('1', (self.W, self.H), 0)
+        d = ImageDraw.Draw(im)
+        for r in roads:
+            if r['cls'] in WIDTH and r['cls'] != 'service':
+                d.line(self.local(r['pts']), fill=1, width=7)
+        todo = {i for i, r in enumerate(roads) if r['cls'] == 'service'}
+        m = np.array(im, bool)
+        def hit(p):
+            x, y = int(round(p[0] - self.ox)), int(round(p[1] - self.oy))
+            return not (0 <= x < self.W and 0 <= y < self.H) or m[y, x]     # off the edge: keep
+        changed = True
+        while changed and todo:
+            changed = False
+            for i in list(todo):
+                pts = roads[i]['pts']
+                if hit(pts[0]) or hit(pts[-1]):
+                    d.line(self.local(pts), fill=1, width=7)
+                    m = np.array(im, bool)
+                    todo.discard(i); changed = True
+        return todo
 
     # ------------------------------------------------------------ houses
     def street_dirs(self, x, y, maxd=40):

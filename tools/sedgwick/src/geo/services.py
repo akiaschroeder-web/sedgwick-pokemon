@@ -23,6 +23,9 @@ MART_W, MART_H, MART_DOOR = 4, 4, (2, 3)
 # price-sign pylon on the lawn at the front corner. Drive lane in front reaches the street.
 STN_W, STN_H = 11, 6
 LAB_W, LAB_H, LAB_DOOR = 7, 5, (3, 4)
+# hand-placed from local knowledge where OSM is off: (name, OSM position) -> top-left tile
+PINS = {('Kwik Shop', (8204, 11011)): (8092, 11013)}      # Goddard: NW corner of Kellogg Dr / Hopper Dr
+LAB_PIN = (8111, 11014)                                    # just east of that Kwik Shop, across Hopper
 CEL_COLORS = ('mint', 'brick', 'beige')
 TWO_CENTERS = 10000                      # towns at least this big get a second Center
 ROAD_HALF = {'street': 3, 'service': 3, 'highway': 4, 'gravel': 3, 'alley': 2, 'track': 2, 'motorway': 6}
@@ -194,7 +197,18 @@ def plan():
         if t and t.get('amenity') == 'fuel':
             stations.append((*warp(extract.proj(lo, la)), t.get('name') or t.get('brand', ''), []))
     seen = []
+    pinned = []
     for sx, sy, nm, ids in stations:
+        pin = next((v for k, v in PINS.items() if k[0] == nm and math.dist((sx, sy), k[1]) < 40), None)
+        if pin and nm not in pinned:
+            pinned.append(nm)
+            seen.append((sx, sy))
+            own = set(ids) | {b['id'] for b in F['buildings'] if any(math.dist(q, (sx, sy)) < 18 for q in b['poly'][:1])}
+            out.append({'kind': 'mart', 'name': nm, 'x': pin[0], 'y': pin[1], 'layout': 'station', 'store': 'mart',
+                        'replaces': sorted(own), 'pinned': True})
+            continue
+        if pin:
+            continue
         if not inside((sx, sy), [ring]) or any(math.dist((sx, sy), s) < 15 for s in seen):
             continue
         seen.append((sx, sy))
@@ -227,6 +241,7 @@ def plan():
     W.free[max(0, ly - 3):ly + sh + 3, max(0, lx - 3):lx + sw + 3] = False      # keep clear of the station
     W.ii[1:, 1:] = np.cumsum(np.cumsum(~W.free, 0), 1)
     spot = W.best(st['x'] + sw // 2, st['y'] + sh // 2, LAB_W, LAB_H, LAB_DOOR, 6, 40, avoid=[(o['x'], o['y']) for o in out if o['kind'] == 'pc'])
+    spot = LAB_PIN or spot
     if spot:
         out.append({'kind': 'lab', 'name': "Professor's Lab", 'x': spot[0], 'y': spot[1], 'near': st['name']})
         print('Lab', spot, 'next to', st['name'], (st['x'], st['y']))

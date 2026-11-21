@@ -1027,14 +1027,15 @@
   {
    "kind": "mart",
    "name": "Kwik Shop",
-   "x": 8200,
-   "y": 11006,
+   "x": 8092,
+   "y": 11013,
    "layout": "station",
    "store": "mart",
    "replaces": [
     637503711,
     1232030120
-   ]
+   ],
+   "pinned": true
   },
   {
    "kind": "gas",
@@ -1909,8 +1910,8 @@
   {
    "kind": "lab",
    "name": "Professor's Lab",
-   "x": 8177,
-   "y": 11002,
+   "x": 8111,
+   "y": 11014,
    "near": "Kwik Shop"
   }
  ]
