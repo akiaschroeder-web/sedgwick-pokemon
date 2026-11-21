@@ -15,7 +15,7 @@ OUT = f'{PEOPLE}/sedgwick'
 SHEETS = {'surf_run': 16, 'bike': 32, 'fish': 32, 'item': 16}
 CHARS = {
     'boy': dict(mod=players_boy, pal=players.BOY_PAL, src=('red', 'red'), rows=8, back='red', C='Boy'),
-    'girl': dict(mod=players_girl, pal=players_girl.GIRL_PAL, src=('leaf', 'green'), rows=9, back='leaf', C='Girl'),
+    'girl': dict(mod=players_girl, pal=players_girl.GIRL_PAL, src=('leaf', 'green'), rows=9, back='red', C='Girl'),
 }
 
 
