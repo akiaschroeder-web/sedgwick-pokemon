@@ -120,16 +120,21 @@ def girl_fixes(g):
             elif v == 4:
                 g[y][x] = 7
     # face: the boy's eyes and mouth, pixel for pixel (lash, white, pupil | 3 skin | pupil,
-    # white, lash; mouth one skin-shade pixel three rows below, centred)
-    face = {14: [1, 12, 1, 15, 15, 15, 1, 12, 1],
-            15: [14, 12, 1, 15, 15, 15, 1, 12, 1],
-            16: [14, 15, 15, 15, 15, 15, 15, 15, 14]}
+    # white, lash), brows above, mouth one skin-shade pixel below, centred
+    for y in range(14, 19):                                  # clear the old eye first
+        for x in range(27, 34):
+            if g[y][x] in (1, 12, 7, 13):
+                g[y][x] = 15
+    face = {14: [None, 7, 7, 15, 15, 15, 7, 7, 15],
+            15: [1, 12, 1, 15, 15, 15, 1, 12, 1],
+            16: [14, 12, 1, 15, 15, 15, 1, 12, 15],
+            17: [14, 15, 15, 15, 15, 15, 15, 15, 14]}
     for y, row in face.items():
         for i, v in enumerate(row):
-            g[y][26 + i] = v
-    g[17][30] = 14
-    for x, v in ((31, 4), (32, 5), (33, 4)):                  # bangs closed above the right eye
-        g[13][x] = v
+            if v is not None:
+                g[y][24 + i] = v
+    g[18][28] = 14
+    g[13][32] = 15                                           # stray pixel of the old eyelid
     for x, y in ((21, 36), (22, 36), (21, 37), (22, 37)):     # Poke Ball emblem on the flap
         if g[y][x] not in (0, 1):
             g[y][x] = 9 if y == 36 else 12
