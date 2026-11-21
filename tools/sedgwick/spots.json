@@ -1,0 +1,4 @@
+{
+  "_doc": "Extra places for the map viewer's jump list (gyms come from gyms.json automatically). Each: cat (group heading), name, lon, lat.",
+  "spots": []
+}

@@ -4,6 +4,7 @@
   r_IJ.png       region tile indices: index = R + 256*G
   county.png     1/8-scale overview
   signs.json     [[x, y, text], ...] world tile coords, every mailbox / address sign
+  spots.json     [{cat, name, x, y}, ...] places to jump to: every gym, plus ../spots.json
   meta.json      grid, region size, map size"""
 import glob, json, os, sys
 import numpy as np
@@ -17,6 +18,22 @@ DST = sys.argv[1] if len(sys.argv) > 1 else '/home/claude/viewer'
 ATLAS_COLS = 32
 
 
+def spots(doors):
+    """Gyms (at their built door when the region recorded one) then the hand-kept list."""
+    from geo import gyms
+    here = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    out = []
+    for g in gyms.load():
+        x, y = doors.get(g['id']) or extract.proj(g['lon'], g['lat'])
+        out.append({'cat': 'Gyms', 'name': g['name'], 'x': int(x), 'y': int(y)})
+    extra = os.path.join(here, 'spots.json')
+    if os.path.exists(extra):
+        for s in json.load(open(extra))['spots']:
+            x, y = extract.proj(s['lon'], s['lat'])
+            out.append({'cat': s.get('cat', 'Places'), 'name': s['name'], 'x': int(x), 'y': int(y)})
+    return out
+
+
 def main():
     os.makedirs(DST, exist_ok=True)
     ids = [json.load(open(f'{gen.TSDIR}/{t}_metatiles.json')) for t in gen.TILESETS]
@@ -25,6 +42,7 @@ def main():
     files = sorted(glob.glob(f'{OUT}/r_*.npz'))
     regions = []
     signs = []
+    doors = {}
     for f in files:
         i, j = int(f[-9:-7]), int(f[-6:-4])
         d = np.load(f, allow_pickle=True)
@@ -46,6 +64,8 @@ def main():
         js = json.load(open(f[:-4] + '.json'))
         for x, y, s in js['signs']:
             signs.append([int(i * REGION + x), int(j * REGION + y), s])
+        for g in js.get('gyms', []):
+            doors[g['id']] = (int(i * REGION + g['door'][0]), int(j * REGION + g['door'][1]))
     # atlas + average colours
     rows = (len(keys) + ATLAS_COLS - 1) // ATLAS_COLS
     atlas = Image.new('RGB', (ATLAS_COLS * 16, rows * 16), (24, 26, 30))
@@ -63,6 +83,7 @@ def main():
     json.dump({'colors': cols, 'names': names}, open(f'{DST}/colors.json', 'w'))
     Image.open(f'{OUT}/county.png').save(f'{DST}/county.png', optimize=True)
     json.dump(signs, open(f'{DST}/signs.json', 'w'), separators=(',', ':'))
+    json.dump(spots(doors), open(f'{DST}/spots.json', 'w'), indent=0)
     gx, gy = grid()
     json.dump({'region': REGION, 'gx': gx, 'gy': gy, 'width': extract.WIDTH, 'height': extract.HEIGHT,
                'thumb': 8, 'atlasCols': ATLAS_COLS, 'regions': regions,

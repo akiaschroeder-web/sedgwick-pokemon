@@ -94,7 +94,9 @@ def run_region(raw, cty, warps, ring, i, j, land_cache=None):
                         table=np.array([f'{t}|{nm}' for (t, nm) in table], object))
     signs = [(x - MARGIN - (i * 0), y - MARGIN, s) for x, y, s in G.signs
              if MARGIN <= x < MARGIN + REGION and MARGIN <= y < MARGIN + REGION]
-    json.dump({'signs': signs, 'stats': G.stats}, open(f'{OUT}/r_{i:02d}_{j:02d}.json', 'w'))
+    gyms = [dict(g, door=(g['door'][0] - MARGIN, g['door'][1] - MARGIN)) for g in getattr(G, 'gyms', [])
+            if g.get('door') and MARGIN <= g['door'][0] < MARGIN + REGION and MARGIN <= g['door'][1] < MARGIN + REGION]
+    json.dump({'signs': signs, 'gyms': gyms, 'stats': G.stats}, open(f'{OUT}/r_{i:02d}_{j:02d}.json', 'w'))
     thumb(idx, inside, list(table), f'{OUT}/t_{i:02d}_{j:02d}.png')
     return G.stats
 
