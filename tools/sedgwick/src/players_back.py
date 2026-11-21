@@ -1,5 +1,6 @@
 """Battle back sprites (64x64, 5 frames) for the two protagonists, edited from
 FireRed's Red and Leaf back pics. Same palette index meanings as the overworld sprites."""
+import os
 from collections import deque
 from PIL import Image
 from players import BOY_PAL
@@ -9,9 +10,22 @@ from lib import EXP
 BACK = f'{EXP}/graphics/trainers/back_pics'
 
 
+class _Frame(list):
+    pass
+
+
 def frames(name):
     im = Image.open(f'{BACK}/{name}.png')
-    return [[[im.getpixel((x, f * 64 + y)) for x in range(64)] for y in range(64)] for f in range(im.height // 64)]
+    out = []
+    for f in range(im.height // 64):
+        fr = _Frame([[im.getpixel((x, f * 64 + y)) for x in range(64)] for y in range(64)])
+        fr.index_ = f
+        out.append(fr)
+    return out
+
+
+def _set_frame(g):
+    FRAME[0] = getattr(g, 'index_', None)
 
 
 def component(g, seed, vals):
@@ -51,7 +65,8 @@ BRIM = ["...666666",
 
 
 def boy(g):
-    g = debag(g, (11, 12, 6), (9, 10), (13, 14), 4, 1)
+    _set_frame(g)
+    g = debag(g, (11, 12, 6), (9, 10), (13, 14), (4, 1), (1, 4))
     cap = hat(g, {11, 12})
     cap |= {p for p in component(g, next(iter(cap)), {11, 12, 8, 15}) if p[1] <= max(y for _, y in cap)}
     xs = [x for x, _ in cap]
@@ -151,85 +166,138 @@ if __name__ == '__main__':
 
 
 # ---------------------------------------------------------------- Red without his backpack
+def bag_pixels(g):
+    """Red's backpack: its yellow pixels plus the dark lines drawn inside it."""
+    B = {(x, y) for y in range(64) for x in range(64) if g[y][x] in (13, 14)}
+    for _ in range(3):
+        add = set()
+        for y in range(64):
+            for x in range(64):
+                if (x, y) in B or g[y][x] not in (4, 15, 6, 8):
+                    continue
+                n = sum((x + dx, y + dy) in B for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)))
+                if n >= 2:
+                    add.add((x, y))
+        B |= add
+    return B
+
+
 def debag(g, jacket, hood, stripe, strap, bag):
-    """Repaint Red's backpack as the back of a jacket: the hood hanging over the top,
-    a stripe across, a strap from the far shoulder to a small bag at the hip.
-    jacket = (light, mid, dark) indices; hood = (cream, shade); stripe = (main, shadow)."""
+    if FRAME[0] in BACK_SPECS:
+        return paint_back(g, BACK_SPECS[FRAME[0]], jacket, hood, stripe, strap, bag)
+    return debag_auto(g, jacket, hood, stripe, strap, bag)
+
+
+FRAME = [None]
+
+
+def debag_auto(g, jacket, hood, stripe, strap, bag):
+    """Repaint Red's backpack as the back of a jacket: a smooth back contour, three-tone
+    fill, the hood hanging over the shoulders, the stripe, a strap from the far shoulder
+    to a small bag at the near hip. jacket = (light, mid, dark); hood = (cream, shade)."""
     g = [r[:] for r in g]
-    rows = [y for y in range(64) if any(v in (13, 14) for v in g[y])]
-    if not rows:
+    B = bag_pixels(g)
+    if not B:
         return g
-    top, bottom = rows[0], 63
-    region = {}
-    prev = None
-    for y in range(top - 1, bottom + 1):
-        bag_x = [x for x in range(64) if g[y][x] in (13, 14)]
-        if bag_x:
-            xl = bag_x[0]
-            while xl > 0 and g[y][xl - 1] and g[y][xl - 1] not in (2, 3, 5, 7):
-                xl -= 1
-            xl = max(0, xl - 1) if xl > 0 and g[y][xl - 1] == 0 else xl
-            x = bag_x[-1]
-            stop = None
-            while x < 63:
-                x += 1
-                v = g[y][x]
-                if v == 0 or v in (5, 7, 2, 3) or (v == 6 and x + 2 < 64 and g[y][x + 1] in (5, 6) and g[y][x + 2] in (5, 6)):
-                    stop = x
-                    break
-            stop = stop or 63
-            prev = (xl, stop)
-        elif prev:
-            xl, stop = prev
-            while xl < stop and g[y][xl] == 0:
-                xl += 1
-        else:
-            continue
-        if stop - xl > 2:
-            region[y] = (xl, stop)
     L, M, D = jacket
-    for y, (xl, stop) in region.items():
-        for x in range(xl + 1, stop - 1):
-            t = (x - xl) / max(1, stop - xl)
-            g[y][x] = L if t < 0.3 else (M if t < 0.8 else D)
-        g[y][xl] = 15
-        if stop - 1 > xl:
-            g[y][stop - 1] = 15
-    # the hood hangs over the upper back
-    ys = sorted(region)
-    y0 = ys[0]
-    for y in ys[:5]:
-        xl, stop = region[y]
-        inset = (y - y0) * 2
-        for x in range(xl + 1 + inset // 2, stop - 1 - inset // 3):
-            g[y][x] = hood[0] if (x - xl) < (stop - xl) * 0.6 else hood[1]
-        if y == ys[4]:
-            for x in range(xl + 1 + inset // 2, stop - 1 - inset // 3):
-                g[y][x] = 15 if g[y - 1][x] in hood else g[y][x]
-    # stripe a third of the way down
-    sy = y0 + max(7, (bottom - y0) // 3)
-    for y in (sy, sy + 1):
-        if y in region:
-            xl, stop = region[y]
-            for x in range(xl + 1, stop - 1):
-                g[y][x] = stripe[0] if y == sy else stripe[1]
-    # strap: from the far shoulder down to the near hip
-    sx0, sy0 = region[ys[0]][1] - 2, ys[0] + 1
-    sx1, sy1 = region[ys[-1]][0] + 6, 63
-    n = max(1, sy1 - sy0)
-    for i in range(n + 1):
-        y = sy0 + i
-        x = round(sx0 + (sx1 - sx0) * i / n)
-        for dx in (0, 1):
-            if y in region and region[y][0] < x + dx < region[y][1] - 1:
-                g[y][x + dx] = strap
-    # the bag itself just shows at the bottom edge by the hip
-    xl = region[ys[-1]][0]
-    for y in range(58, 64):
-        for x in range(xl, xl + 9):
-            if 0 <= x < 64 and g[y][x]:
-                edge = y == 58 or x == xl or x == xl + 8
-                g[y][x] = 15 if edge else bag
+    rows = sorted({y for _, y in B})
+    # where the bag is the leftmost thing in its row, the back's contour has to be invented:
+    # fit a smooth curve to the bag's left edge and pull it in a pixel or two
+    lead = []
+    for y in rows:
+        xs = [x for x in range(64) if g[y][x]]
+        if xs and (xs[0], y) in B:
+            lead.append((y, xs[0]))
+    contour = {}
+    if len(lead) >= 3:
+        n = len(lead)
+        sy = sum(y for y, _ in lead) / n
+        sx = sum(x for _, x in lead) / n
+        k = sum((y - sy) * (x - sx) for y, x in lead) / max(1e-6, sum((y - sy) ** 2 for y, _ in lead))
+        y_top = lead[0][0]
+        for y, _ in lead:
+            contour[y] = round(sx + k * (y - sy) + 1 + 1.5 * (y - y_top) / max(1, 63 - y_top))
+    for x, y in B:
+        g[y][x] = 0
+    filled = set()
+    for y in rows:
+        x = 0
+        while x < 64:
+            if (x, y) in B:
+                x2 = x
+                while x2 + 1 < 64 and (x2 + 1, y) in B:
+                    x2 += 1
+                left_body = x > 0 and g[y][x - 1] != 0
+                right_body = x2 < 63 and g[y][x2 + 1] != 0
+                if left_body or (y in contour and contour[y] <= x2):
+                    start = x if left_body else max(x, contour[y])
+                    if right_body or left_body:
+                        for xx in range(start, x2 + 1):
+                            filled.add((xx, y))
+                x = x2 + 1
+            else:
+                x += 1
+    for x, y in filled:
+        g[y][x] = M
+    # outline the new edge, shade from it
+    for x, y in filled:
+        if any(not (0 <= x + dx < 64 and 0 <= y + dy < 64) or g[y + dy][x + dx] == 0
+               for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1))):
+            g[y][x] = 15
+    for x, y in filled:
+        if g[y][x] != M:
+            continue
+        dl = next((d for d in range(1, 4) if g[y][x - d] == 15 and (x - d, y) in filled), None) if x >= 3 else None
+        dr = next((d for d in range(1, 3) if x + d < 64 and (x + d, y) not in filled and g[y][x + d] != 0), None)
+        if dl is not None and dl <= 2:
+            g[y][x] = L
+        elif dr is not None:
+            g[y][x] = D
+    if FRAME[0] not in (1,):
+        return g                                             # turned side-on: just the jacket
+    # the hood over the shoulders: rounded at the bottom
+    frows = sorted({y for _, y in filled})
+    y0 = frows[0]
+    span = {y: (min(x for x, yy in filled if yy == y), max(x for x, yy in filled if yy == y)) for y in frows}
+    for i, inset in enumerate((0, 0, 1, 2, 4)):
+        y = y0 + i
+        if y not in span:
+            continue
+        a_, b_ = span[y]
+        for x in range(a_ + 1 + inset, b_ - inset):
+            g[y][x] = hood[0] if x < (a_ + b_) / 2 + 2 else hood[1]
+        if i == 4:
+            for x in range(a_ + 1 + inset, b_ - inset):
+                if y + 1 in span and (x, y + 1) in filled:
+                    g[y + 1][x] = 15 if x in (a_ + 1 + inset, b_ - inset - 1) else hood[1]
+    # stripe
+    sy = y0 + 9
+    for y, col in ((sy, stripe[0]), (sy + 1, stripe[1])):
+        for x in range(64):
+            if (x, y) in filled and g[y][x] != 15:
+                g[y][x] = col
+    # strap from the far shoulder to the near hip, two pixels wide, even steps
+    xa, ya = span[y0 + 3][1] - 2, y0 + 3
+    yb = 62
+    xb = span[max(y for y in frows if y <= yb)][0] + 5
+    for y in range(ya, yb + 1):
+        t = (y - ya) / max(1, yb - ya)
+        x = round(xa + (xb - xa) * t)
+        for dx, col in ((0, strap[0]), (1, strap[1])):
+            if (x + dx, y) in filled and g[y][x + dx] != 15:
+                g[y][x + dx] = col
+    # small bag at the hip, cut off by the bottom of the frame
+    bx0 = span[max(frows)][0]
+    art = ["oooooooo",
+           "oBBBBBBo",
+           "obbbbbbo",
+           "oBBBBBBo",
+           "oBBBBBBo"]
+    for r, row in enumerate(art):
+        for c, ch in enumerate(row):
+            x, y = bx0 - 1 + c, 59 + r
+            if 0 <= x < 64 and y < 64:
+                g[y][x] = {'o': 15, 'B': bag[0], 'b': bag[1]}[ch]
     return g
 
 
@@ -238,7 +306,8 @@ def girl(g):
     """Her reference: hair pulled up into a big wavy high ponytail (nape showing), a
     yellow ribbon tied at its base, bangs with a cream streak; maroon jacket, cream hood."""
     import math
-    g = debag(g, (7, 5, 8), (9, 10), (13, 14), 6, 9)
+    _set_frame(g)
+    g = debag(g, (7, 5, 8), (9, 10), (13, 14), (6, 4), (9, 10))
     cap = hat(g, {11, 12})
     cap |= {p for p in component(g, next(iter(cap)), {11, 12, 8, 15}) if p[1] <= max(y for _, y in cap)}
     xs = [x for x, _ in cap]
@@ -260,87 +329,18 @@ def girl(g):
         for x in range(max(0, x0 - 4), min(64, x1 + 2)):
             if x < face_left[y] and g[y][x] in (1, 4, 8):
                 g[y][x] = {1: 1, 4: 1, 8: 4}[g[y][x]]
-    # hair is drawn as layered shapes, each with its own dark outline so locks separate
-    def shape(inside, light_dir=(-1, -1)):
-        pts = {(x, y) for y in range(64) for x in range(64) if inside(x + .5, y + .5)}
-        for x, y in pts:
-            edge = any((x + dx, y + dy) not in pts for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)))
-            g[y][x] = 6 if edge else 4
-        return pts
-
-    def shade(pts, centre_fn):
-        for x, y in pts:
-            if g[y][x] == 6:
-                continue
-            off = centre_fn(x + .5, y + .5)
-            if -0.8 < off < -0.15:
-                g[y][x] = 1
-            elif off > 0.82:
-                g[y][x] = 6
-
-    def lock(path, wave=0.0, phase=0.0):
-        """A lock of hair along path [(x, y, r)...] with a wavy edge."""
-        segs = list(zip(path, path[1:]))
-
-        def near(x, y):
-            best = None
-            for (ax, ay, ar), (bx_, by_, br) in segs:
-                vx, vy = bx_ - ax, by_ - ay
-                t = max(0.0, min(1.0, ((x - ax) * vx + (y - ay) * vy) / (vx * vx + vy * vy)))
-                qx, qy = ax + vx * t, ay + vy * t
-                r = ar + (br - ar) * t
-                r += wave * math.sin((ay + vy * t) * 0.9 + phase)
-                dist = math.hypot(x - qx, y - qy)
-                # signed: negative on the left of the direction of travel (the lit side)
-                side = (x - qx) * vy - (y - qy) * vx
-                if best is None or dist / r < best[0]:
-                    best = (dist / r, math.copysign(dist / r, -side))
-            return best
-
-        pts = shape(lambda x, y: near(x, y)[0] <= 1)
-        shade(pts, lambda x, y: near(x, y)[1])
-        return pts
-
-    X, Y = x0, y0                                            # anchor: top-left of Red's cap
-    cx, cy = (x0 + x1) / 2 - 0.5, y1 + 2.0
-    rx, ry = (x1 - x0) / 2, (y1 - y0) + 1.0
+    put_hair(g, x0, y0, face_left)                           # traced from her sheet
+    cx, rx = (x0 + x1) / 2 - 0.5, (x1 - x0) / 2
     face_l = lambda y: face_left.get(int(y), 64)
-    crown = shape(lambda x, y: ((x - cx) / rx) ** 2 + ((y - cy) / ry) ** 2 <= 1
-                  and not (y >= y1 - 0.5 and x >= face_l(y) - 1) and (y < y1 + 1 or g[int(y)][int(x)] in (0, 1, 4, 8, 15)))
-    shade(crown, lambda x, y: ((x - cx) / rx + (y - cy) / ry) * 0.9)
-    for k in (0.35, 0.65):                                   # two strands combed up to the ponytail
-        for t in range(40):
-            tt = t / 39
-            x = int(cx + rx * (0.15 + 0.5 * k) - (rx * 0.9) * tt * tt)
-            y = int(cy - ry * 0.15 - ry * 0.75 * tt + k * 3)
-            if (x, y) in crown and g[y][x] != 6:
-                g[y][x] = 6
-    # the ponytail: a puff above the crown, then locks falling down the back of the head
-    lock([(X + 6, Y + 1, 5.5), (X + 1, Y - 5, 6.5), (X - 6, Y - 4, 5.5)], wave=0.6)
-    lock([(X - 2, Y - 2, 5.0), (X - 9, Y + 4, 5.0), (X - 10, Y + 12, 4.0), (X - 7, Y + 18, 2.5)], wave=0.8, phase=1)
-    lock([(X + 3, Y + 1, 4.0), (X - 4, Y + 7, 4.0), (X - 5, Y + 14, 3.0), (X - 2, Y + 18, 2.0)], wave=0.7, phase=2)
-    # yellow ribbon tied at the base of the ponytail, loops pointing up and back
-    ribbon = ["...6666.......",
-              "..6dddd6..66..",
-              ".6ddddde66dd6.",
-              ".6dddeeddddde6",
-              "..66ddeedde66.",
-              "....6edde6....",
-              "...6dde66d6...",
-              "..6dde6..6e6..",
-              "..666.....6..."]
-    put(g, X + 3, Y - 7, ribbon, {'6': 6, 'd': 13, 'e': 14})
-    # bangs over the forehead, one cream lock
+    # bangs over the forehead, with the cream lock
     fl = min(face_l(y) for y in range(y1 - 1, y1 + 3))
-    for i, x in enumerate(range(fl - 2, int(cx + rx) + 1)):
-        tip = y1 + (2 if i % 3 == 2 else 1)
-        for y in range(y1 - 3, min(64, tip + 1)):
-            if y == tip:
-                g[y][x] = 6
-            elif i == 2:
-                g[y][x] = 9 if y < tip - 1 else 10
-            else:
-                g[y][x] = 1 if (i + y) % 3 == 0 else 4
+    bangs = [".oooooooo.",
+             "ommmllmmmo",
+             "omcmmmlmmo",
+             "omcmommlmo",
+             ".ocoo.omo.",
+             "..o....o.."]
+    put(g, fl - 3, y1 - 4, bangs, {'o': 6, 'm': 4, 'l': 1, 'c': 9})
     # clothes: Red's red jacket and blue sleeves become maroon
     for y in range(y1 + 8, 64):
         for x in range(64):
@@ -348,3 +348,147 @@ def girl(g):
             if v in (11, 12, 6, 5):
                 g[y][x] = {11: 7, 12: 5, 6: 8, 5: 5}[v]
     return g
+
+
+# ---------------------------------------------------------------- hand-set geometry for the idle frames
+# Frame 0 is on screen for the whole battle and frame 2 is the same pose mid-throw, so their
+# jacket backs are laid out by hand: per row, the back contour (x of its outline) and the first
+# column of the sleeve/arm that stays as Red drew it. Hood, stripe, strap and bag are placed
+# explicitly rather than inferred.
+BACK_SPECS = {
+    0: dict(rows={44: (31, 45), 45: (29, 45), 46: (27, 45), 47: (26, 44), 48: (25, 42), 49: (24, 42),
+                  50: (24, 42), 51: (23, 41), 52: (23, 41), 53: (22, 40), 54: (22, 40), 55: (22, 40),
+                  56: (21, 41), 57: (21, 40), 58: (21, 40), 59: (21, 39), 60: (20, 38), 61: (20, 39),
+                  62: (20, 39), 63: (20, 38)},
+            hood={44: (32, 44), 45: (30, 44), 46: (29, 43), 47: (29, 41), 48: (31, 38)},
+            stripe=53, strap=((41, 45), (27, 58)), bag=(19, 58)),
+    2: dict(rows={44: (18, 29), 45: (24, 29), 46: (24, 29), 47: (23, 42), 48: (19, 42), 49: (19, 42),
+                  50: (18, 39), 51: (17, 37), 52: (16, 35), 53: (16, 35), 54: (16, 34), 55: (15, 34),
+                  56: (15, 33), 57: (15, 33), 58: (14, 32), 59: (14, 32), 60: (14, 31), 61: (13, 30),
+                  62: (13, 30), 63: (13, 30)},
+            hood={45: (26, 33), 46: (25, 34), 47: (25, 36), 48: (26, 36), 49: (28, 34)},
+            stripe=53, strap=((37, 49), (22, 58)), bag=(12, 58)),
+}
+
+
+def paint_back(g, spec, jacket, hood, stripe, strap, bag):
+    g = [r[:] for r in g]
+    B = bag_pixels(g)
+    L, M, D = jacket
+    rows = spec['rows']
+    for x, y in B:                                           # backpack off
+        if y not in rows or x < rows[y][0] or x >= rows[y][1]:
+            g[y][x] = 0
+    for y, (c, r) in rows.items():
+        g[y][c] = 15
+        for x in range(c + 1, r):
+            t = x - c
+            g[y][x] = L if t <= 2 else (D if r - x <= 2 else M)
+        if r < 64 and g[y][r] == 0:
+            g[y][r - 1] = 15                                 # open side: close it with an outline
+        for x in range(0, c):                                # nothing of the bag left outside
+            if (x, y) in B:
+                g[y][x] = 0
+    top = min(rows)
+    for x in range(rows[top][0], rows[top][1]):              # close the shoulders with an outline
+        if g[top - 1][x] == 0:
+            g[top - 1][x] = 15
+    # hood draped over the shoulders, outlined along its bottom edge
+    hood_px = {(x, y) for y, (a_, b_) in spec['hood'].items() for x in range(a_, b_ + 1)}
+    for x, y in hood_px:
+        a_, b_ = spec['hood'][y]
+        g[y][x] = hood[0] if x < a_ + (b_ - a_) * 0.62 else hood[1]
+    for x, y in hood_px:
+        if (x, y + 1) not in hood_px and y + 1 in rows and rows[y + 1][0] < x < rows[y + 1][1]:
+            g[y + 1][x] = 15
+    # stripe
+    for y, col in ((spec['stripe'], stripe[0]), (spec['stripe'] + 1, stripe[1])):
+        c, r = rows[y]
+        for x in range(c + 1, r):
+            g[y][x] = col
+    # strap: even steps from the far shoulder to the bag
+    (xa, ya), (xb, yb) = spec['strap']
+    for y in range(ya, yb + 1):
+        x = round(xa + (xb - xa) * (y - ya) / (yb - ya))
+        for dx, col in ((0, strap[0]), (1, strap[1])):
+            if y in rows and rows[y][0] < x + dx < rows[y][1]:
+                g[y][x + dx] = col
+    # the bag at the hip, hanging just outside the back contour
+    bx, by = spec['bag']
+    art = ["oooooooo",
+           "oBBBBBBo",
+           "obbbbbbo",
+           "oBBYBBBo",
+           "oBBBBBBo",
+           "oBBBBBBo"]
+    for r_, row in enumerate(art):
+        for c_, ch in enumerate(row):
+            x, y = bx + c_, by + r_
+            if 0 <= x < 64 and y < 64:
+                g[y][x] = {'o': 15, 'B': bag[0], 'b': bag[1], 'Y': stripe[0]}[ch]
+    return g
+
+
+# ---------------------------------------------------------------- the girl's hair, traced from her sheet
+REF = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'custom', 'source', 'girl_reference.png')
+HAIR_SCALE = 0.19
+
+
+def hair_patch():
+    """Her back-view head from the reference sheet, shrunk to sprite size and snapped to her
+    palette: dict (x, y) -> index, in patch coordinates."""
+    im = Image.open(REF).convert('RGB')
+    w, h = im.size
+    crop = im.crop((int(w * 0.255), int(h * 0.015), int(w * 0.405), int(h * 0.185)))   # head, above the hood
+    sw, sh = round(crop.width * HAIR_SCALE), round(crop.height * HAIR_SCALE)
+    small = crop.resize((sw, sh), Image.LANCZOS)
+    out, lums = {}, {}
+    for y in range(sh):
+        for x in range(sw):
+            r, g_, b = small.getpixel((x, y))
+            if r > 215 and g_ > 205 and b > 195:
+                continue                                     # paper
+            if r > 190 and g_ > 140 and b < 120 and r - b > 80:
+                out[(x, y)] = 13 if g_ > 175 else 14         # ribbon
+            elif r > 215 and g_ > 165 and b > 130:
+                out[(x, y)] = 'skin'
+            else:
+                lums[(x, y)] = 0.3 * r + 0.59 * g_ + 0.11 * b
+    ordered = sorted(lums.values())
+    lo, hi = ordered[int(len(ordered) * 0.28)], ordered[int(len(ordered) * 0.80)]
+    for p, l in lums.items():
+        out[p] = 6 if l < lo else (4 if l < hi else 1)
+    for _ in range(2):                                       # tidy single stray pixels
+        nxt = dict(out)
+        for (x, y), v in out.items():
+            if v not in (1, 4, 6):
+                continue
+            n = [out.get((x + dx, y + dy)) for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1))]
+            n = [k for k in n if k in (1, 4, 6)]
+            if len(n) == 4 and v not in n:
+                nxt[(x, y)] = max(set(n), key=n.count)
+        out = nxt
+    for (x, y), v in list(out.items()):
+        if v == 1 and sum(out.get((x + dx, y + dy)) == 1 for dx in (-1, 0, 1) for dy in (-1, 0, 1) if dx or dy) <= 1:
+            out[(x, y)] = 4
+    # Gen 3 outline: hair pixels on the silhouette go dark
+    for (x, y), v in list(out.items()):
+        if v in (1, 4) and any((x + dx, y + dy) not in out for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1))):
+            out[(x, y)] = 6
+    return out
+
+
+_PATCH = []
+
+
+def put_hair(g, x0, y0, face_left):
+    if not _PATCH:
+        _PATCH.append(hair_patch())
+    ox, oy = x0 - 18, y0 - 10
+    for (x, y), v in _PATCH[0].items():
+        X, Y = x + ox, y + oy
+        if not (0 <= X < 64 and 0 <= Y < 64) or v == 'skin':
+            continue
+        if Y >= y0 + 12 and X >= face_left.get(Y, 64) - 1:
+            continue                                         # leave the face and ear clear
+        g[Y][X] = v
