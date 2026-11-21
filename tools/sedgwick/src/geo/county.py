@@ -134,7 +134,13 @@ def run(which):
         if os.path.exists(f'{OUT}/r_{i:02d}_{j:02d}.npz') and not which:
             continue
         t = time.time()
-        st = run_region(raw, cty, warps, ring, i, j)
+        try:
+            st = run_region(raw, cty, warps, ring, i, j)
+        except Exception:
+            import traceback
+            print(f'region {i},{j} FAILED', flush=True)
+            traceback.print_exc()
+            continue
         print(f'region {i},{j} {time.time() - t:.0f}s', st, flush=True)
 
 

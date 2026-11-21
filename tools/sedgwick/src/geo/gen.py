@@ -334,7 +334,7 @@ class Gen:
                 self.featured.append((x, y, f"{a['num']} {a['street']}"))
             if self.place_house(x, y, d, dirs[d][0], width, storeys, hs, f"{a['num']} {a['street']}"):
                 placed += 1
-                if st.get('neighbors_east') and d == 's':
+                if st.get('neighbors_east') and d == 's' and not getattr(self, 'skip_neighbors', False):
                     self.fix_neighbors_east(self.houses[-1], st['neighbors_east'])
             elif self.place_house(x, y, d, dirs[d][0], 5, 1, hs, f"{a['num']} {a['street']}"):
                 placed += 1
@@ -452,7 +452,13 @@ class Gen:
         end: reserve that frontage and put exactly n evenly spaced houses on it."""
         edge = h['edge']
         x = h['x'] + h['w']
+        # stop where this street's name ends (West Autumn Blaze -> Autumn Blaze is another street)
+        rid0 = int(self.roadid[edge + 1, h['x'] + h['w'] // 2])
+        name0 = self.F['roads'][rid0 - 1]['name'] if rid0 else None
         while x < self.W - 1 and self.road[edge + 1, x] and not self.road[edge, x]:
+            rid = int(self.roadid[edge + 1, x])
+            if name0 and rid and self.F['roads'][rid - 1]['name'] != name0:
+                break
             x += 1
         x0, x1 = h['x'] + h['w'] + 1, x - 1
         top = edge - 12

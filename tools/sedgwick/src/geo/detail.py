@@ -62,7 +62,7 @@ def street_car(G, hrec):
     edge = hrec['edge']
     for cx in (hrec['x'] + 1, hrec['x'] + hrec['w'] - 3):
         lane = edge + 1
-        if lane >= G.H or cx + 1 >= G.W:
+        if lane + 1 >= G.H or cx + 2 >= G.W or cx < 1:
             continue
         if all(G.road[lane, cx + i] == R_STREET and G.road[lane + 1, cx + i] in (R_STREET,) and
                G.road[edge, cx + i] == 0 and (cx + i, edge) not in G.obj and (cx + i, lane) not in G.obj
