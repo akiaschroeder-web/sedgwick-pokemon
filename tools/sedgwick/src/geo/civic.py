@@ -111,6 +111,10 @@ def pass_civic(G):
                 n += 1
         elif kind in ('library', 'post_office', 'police', 'fire_station', 'townhall', 'supermarket',
                       'social_facility', 'convenience', 'bank'):
+            if kind == 'supermarket' and any(min(q[0] for q in b['poly']) <= p['x'] <= max(q[0] for q in b['poly']) and
+                                             min(q[1] for q in b['poly']) <= p['y'] <= max(q[1] for q in b['poly'])
+                                             for b in G.F['buildings']):
+                continue                  # its own building becomes a big-box store (extras)
             units = 3 if kind in ('supermarket', 'social_facility') else 2
             s = spot(G, x, y, units * 4, 4 if units == 3 else 5)
             if s:

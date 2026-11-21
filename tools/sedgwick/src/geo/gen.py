@@ -16,14 +16,14 @@ from PIL import Image, ImageDraw
 HERE = os.path.dirname(os.path.abspath(__file__))
 TSDIR = os.path.join(HERE, '..', '..')
 TILESETS = ['sedgwick_residential', 'sedgwick_rural', 'sedgwick_commercial', 'sedgwick_downtown', 'sedgwick_metro',
-            'sedgwick_landmarks', 'sedgwick_aviation']
+            'sedgwick_landmarks', 'sedgwick_aviation', 'sedgwick_city', 'sedgwick_retail', 'sedgwick_confluence']
 METRO = 4
 RES, RUR = 0, 1
 
 # ground classes
 G_LAWN, G_FIELD, G_WOOD, G_WATER, G_PARK, G_PARKING, G_CEMETERY, G_MEADOW, G_FARMYARD, G_DITCH, G_PRAIRIE = range(11)
 # NLCD 2025 land cover classes -> ground (None = keep the default)
-NLCD_GROUND = {11: G_WATER, 31: G_MEADOW, 41: G_WOOD, 42: G_WOOD, 43: G_WOOD, 52: G_PRAIRIE, 71: G_PRAIRIE,
+NLCD_GROUND = {11: G_WATER, 21: G_LAWN, 31: G_MEADOW, 41: G_WOOD, 42: G_WOOD, 43: G_WOOD, 52: G_PRAIRIE, 71: G_PRAIRIE,
                81: G_MEADOW, 82: G_FIELD, 90: G_WOOD, 95: G_PRAIRIE}
 # road classes (core cells)
 R_NONE, R_STREET, R_MAIN, R_HWY, R_GRAVEL, R_ALLEY = range(6)
@@ -199,6 +199,10 @@ class Gen:
                     m &= ~self.zone if k == 'farmland' else m
                     self.field_id[m] = a['id'] & 0x7fffffff
                 self.ground[m] = cls[k]
+        # airfields: mown grass between the runways, not crops
+        aero = self.poly_mask([self.local(f['pts']) for f in self.F.get('feat', [])
+                               if f['closed'] and f['tags'].get('aeroway') == 'aerodrome'])
+        self.ground[aero & ~np.isin(self.ground, (G_WATER, G_WOOD))] = G_LAWN
         # fields with no polygon: one crop per quarter-section (half-mile square, 322 tiles)
         ys, xs = np.mgrid[0:self.H, 0:self.W]
         q = ((ys + self.oy) // 322) * 1000 + (xs + self.ox) // 322
@@ -207,6 +211,9 @@ class Gen:
 
     def pass_roads(self):
         prio = {R_ALLEY: 1, R_GRAVEL: 2, R_STREET: 3, R_MAIN: 4, R_HWY: 5}
+        self.motor = np.zeros((self.H, self.W), bool)     # interstate carriageways
+        self.ovp = np.zeros((self.H, self.W), bool)       # roads crossing over them
+        later = []
         for i, r in enumerate(self.F['roads']):
             c = r['cls']
             if c in ('driveway',) or c not in WIDTH:
@@ -222,11 +229,24 @@ class Gen:
             if c == 'street' and r['name'].endswith('Main Street'):
                 rc, w = R_MAIN, 3
             ow = bool(r.get('oneway'))
-            def f(x, y, rc=rc, i=i, ow=ow):
+            mo = c == 'motorway' and not r.get('link')
+            def f(x, y, rc=rc, i=i, ow=ow, mo=mo):
                 if prio[rc] > prio.get(int(self.road[y, x]), 0):
                     self.road[y, x] = rc
                     self.roadid[y, x] = i + 1
                     self.oneway[y, x] = ow
+                    self.motor[y, x] = mo
+            self.brush_line(p, w, f)
+            if r.get('bridge') and c != 'motorway':
+                later.append((p, w, rc, i))
+        # roads that bridge over the interstate stay on top of it (overpasses)
+        for p, w, rc, i in later:
+            def f(x, y, rc=rc, i=i):
+                if self.motor[y, x]:
+                    self.road[y, x] = rc
+                    self.roadid[y, x] = i + 1
+                    self.motor[y, x] = False
+                    self.ovp[y, x] = True
             self.brush_line(p, w, f)
         # parking lots: asphalt with curbs, drawn as low-priority street cores
         self.parking = np.zeros((self.H, self.W), bool)
@@ -353,7 +373,7 @@ class Gen:
 
     def pass_houses(self):
         roads = self.road_ring()
-        self.blocked = roads | self.rail | (self.ground == G_WATER) | self.reserved
+        self.blocked |= roads | self.rail | (self.ground == G_WATER) | self.reserved
         bmask = {}
         for b in self.F['buildings']:
             xs = [p[0] - self.ox for p in b['poly']]; ys = [p[1] - self.oy for p in b['poly']]
@@ -759,7 +779,7 @@ class Gen:
         """Trees in groves, not sprinkles: smooth noise picks where groves sit, the
         canopy % (or a per-ground default) picks how much of the land they cover.
         Inside a grove every free 2x2 spot gets a tree, so stands read as solid."""
-        free = ~(self.road_ring() | self.rail | self.occupied | (self.ground == G_WATER))
+        free = ~(self.road_ring() | self.rail | self.occupied | (self.ground == G_WATER) | self.apron)
         H, W = self.H, self.W
         nz = 0.9 * vnoise(H, W, self.ox, self.oy, 10, 'grove') + 0.1 * vnoise(H, W, self.ox, self.oy, 3, 'grove2')
         # rank-transform to uniform so "cover fraction f" means f of the land
@@ -1019,11 +1039,15 @@ class Gen:
         self.blocked = roads | self.rail | (self.ground == G_WATER) | self.reserved
         from geo import gyms
         gyms.build(self)
+        self.blocked |= self.apron              # nothing else builds on airport concrete
         from geo import services
         services.build(self)
+        from geo import extras
+        extras.place(self)
         civic.pass_elevators(self)
         civic.pass_downtown(self)
         civic.pass_civic(self)
+        extras.special_buildings(self)
         self.pass_houses()
         self.pass_infill()
         from geo import detail
@@ -1043,5 +1067,6 @@ class Gen:
         env.flowers(self)
         self.pass_trees()
         tsg, names, walk = self.resolve()
+        extras.finish(self, tsg, names, walk)
         detail.furniture(self, tsg, names)
         return tsg, names, walk

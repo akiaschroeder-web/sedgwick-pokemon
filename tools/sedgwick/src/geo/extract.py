@@ -74,6 +74,25 @@ def area_class(t):
     return None
 
 
+FEAT_WAY = {'aeroway': None, 'golf': None, 'leisure': ('pitch', 'playground', 'park', 'garden', 'golf_course'),
+            'man_made': ('pier',), 'amenity': ('fast_food', 'shelter'), 'tourism': ('attraction', 'zoo', 'artwork'),
+            'shop': ('supermarket', 'department_store', 'doityourself', 'wholesale', 'hardware'),
+            'waterway': ('canal', 'river'), 'barrier': ('lift_gate',)}
+FEAT_NODE = {'highway': ('traffic_signals', 'stop', 'bus_stop'), 'emergency': ('fire_hydrant',),
+             'railway': ('level_crossing', 'crossing'), 'amenity': ('bench', 'waste_basket', 'fast_food', 'shelter'),
+             'leisure': ('picnic_table', 'playground'), 'golf': ('pin',), 'tourism': ('artwork', 'attraction', 'zoo'),
+             'barrier': ('lift_gate', 'gate'), 'military': ('checkpoint',),
+             'shop': ('supermarket', 'department_store', 'doityourself', 'wholesale', 'hardware')}
+
+
+def _feat(t, table):
+    for k, vals in table.items():
+        v = t.get(k)
+        if v and (vals is None or v in vals):
+            return True
+    return False
+
+
 def extract(raw, bbox=None):
     """bbox = (x0, y0, x1, y1) in tile coords; features touching it are kept."""
     nodes, ways, rels = raw
@@ -97,13 +116,18 @@ def extract(raw, bbox=None):
         xs = [q[0] for q in p]; ys = [q[1] for q in p]
         return max(xs) >= x0 and min(xs) <= x1 and max(ys) >= y0 and min(ys) <= y1
 
-    F = {'roads': [], 'areas': [], 'buildings': [], 'rail': [], 'addresses': [], 'pois': [], 'turns': []}
+    F = {'roads': [], 'areas': [], 'buildings': [], 'rail': [], 'addresses': [], 'pois': [], 'turns': [],
+         'feat': [], 'nfeat': [], 'paths': []}
     for wid, (refs, t) in ways.items():
         if not t:
             continue
         p = pts(refs)
         if not p or not keep(p):
             continue
+        if _feat(t, FEAT_WAY):          # extra detail layer (aeroways, golf, pitches, piers ...)
+            F['feat'].append({'id': wid, 'pts': p, 'closed': refs[0] == refs[-1], 'tags': t})
+        if t.get('highway') in ('footway', 'path', 'cycleway', 'pedestrian'):
+            F['paths'].append({'id': wid, 'pts': p, 'bridge': t.get('bridge') == 'yes', 'tags': t})
         if 'building' in t:
             F['buildings'].append({'id': wid, 'poly': p, 'tags': t})
             continue
@@ -127,6 +151,12 @@ def extract(raw, bbox=None):
             continue
         ac = area_class(t)
         isb = 'building' in t
+        if t.get('aeroway') == 'aerodrome' or t.get('tourism') == 'zoo':
+            for r in rings((mem, t), ways, nodes, 'outer'):
+                if r and r[0] == r[-1]:
+                    o = [proj(*q) for q in r]
+                    if keep(o):
+                        F['feat'].append({'id': -rid, 'pts': o, 'closed': True, 'tags': t})
         if not ac and not isb:
             continue
         rel = (mem, t)
@@ -144,6 +174,8 @@ def extract(raw, bbox=None):
             continue
         if t.get('highway') in ('turning_circle', 'turning_loop'):
             F['turns'].append({'x': x, 'y': y})
+        if _feat(t, FEAT_NODE):
+            F['nfeat'].append({'id': nid, 'x': x, 'y': y, 'tags': t})
         if 'addr:housenumber' in t:
             F['addresses'].append({'x': x, 'y': y, 'num': t['addr:housenumber'], 'street': t.get('addr:street', ''), 'tags': t})
         elif any(k in t for k in ('amenity', 'shop', 'man_made', 'leisure', 'tourism', 'office')):
