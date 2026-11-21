@@ -62,6 +62,9 @@ body { background: var(--ground); color: var(--ink); font-family: var(--font-bod
   border-radius: 999px; padding: 4px 10px; cursor: pointer;
 }
 .chip:hover, .chip:focus-visible { border-color: var(--accent); outline: none; }
+.interior { margin: 0; border-top: 1px solid var(--line); padding-top: 8px; display: grid; gap: 6px; }
+.interior .room { width: 192px; height: 144px; max-width: 100%; background: url(interiors.png) no-repeat; image-rendering: pixelated; border-radius: 6px; justify-self: center; }
+.interior figcaption { font: 500 12px var(--font-body); color: var(--muted); text-align: center; }
 .spots { border-top: 1px solid var(--line); padding-top: 8px; }
 .spots summary { cursor: pointer; font: 600 13px var(--font-body); list-style: none; display: flex; justify-content: space-between; align-items: center; }
 .spots summary::-webkit-details-marker { display: none; }
@@ -108,6 +111,10 @@ body { background: var(--ground); color: var(--ink); font-family: var(--font-bod
     <input id="q" type="search" placeholder="Search an address, e.g. 208 West Autumn Blaze" autocomplete="off">
     <ul class="results" id="results"></ul>
   </div>
+  <figure class="interior" id="interior" hidden>
+    <div class="room" id="room" role="img"></div>
+    <figcaption id="roomCap"></figcaption>
+  </figure>
   <div class="chips" id="chips"></div>
   <details class="spots" id="spots">
     <summary>Places <span class="count" id="spotCount"></span></summary>
@@ -373,10 +380,18 @@ q.addEventListener('input', () => {
   for (const h of hits) {
     const li = document.createElement('li'), b = document.createElement('button');
     b.textContent = h[2];
-    b.onclick = () => { flyTo(h[0], h[1], 24, h[2]); results.innerHTML = ''; q.blur(); };
+    b.onclick = () => { flyTo(h[0], h[1], 24, h[2]); results.innerHTML = ''; q.blur(); showRoom(h[3], h[2]); };
     li.appendChild(b); results.appendChild(li);
   }
 });
+function showRoom(n, addr) {
+  const f = document.getElementById('interior');
+  if (!n) { f.hidden = true; return; }
+  const k = n - 1;
+  document.getElementById('room').style.backgroundPosition = `-${(k % 10) * 192}px -${Math.floor(k / 10) * 144}px`;
+  document.getElementById('roomCap').textContent = `Inside ${addr}: House ${String(n).padStart(3, '0')} (one of 100 interiors)`;
+  f.hidden = false;
+}
 q.addEventListener('keydown', e => { if (e.key === 'Enter') { const b = results.querySelector('button'); if (b) b.click(); } });
 
 // ---------- boot
