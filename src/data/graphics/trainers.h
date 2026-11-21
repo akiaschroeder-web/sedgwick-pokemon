@@ -273,6 +273,12 @@ const u16 gTrainerPalette_PyramidKingBrandon[] = INCGFX_U16("graphics/trainers/f
 
 const u32 gTrainerFrontPic_Red[] = INCGFX_U32("graphics/trainers/front_pics/red.png", ".4bpp.smol");
 const u16 gTrainerPalette_Red[] = INCGFX_U16("graphics/trainers/front_pics/red.png", ".gbapal");
+// sedgwick front pics begin
+const u32 gTrainerFrontPic_SedgwickBoy[] = INCGFX_U32("graphics/trainers/front_pics/sedgwick_boy.png", ".4bpp.smol");
+const u16 gTrainerPalette_SedgwickBoy[] = INCGFX_U16("graphics/trainers/front_pics/sedgwick_boy.png", ".gbapal");
+const u32 gTrainerFrontPic_SedgwickGirl[] = INCGFX_U32("graphics/trainers/front_pics/sedgwick_girl.png", ".4bpp.smol");
+const u16 gTrainerPalette_SedgwickGirl[] = INCGFX_U16("graphics/trainers/front_pics/sedgwick_girl.png", ".gbapal");
+// sedgwick front pics end
 
 const u32 gTrainerFrontPic_Leaf[] = INCGFX_U32("graphics/trainers/front_pics/leaf.png", ".4bpp.smol");
 const u16 gTrainerPalette_Leaf[] = INCGFX_U16("graphics/trainers/front_pics/leaf.png", ".gbapal");
@@ -598,12 +604,12 @@ const struct TrainerPicInfo gTrainerPicInfo[TRAINER_PIC_COUNT] =
     },
     [TRAINER_PIC_BRENDAN] =
     {
-        .frontPic = TRAINER_FRONT_PIC(gTrainerFrontPic_Brendan, gTrainerPalette_Brendan),
+        .frontPic = TRAINER_FRONT_PIC(gTrainerFrontPic_SedgwickBoy, gTrainerPalette_SedgwickBoy),
         .backPic = TRAINER_BACK_PIC(5, gTrainerBackPic_SedgwickBoy, gTrainerBackPicPalette_SedgwickBoy, sBackAnims_Kanto),
     },
     [TRAINER_PIC_MAY] =
     {
-        .frontPic = TRAINER_FRONT_PIC(gTrainerFrontPic_May, gTrainerPalette_May),
+        .frontPic = TRAINER_FRONT_PIC(gTrainerFrontPic_SedgwickGirl, gTrainerPalette_SedgwickGirl),
         .backPic = TRAINER_BACK_PIC(5, gTrainerBackPic_SedgwickGirl, gTrainerBackPicPalette_SedgwickGirl, sBackAnims_Kanto),
     },
     [TRAINER_PIC_RED] =
