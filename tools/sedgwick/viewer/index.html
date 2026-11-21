@@ -1,0 +1,395 @@
+<title>Sedgwick Region Map</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Silkscreen&family=Inter:wght@400;500;600&display=swap">
+<style>
+/* Layout: one full-screen map canvas; a floating survey card top-left (name, address search),
+   a readout strip bottom-left, zoom controls bottom-right. */
+:root {
+  --panel: rgba(250, 251, 247, 0.94);
+  --panel-solid: #fafbf7;
+  --ink: #1d2a24;
+  --muted: #5d6c64;
+  --line: rgba(29, 42, 36, 0.14);
+  --accent: #2f7d5b;          /* Hoenn grass green, darkened for text */
+  --accent-ink: #ffffff;
+  --mark: #e0533d;            /* the house marker */
+  --ground: #6fc6a4;          /* behind the map, matches the lawn tile */
+  --font-display: "Silkscreen", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --font-body: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --panel: rgba(22, 28, 25, 0.92); --panel-solid: #161c19; --ink: #e6efe9; --muted: #9db0a5;
+    --line: rgba(230, 239, 233, 0.14); --accent: #6fd3a3; --accent-ink: #0d1a13; --mark: #ff7a5c;
+    --ground: #1b2420; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --panel: rgba(22, 28, 25, 0.92); --panel-solid: #161c19; --ink: #e6efe9; --muted: #9db0a5;
+  --line: rgba(230, 239, 233, 0.14); --accent: #6fd3a3; --accent-ink: #0d1a13; --mark: #ff7a5c;
+  --ground: #1b2420; color-scheme: dark;
+}
+html, body { height: 100%; }
+body { background: var(--ground); color: var(--ink); font-family: var(--font-body); overflow: hidden; }
+#map { position: fixed; inset: 0; width: 100%; height: 100%; display: block; cursor: grab; touch-action: none; }
+#map.dragging { cursor: grabbing; }
+
+.card {
+  position: fixed; top: calc(12px + env(safe-area-inset-top, 0px)); left: max(12px, env(safe-area-inset-left, 0px));
+  width: min(340px, calc(100vw - 24px)); background: var(--panel); border: 1px solid var(--line);
+  border-radius: 10px; box-shadow: 0 6px 24px rgba(0,0,0,.18); backdrop-filter: blur(6px);
+  display: flex; flex-direction: column; gap: 10px; padding: 14px;
+}
+.card h1 { margin: 0; font-family: var(--font-display); font-size: 17px; font-weight: 400; letter-spacing: .02em; text-wrap: balance; }
+.card .sub { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.4; }
+.search { position: relative; }
+.search input {
+  width: 100%; box-sizing: border-box; font: 500 14px var(--font-body); color: var(--ink);
+  background: var(--panel-solid); border: 1px solid var(--line); border-radius: 7px; padding: 9px 10px;
+}
+.search input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+.results { list-style: none; margin: 6px 0 0; padding: 0; display: flex; flex-direction: column; max-height: 40vh; overflow: auto; }
+.results button {
+  width: 100%; text-align: left; font: 13px var(--font-body); color: var(--ink); background: none;
+  border: 0; border-radius: 6px; padding: 7px 8px; cursor: pointer;
+}
+.results button:hover, .results button:focus-visible { background: var(--line); outline: none; }
+.results .none { color: var(--muted); font-size: 13px; padding: 6px 8px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip {
+  font: 500 12px var(--font-body); color: var(--accent); background: none; border: 1px solid var(--line);
+  border-radius: 999px; padding: 4px 10px; cursor: pointer;
+}
+.chip:hover, .chip:focus-visible { border-color: var(--accent); outline: none; }
+
+.readout {
+  position: fixed; left: max(12px, env(safe-area-inset-left, 0px)); bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 7px 10px;
+  font: 12px var(--font-body); color: var(--muted); font-variant-numeric: tabular-nums;
+  display: flex; gap: 12px; flex-wrap: wrap; max-width: calc(100vw - 120px);
+}
+.readout b { color: var(--ink); font-weight: 600; }
+.zoom {
+  position: fixed; right: max(12px, env(safe-area-inset-right, 0px)); bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  display: flex; flex-direction: column; gap: 6px;
+}
+.zoom button {
+  width: 40px; height: 40px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel);
+  color: var(--ink); font: 600 18px var(--font-body); cursor: pointer;
+}
+.zoom button:focus-visible { outline: 2px solid var(--accent); }
+.loading {
+  position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--panel);
+  border: 1px solid var(--line); border-radius: 8px; padding: 10px 14px; font: 13px var(--font-body);
+}
+@media (max-width: 480px) {
+  .card { padding: 12px; gap: 8px; }
+  .card .sub { display: none; }
+}
+</style>
+
+<canvas id="map" aria-label="Map of Sedgwick County in Gen 3 tiles"></canvas>
+
+<section class="card" aria-label="Map controls">
+  <h1>Sedgwick County</h1>
+  <p class="sub">The generated overworld, tile for tile. Drag to move, scroll or pinch to zoom, search an address to jump there.</p>
+  <div class="search">
+    <label for="q" class="sub" style="display:none">Address</label>
+    <input id="q" type="search" placeholder="Search an address, e.g. 208 West Autumn Blaze" autocomplete="off">
+    <ul class="results" id="results"></ul>
+  </div>
+  <div class="chips" id="chips"></div>
+</section>
+
+<div class="readout" id="readout"><span>Loading…</span></div>
+<div class="zoom">
+  <button id="zin" aria-label="Zoom in">+</button>
+  <button id="zout" aria-label="Zoom out">−</button>
+  <button id="zall" aria-label="Show the whole county" title="Whole county">⤢</button>
+</div>
+<div class="loading" id="loading">Loading the county…</div>
+
+<script>
+(() => {
+const cv = document.getElementById('map');
+const ctx = cv.getContext('2d');
+let meta, colors, names, atlas, overview, signs = [];
+const view = { x: 0, y: 0, s: 0.05 };      // centre in tile coords, s = CSS px per tile
+const MIN_S = 0.02, MAX_S = 48;
+let dpr = 1, W = 0, H = 0;
+const cache = new Map();                 // "i,j" -> {idx, colorCanvas, last}
+const pending = new Map();
+let marker = null;                       // {x, y, text, t0}
+const signBuckets = new Map();           // "i,j" -> [sign]
+
+const PLACES = [
+  ['Downtown Wichita', -97.3375, 37.6872], ['Cheney', -97.7826, 37.6300], ['Goddard', -97.5753, 37.6597],
+  ['Derby', -97.2689, 37.5450], ['Haysville', -97.3523, 37.5645], ['Valley Center', -97.3734, 37.8347],
+];
+
+function proj(lon, lat) { return [(lon - meta.proj.lon0) * meta.proj.kx, (meta.proj.lat0 - lat) * meta.proj.ky]; }
+function unproj(x, y) { return [meta.proj.lon0 + x / meta.proj.kx, meta.proj.lat0 - y / meta.proj.ky]; }
+
+function resize() {
+  dpr = Math.min(window.devicePixelRatio || 1, 2);
+  W = cv.clientWidth; H = cv.clientHeight;
+  cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+  draw();
+}
+
+function fit() {
+  view.x = meta.width / 2; view.y = meta.height / 2;
+  view.s = Math.min(W / meta.width, H / meta.height) * 0.95;
+}
+
+function save() { try { localStorage.setItem('sedgwick-view', JSON.stringify(view)); } catch (e) {} }
+function restore() {
+  try { const v = JSON.parse(localStorage.getItem('sedgwick-view')); if (v && isFinite(v.x)) Object.assign(view, v); return !!v; }
+  catch (e) { return false; }
+}
+
+// ---------- region data
+const hasRegion = new Set();
+function loadRegion(i, j) {
+  const key = i + ',' + j;
+  if (cache.has(key) || pending.has(key) || !hasRegion.has(key)) return;
+  const img = new Image();
+  pending.set(key, img);
+  img.onload = () => {
+    const R = meta.region;
+    const c = document.createElement('canvas'); c.width = img.width; c.height = img.height;
+    const cx = c.getContext('2d', { willReadFrequently: true });
+    cx.drawImage(img, 0, 0);
+    const px = cx.getImageData(0, 0, c.width, c.height).data;
+    const idx = new Uint16Array(c.width * c.height);
+    const col = cx.createImageData(c.width, c.height);
+    const cd = col.data;
+    for (let k = 0, p = 0; k < idx.length; k++, p += 4) {
+      const v = px[p] | (px[p + 1] << 8);
+      idx[k] = v;
+      const cc = colors[v] || colors[0];
+      cd[p] = cc[0]; cd[p + 1] = cc[1]; cd[p + 2] = cc[2]; cd[p + 3] = v ? 255 : 0;
+    }
+    cx.putImageData(col, 0, 0);
+    cache.set(key, { idx, w: c.width, h: c.height, colorCanvas: c, last: performance.now() });
+    pending.delete(key);
+    trim();
+    draw();
+  };
+  img.onerror = () => pending.delete(key);
+  img.src = `r_${String(i).padStart(2, '0')}_${String(j).padStart(2, '0')}.png`;
+}
+function trim() {
+  if (cache.size <= 28) return;
+  const old = [...cache.entries()].sort((a, b) => a[1].last - b[1].last);
+  for (let k = 0; k < cache.size - 28; k++) cache.delete(old[k][0]);
+}
+function tileAt(x, y) {
+  const R = meta.region, i = Math.floor(x / R), j = Math.floor(y / R);
+  const r = cache.get(i + ',' + j);
+  if (!r) return -1;
+  const lx = Math.floor(x - i * R), ly = Math.floor(y - j * R);
+  if (lx < 0 || ly < 0 || lx >= r.w || ly >= r.h) return 0;
+  return r.idx[ly * r.w + lx];
+}
+
+// ---------- drawing
+let raf = 0;
+function draw() { if (!raf) raf = requestAnimationFrame(render); }
+function render() {
+  raf = 0;
+  if (!meta) return;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, W, H);
+  const s = view.s;
+  const x0 = view.x - W / 2 / s, y0 = view.y - H / 2 / s;
+  const x1 = view.x + W / 2 / s, y1 = view.y + H / 2 / s;
+  const toScreen = (x, y) => [(x - x0) * s, (y - y0) * s];
+  ctx.imageSmoothingEnabled = s < 1 / meta.thumb;
+  // overview underneath everything (fills while regions load)
+  if (overview) {
+    const [sx, sy] = toScreen(0, 0);
+    ctx.drawImage(overview, sx, sy, overview.width * meta.thumb * s, overview.height * meta.thumb * s);
+  }
+  const R = meta.region;
+  if (s >= 0.35) {
+    ctx.imageSmoothingEnabled = false;
+    const i0 = Math.max(0, Math.floor(x0 / R)), i1 = Math.min(meta.gx - 1, Math.floor(x1 / R));
+    const j0 = Math.max(0, Math.floor(y0 / R)), j1 = Math.min(meta.gy - 1, Math.floor(y1 / R));
+    for (let j = j0; j <= j1; j++) for (let i = i0; i <= i1; i++) {
+      const r = cache.get(i + ',' + j);
+      if (!r) { loadRegion(i, j); continue; }
+      r.last = performance.now();
+      if (s < 6) {
+        const [sx, sy] = toScreen(i * R, j * R);
+        ctx.drawImage(r.colorCanvas, sx, sy, r.w * s, r.h * s);
+      } else {
+        // real metatiles
+        const tx0 = Math.max(i * R, Math.floor(x0)), tx1 = Math.min(i * R + r.w - 1, Math.ceil(x1));
+        const ty0 = Math.max(j * R, Math.floor(y0)), ty1 = Math.min(j * R + r.h - 1, Math.ceil(y1));
+        const ac = meta.atlasCols;
+        for (let ty = ty0; ty <= ty1; ty++) {
+          const row = (ty - j * R) * r.w - i * R;
+          for (let tx = tx0; tx <= tx1; tx++) {
+            const v = r.idx[row + tx];
+            if (!v) continue;
+            const [sx, sy] = toScreen(tx, ty);
+            ctx.drawImage(atlas, (v % ac) * 16, Math.floor(v / ac) * 16, 16, 16,
+              Math.floor(sx), Math.floor(sy), Math.ceil(s) + 1, Math.ceil(s) + 1);
+          }
+        }
+      }
+    }
+  }
+  // address labels when close in
+  if (s >= 14) {
+    ctx.font = `600 ${Math.min(13, s * 0.55)}px Inter, system-ui, sans-serif`;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+    const i0 = Math.floor(x0 / R), i1 = Math.floor(x1 / R), j0 = Math.floor(y0 / R), j1 = Math.floor(y1 / R);
+    for (let j = j0; j <= j1; j++) for (let i = i0; i <= i1; i++) {
+      for (const sg of signBuckets.get(i + ',' + j) || []) {
+        if (sg[0] < x0 - 2 || sg[0] > x1 + 2 || sg[1] < y0 - 2 || sg[1] > y1 + 2) continue;
+        const [sx, sy] = toScreen(sg[0] + 0.5, sg[1]);
+        const w = ctx.measureText(sg[2]).width + 8;
+        ctx.fillStyle = 'rgba(20,28,24,.78)'; ctx.fillRect(sx - w / 2, sy - 18, w, 16);
+        ctx.fillStyle = '#fff'; ctx.fillText(sg[2], sx, sy - 3);
+      }
+    }
+  }
+  if (marker) {
+    const [sx, sy] = toScreen(marker.x + 0.5, marker.y + 0.5);
+    const t = ((performance.now() - marker.t0) / 900) % 1;
+    const css = getComputedStyle(document.documentElement).getPropertyValue('--mark').trim() || '#e0533d';
+    ctx.strokeStyle = css; ctx.lineWidth = 3;
+    ctx.globalAlpha = 1 - t;
+    ctx.beginPath(); ctx.arc(sx, sy, 10 + t * 28, 0, Math.PI * 2); ctx.stroke();
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = css; ctx.beginPath(); ctx.arc(sx, sy, 5, 0, Math.PI * 2); ctx.fill();
+    if (!matchMedia('(prefers-reduced-motion: reduce)').matches) draw();
+  }
+  readout();
+}
+
+// ---------- readout
+let hover = null;
+function readout() {
+  const el = document.getElementById('readout');
+  const mpp = meta.metersPerTile / view.s;
+  const scale = mpp * 100 >= 1000 ? (mpp * 100 / 1000).toFixed(1) + ' km' : Math.round(mpp * 100) + ' m';
+  let html = `<span>Zoom <b>${view.s >= 1 ? view.s.toFixed(view.s < 10 ? 1 : 0) + ' px/tile' : '1:' + Math.round(1 / view.s) + ' tiles/px'}</b></span><span>100 px ≈ <b>${scale}</b></span>`;
+  if (hover) {
+    const [lon, lat] = unproj(hover[0], hover[1]);
+    const v = tileAt(hover[0], hover[1]);
+    html += `<span>Tile <b>${Math.floor(hover[0])}, ${Math.floor(hover[1])}</b></span><span><b>${lat.toFixed(5)}, ${lon.toFixed(5)}</b></span>`;
+    if (v > 0 && view.s >= 3) html += `<span><b>${names[v].replace('prim:', 'Hoenn ')}</b></span>`;
+  }
+  el.innerHTML = html;
+}
+
+// ---------- interaction
+function zoomAt(f, sx, sy) {
+  const ns = Math.max(MIN_S, Math.min(MAX_S, view.s * f));
+  const wx = view.x + (sx - W / 2) / view.s, wy = view.y + (sy - H / 2) / view.s;
+  view.s = ns;
+  view.x = wx - (sx - W / 2) / ns; view.y = wy - (sy - H / 2) / ns;
+  draw(); save();
+}
+cv.addEventListener('wheel', e => { e.preventDefault(); zoomAt(Math.exp(-e.deltaY * 0.0018), e.offsetX, e.offsetY); }, { passive: false });
+const pts = new Map(); let pinch = null;
+cv.addEventListener('pointerdown', e => { cv.setPointerCapture(e.pointerId); pts.set(e.pointerId, [e.offsetX, e.offsetY]); cv.classList.add('dragging'); });
+cv.addEventListener('pointermove', e => {
+  hover = [view.x + (e.offsetX - W / 2) / view.s, view.y + (e.offsetY - H / 2) / view.s];
+  if (!pts.has(e.pointerId)) { draw(); return; }
+  const prev = pts.get(e.pointerId);
+  pts.set(e.pointerId, [e.offsetX, e.offsetY]);
+  if (pts.size === 2) {
+    const [a, b] = [...pts.values()];
+    const d = Math.hypot(a[0] - b[0], a[1] - b[1]);
+    if (pinch) zoomAt(d / pinch, (a[0] + b[0]) / 2, (a[1] + b[1]) / 2);
+    pinch = d;
+  } else {
+    view.x -= (e.offsetX - prev[0]) / view.s; view.y -= (e.offsetY - prev[1]) / view.s;
+    draw();
+  }
+});
+const up = e => { pts.delete(e.pointerId); pinch = null; if (!pts.size) cv.classList.remove('dragging'); save(); };
+cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up);
+cv.addEventListener('dblclick', e => zoomAt(2, e.offsetX, e.offsetY));
+document.getElementById('zin').onclick = () => zoomAt(2, W / 2, H / 2);
+document.getElementById('zout').onclick = () => zoomAt(0.5, W / 2, H / 2);
+document.getElementById('zall').onclick = () => { fit(); draw(); save(); };
+window.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT') return;
+  const step = 120 / view.s;
+  if (e.key === '+' || e.key === '=') zoomAt(1.5, W / 2, H / 2);
+  else if (e.key === '-') zoomAt(1 / 1.5, W / 2, H / 2);
+  else if (e.key === 'ArrowLeft') { view.x -= step; draw(); }
+  else if (e.key === 'ArrowRight') { view.x += step; draw(); }
+  else if (e.key === 'ArrowUp') { view.y -= step; draw(); }
+  else if (e.key === 'ArrowDown') { view.y += step; draw(); }
+});
+window.addEventListener('resize', resize);
+
+// fly-to
+function flyTo(x, y, s, text) {
+  const from = { ...view }, t0 = performance.now(), dur = matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 900;
+  marker = text ? { x, y, text, t0 } : null;
+  const step = now => {
+    const t = dur ? Math.min(1, (now - t0) / dur) : 1, e = t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+    const ls = Math.log(from.s) + (Math.log(s) - Math.log(from.s)) * e;
+    view.s = Math.exp(ls); view.x = from.x + (x + 0.5 - from.x) * e; view.y = from.y + (y + 0.5 - from.y) * e;
+    draw();
+    if (t < 1) requestAnimationFrame(step); else save();
+  };
+  requestAnimationFrame(step);
+}
+
+// ---------- search
+const q = document.getElementById('q'), results = document.getElementById('results');
+function norm(s) { return s.toLowerCase().replace(/\b(north|south|east|west)\b/g, m => m[0]).replace(/\b(street|st)\b/g, 'st').replace(/\b(avenue|ave)\b/g, 'ave').replace(/\b(drive|dr)\b/g, 'dr').replace(/\b(road|rd)\b/g, 'rd').replace(/\b(circle|cir)\b/g, 'cir').replace(/\b(court|ct)\b/g, 'ct').replace(/\s+/g, ' ').trim(); }
+let normed = [];
+q.addEventListener('input', () => {
+  const v = norm(q.value);
+  results.innerHTML = '';
+  if (v.length < 3) return;
+  const words = v.split(' ');
+  const hits = [];
+  for (let k = 0; k < normed.length && hits.length < 8; k++) if (words.every(w => normed[k].includes(w))) hits.push(signs[k]);
+  if (!hits.length) { results.innerHTML = '<li class="none">No mapped address matches that yet.</li>'; return; }
+  for (const h of hits) {
+    const li = document.createElement('li'), b = document.createElement('button');
+    b.textContent = h[2];
+    b.onclick = () => { flyTo(h[0], h[1], 24, h[2]); results.innerHTML = ''; q.blur(); };
+    li.appendChild(b); results.appendChild(li);
+  }
+});
+q.addEventListener('keydown', e => { if (e.key === 'Enter') { const b = results.querySelector('button'); if (b) b.click(); } });
+
+// ---------- boot
+async function boot() {
+  meta = await (await fetch('meta.json')).json();
+  const c = await (await fetch('colors.json')).json();
+  colors = c.colors; names = c.names;
+  for (const [i, j] of meta.regions) hasRegion.add(i + ',' + j);
+  atlas = await new Promise(r => { const im = new Image(); im.onload = () => r(im); im.src = 'atlas.png'; });
+  overview = await new Promise(r => { const im = new Image(); im.onload = () => r(im); im.onerror = () => r(null); im.src = 'county.png'; });
+  resize();
+  if (!restore()) fit();
+  document.getElementById('loading').hidden = true;
+  draw();
+  const chips = document.getElementById('chips');
+  for (const [label, lon, lat] of PLACES) {
+    const b = document.createElement('button'); b.className = 'chip'; b.textContent = label;
+    b.onclick = () => { const [x, y] = proj(lon, lat); flyTo(x, y, 2.5, null); };
+    chips.appendChild(b);
+  }
+  signs = await (await fetch('signs.json')).json();
+  normed = signs.map(s => norm(s[2]));
+  const R = meta.region;
+  for (const sg of signs) { const k = Math.floor(sg[0] / R) + ',' + Math.floor(sg[1] / R); (signBuckets.get(k) || signBuckets.set(k, []).get(k)).push(sg); }
+  draw();
+}
+boot().catch(err => { document.getElementById('loading').textContent = 'The map data did not load: ' + err.message; });
+})();
+</script>
