@@ -57,6 +57,24 @@ def church(G, x, y, width=8, roof='charcoal', wall='white'):
     G.occupied[y - 1:y + 2 + len(rows) + 1, x - 1:x + width + 1] = True
 
 
+def pass_elevators(G):
+    """Grain elevator beside each rail siding or spur (that's what Kansas sidings serve)."""
+    n = 0
+    for r in G.F['rail']:
+        if r['service'] not in ('siding', 'spur') or r['state'] == 'abandoned':
+            continue
+        p = G.local(r['pts'])
+        mx, my = p[len(p) // 2]
+        s = spot(G, int(mx), int(my), 6, 7, 16)
+        if s:
+            for c in range(6):
+                for rr in range(7):
+                    G.put(s[0] + c, s[1] + rr, 1, f'elevator_{c}{rr}', False)
+            G.occupied[s[1] - 1:s[1] + 8, s[0] - 1:s[0] + 7] = True
+            n += 1
+    G.stats['elevators'] = n
+
+
 def pass_civic(G):
     n = 0
     for p in G.F['pois'] + [a for a in G.F['addresses']]:

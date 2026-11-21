@@ -184,10 +184,12 @@ class Gen:
                     self.roadid[y, x] = i + 1
             self.brush_line(p, w, f)
         # parking lots: asphalt with curbs, drawn as low-priority street cores
+        self.parking = np.zeros((self.H, self.W), bool)
         for a in self.F['areas']:
             if a['cls'] == 'parking':
                 m = self.poly_mask([self.local(a['poly'])]) & (self.road == 0)
                 self.road[m] = R_STREET
+                self.parking |= m
         for r in self.F['rail']:
             if r['state'] == 'abandoned':
                 continue
@@ -330,9 +332,9 @@ class Gen:
         elif d == 'n':
             self.mailbox(x + width // 2, edge + 1, address)
         elif d == 'e':
-            self.mailbox(edge - 1, bottom, address)
+            self.mailbox(edge - 1, bottom - 2, address)     # clear of the side drive
         else:
-            self.mailbox(edge + 1, bottom, address)
+            self.mailbox(edge + 1, bottom - 2, address)
 
     def mailbox(self, x, y, address):
         if 0 <= x < self.W and 0 <= y < self.H and (x, y) not in self.obj and not self.blocked[y, x]:
@@ -433,6 +435,8 @@ class Gen:
                 if self.canopy is not None and self.canopy[y, x] <= 100:
                     # tree canopy %: dense where the satellite sees trees, none where it doesn't
                     c = int(self.canopy[y, x])
+                    if self.zone[y, x]:
+                        c = max(c, 10)        # the canopy product misses most small-town yard trees
                     want = (g == G_WOOD and c >= 15) or (g not in (G_FIELD, G_WATER, G_PARKING) and hs % 100 < c * 0.9)
                 else:
                     want = (g == G_WOOD) or (g == G_LAWN and self.zone[y, x] and hs % 41 == 0) \
@@ -516,6 +520,14 @@ class Gen:
                 if not C(y, x, sx, 0) and not C(y, x, 0, sy) and C(y, x, -sx, sy) and C(y, x, sx, -sy):
                     names[y, x] = f'diag45_{k}_3'
                     break
+        # parking lots: two rows of stalls, two rows of aisle, inside the curbs
+        pk = self.parking & (names == 'asphalt')
+        inner = pk.copy()
+        inner[1:] &= pk[:-1]; inner[:-1] &= pk[1:]; inner[:, 1:] &= pk[:, :-1]; inner[:, :-1] &= pk[:, 1:]
+        for y, x in zip(*np.nonzero(inner)):
+            if (y + self.oy) % 4 in (0, 1):
+                names[y, x] = 'lot_stalls_n'
+                tsg[y, x] = 2
         # centre lines on 3-wide Main Street / highway: middle cell of a straight run
         for y, x in zip(*np.nonzero((core == R_MAIN) | (core == R_HWY))):
             rc = core[y, x]
@@ -630,6 +642,7 @@ class Gen:
         from geo import civic
         roads = self.road_ring()
         self.blocked = roads | self.rail | (self.ground == G_WATER)
+        civic.pass_elevators(self)
         civic.pass_downtown(self)
         civic.pass_civic(self)
         self.pass_houses()

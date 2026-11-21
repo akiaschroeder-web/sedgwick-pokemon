@@ -32,20 +32,22 @@ def driveway(G, hrec):
                 claim(G, side, edge + 1, 2, bottom - edge)
                 return
     if d in 'ew':
-        for top in (bottom + 2, y - 3):
-            if d == 'e':
-                xs = range(x + w - 2, edge)
-                apron = 'drive_apron_w'
-            else:
-                xs = range(edge + 1, x + 2)
-                apron = 'drive_apron_e'
-            cells = [(cx, top + j) for cx in xs for j in range(2)]
-            if cells and all(0 <= cy < G.H and G.free(cx, cy) and (cx, cy) not in G.obj for cx, cy in cells):
-                for cx in xs:
-                    G.put(cx, top, RES, 'drive_t', True); G.put(cx, top + 1, RES, 'drive_b', True)
-                G.put(edge, top, RES, apron + '_t', True); G.put(edge, top + 1, RES, apron + '_b', True)
-                claim(G, min(xs), top, len(xs), 2)
-                return
+        # side-entry garage: a 2-row drive from the street to the house's street-side wall,
+        # level with the house's bottom two rows
+        top = bottom - 1
+        if d == 'e':
+            xs = range(x + w, edge)
+            apron = 'drive_apron_w'
+        else:
+            xs = range(edge + 1, x)
+            apron = 'drive_apron_e'
+        cells = [(cx, top + j) for cx in xs for j in range(2)]
+        if cells and all((cx, cy) not in G.obj and not G.blocked[cy, cx] for cx, cy in cells):
+            for cx in xs:
+                G.put(cx, top, RES, 'drive_t', True); G.put(cx, top + 1, RES, 'drive_b', True)
+            G.put(edge, top, RES, apron + '_t', True); G.put(edge, top + 1, RES, apron + '_b', True)
+            claim(G, min(xs), top, len(xs), 2)
+        return
 
 
 def street_car(G, hrec):
@@ -92,7 +94,7 @@ def backyard(G, hrec):
         for cy in range(top + 1, y + 1):
             G.put(x - 1, cy, RES, f'{kind}_v', False)
             G.put(x + w, cy, RES, f'{kind}_v', False)
-    claim(G, x - 1, top, w + 2, depth + 1)
+    claim(G, x - 1, top, w + 2, 1)                 # the fence line; the yard stays open for trees
     # inside the yard: a shed, or a tree
     roll = (hs >> 15) % 4
     if roll == 0 and depth >= 4 and w >= 5:
@@ -103,9 +105,11 @@ def backyard(G, hrec):
             G.put(sx + c, sy, RES, f'h_roof0_{a}_{roof}', False)
             G.put(sx + c, sy + 1, RES, f'h_roof2_{b}_{roof}', False)
             G.put(sx + c, sy + 2, RES, f'h_wall_{cc}_white', False)
+        claim(G, sx - 1, sy, 5, 4)
     elif roll in (1, 2) and depth >= 3:
         tx = x + (hs >> 19) % max(1, w - 2)
         tree(G, tx, top + 1, RES)
+        claim(G, tx, top + 1, 2, 2)
 
 
 def tree(G, x, y, ts):

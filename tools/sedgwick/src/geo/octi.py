@@ -53,4 +53,30 @@ def snap(pts, eps=1.5, min_diag=3):
             # small sideways offset on a long run: keep it straight, the next leg absorbs it
             b = (b[0], a[1]) if dx >= dy else (a[0], b[1])
         out += legs(a, b)[1:]
-    return out
+    return merge_jogs(out)
+
+
+def _dir(a, b):
+    dx, dy = b[0] - a[0], b[1] - a[1]
+    return ((dx > 0) - (dx < 0), (dy > 0) - (dy < 0)), max(abs(dx), abs(dy))
+
+
+def merge_jogs(p, max_jog=3):
+    """Diagonal, short straight jog, diagonal the same way -> one diagonal run.
+    The straight jog is folded into the run (end point moves at most max_jog tiles
+    along the jog direction, then the next leg re-joins the original path)."""
+    changed = True
+    while changed:
+        changed = False
+        for i in range(len(p) - 3):
+            (d1, l1), (d2, l2), (d3, l3) = _dir(p[i], p[i + 1]), _dir(p[i + 1], p[i + 2]), _dir(p[i + 2], p[i + 3])
+            if d1 == d3 and 0 not in d1 and 0 in d2 and l2 <= max_jog:
+                # replace the jog by lengthening both diagonals half-way; keep integer 45s
+                n = l1 + l3
+                end = (p[i][0] + d1[0] * n, p[i][1] + d1[1] * n)
+                rest = legs(end, p[i + 3])[1:]
+                p = p[:i + 1] + [end] + rest + p[i + 4:]
+                p = [q for k, q in enumerate(p) if k == 0 or q != p[k - 1]]
+                changed = True
+                break
+    return p
