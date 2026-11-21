@@ -26,6 +26,11 @@ def spots(doors):
     for g in gyms.load():
         x, y = doors.get(g['id']) or extract.proj(g['lon'], g['lat'])
         out.append({'cat': 'Gyms', 'name': g['name'], 'x': int(x), 'y': int(y)})
+    from geo import services
+    for s in services.load():
+        if s['kind'] == 'pc':
+            out.append({'cat': 'Pokémon Centers', 'name': s['name'].replace(' Pokémon Center', ''),
+                        'x': s['x'] + services.PC_DOOR[0], 'y': s['y'] + services.PC_DOOR[1]})
     extra = os.path.join(here, 'spots.json')
     if os.path.exists(extra):
         for s in json.load(open(extra))['spots']:

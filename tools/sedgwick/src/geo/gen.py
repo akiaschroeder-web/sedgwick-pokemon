@@ -358,7 +358,7 @@ class Gen:
         for b in self.F['buildings']:
             xs = [p[0] - self.ox for p in b['poly']]; ys = [p[1] - self.oy for p in b['poly']]
             bmask[b['id']] = (min(xs), min(ys), max(xs), max(ys), b)
-        self.used_buildings = set()
+        self.used_buildings = getattr(self, "used_buildings", set())
         placed = skipped = 0
         norm = lambda s: s.lower().replace('north ', '').replace('south ', '').replace('east ', '').replace('west ', '')
         for a in sorted(self.F['addresses'], key=lambda a: (not a.get('featured'), a['y'], a['x'])):
@@ -1019,6 +1019,8 @@ class Gen:
         self.blocked = roads | self.rail | (self.ground == G_WATER) | self.reserved
         from geo import gyms
         gyms.build(self)
+        from geo import services
+        services.build(self)
         civic.pass_elevators(self)
         civic.pass_downtown(self)
         civic.pass_civic(self)

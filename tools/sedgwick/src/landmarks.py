@@ -1,5 +1,5 @@
 """Landmark buildings cut straight out of FireRed maps (block data rectangles):
-the standard Gym, Pewter's museum, Fuchsia's Safari Zone entrance and zoo pens."""
+the standard Gym, Pokémon Center and Poké Mart, Pewter's museum, Fuchsia's Safari Zone entrance and zoo pens."""
 import json, struct
 import orig
 from lib import EXP
@@ -28,6 +28,8 @@ CUTS = {
     'museum': ('LAYOUT_PEWTER_CITY', 'pewter_city_frlg', 12, 0, 11, 7, [(5, 5)]),
     'safari': ('LAYOUT_FUCHSIA_CITY', 'fuchsia_city_frlg', 22, 0, 6, 6, [(2, 5)]),
     'pen_pool': ('LAYOUT_FUCHSIA_CITY', 'fuchsia_city_frlg', 5, 6, 7, 5, []),
+    'pc':     ('LAYOUT_PEWTER_CITY', 'pewter_city_frlg', 15, 21, 5, 5, [(2, 4)]),
+    'mart':   ('LAYOUT_PEWTER_CITY', 'pewter_city_frlg', 26, 15, 4, 4, [(2, 3)]),
     'pen_sand': ('LAYOUT_FUCHSIA_CITY', 'fuchsia_city_frlg', 12, 6, 7, 5, []),
 }
 
