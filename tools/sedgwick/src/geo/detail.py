@@ -136,6 +136,9 @@ def furniture(G, tsg, names):
         if h32(x, y, 'lamp') % 3:
             continue
         dx, dy = lamp_at[names[y, x]]
+        # only real intersections: both streets continue straight past the corner
+        if not (G.road[min(H - 1, max(0, y - 3 * dy)), x - dx] and G.road[y - dy, min(W - 1, max(0, x - 3 * dx))]):
+            continue
         lx, ly = x + dx, y + dy
         if dy > 0:
             ly += 1           # lamp base sits on the lower tile

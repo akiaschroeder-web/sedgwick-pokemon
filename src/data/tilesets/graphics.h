@@ -3039,7 +3039,7 @@ const u32 gTilesetTiles_General_Frlg[] = INCGFX_U32("data/tilesets/primary/gener
 
 #endif // IS_FRLG
 
-const u32 gTilesetTiles_SedgwickResidential[] = INCGFX_U32("data/tilesets/secondary/sedgwick_residential/tiles.png", ".4bpp.fastSmol", "-num_tiles 445 -Wnum_tiles");
+const u32 gTilesetTiles_SedgwickResidential[] = INCGFX_U32("data/tilesets/secondary/sedgwick_residential/tiles.png", ".4bpp.fastSmol", "-num_tiles 447 -Wnum_tiles");
 
 const u16 gTilesetPalettes_SedgwickResidential[][16] =
 {
@@ -3083,7 +3083,7 @@ const u16 gTilesetPalettes_SedgwickRural[][16] =
     INCGFX_U16("data/tilesets/secondary/sedgwick_rural/palettes/15.pal", ".gbapal"),
 };
 
-const u32 gTilesetTiles_SedgwickCommercial[] = INCGFX_U32("data/tilesets/secondary/sedgwick_commercial/tiles.png", ".4bpp.fastSmol", "-num_tiles 390 -Wnum_tiles");
+const u32 gTilesetTiles_SedgwickCommercial[] = INCGFX_U32("data/tilesets/secondary/sedgwick_commercial/tiles.png", ".4bpp.fastSmol", "-num_tiles 392 -Wnum_tiles");
 
 const u16 gTilesetPalettes_SedgwickCommercial[][16] =
 {
@@ -3105,7 +3105,7 @@ const u16 gTilesetPalettes_SedgwickCommercial[][16] =
     INCGFX_U16("data/tilesets/secondary/sedgwick_commercial/palettes/15.pal", ".gbapal"),
 };
 
-const u32 gTilesetTiles_SedgwickCity[] = INCGFX_U32("data/tilesets/secondary/sedgwick_city/tiles.png", ".4bpp.fastSmol", "-num_tiles 436 -Wnum_tiles");
+const u32 gTilesetTiles_SedgwickCity[] = INCGFX_U32("data/tilesets/secondary/sedgwick_city/tiles.png", ".4bpp.fastSmol", "-num_tiles 440 -Wnum_tiles");
 
 const u16 gTilesetPalettes_SedgwickCity[][16] =
 {
@@ -3127,7 +3127,7 @@ const u16 gTilesetPalettes_SedgwickCity[][16] =
     INCGFX_U16("data/tilesets/secondary/sedgwick_city/palettes/15.pal", ".gbapal"),
 };
 
-const u32 gTilesetTiles_SedgwickDowntown[] = INCGFX_U32("data/tilesets/secondary/sedgwick_downtown/tiles.png", ".4bpp.fastSmol", "-num_tiles 355 -Wnum_tiles");
+const u32 gTilesetTiles_SedgwickDowntown[] = INCGFX_U32("data/tilesets/secondary/sedgwick_downtown/tiles.png", ".4bpp.fastSmol", "-num_tiles 359 -Wnum_tiles");
 
 const u16 gTilesetPalettes_SedgwickDowntown[][16] =
 {
@@ -3149,7 +3149,7 @@ const u16 gTilesetPalettes_SedgwickDowntown[][16] =
     INCGFX_U16("data/tilesets/secondary/sedgwick_downtown/palettes/15.pal", ".gbapal"),
 };
 
-const u32 gTilesetTiles_SedgwickRetail[] = INCGFX_U32("data/tilesets/secondary/sedgwick_retail/tiles.png", ".4bpp.fastSmol", "-num_tiles 308 -Wnum_tiles");
+const u32 gTilesetTiles_SedgwickRetail[] = INCGFX_U32("data/tilesets/secondary/sedgwick_retail/tiles.png", ".4bpp.fastSmol", "-num_tiles 310 -Wnum_tiles");
 
 const u16 gTilesetPalettes_SedgwickRetail[][16] =
 {
@@ -3193,7 +3193,7 @@ const u16 gTilesetPalettes_SedgwickAviation[][16] =
     INCGFX_U16("data/tilesets/secondary/sedgwick_aviation/palettes/15.pal", ".gbapal"),
 };
 
-const u32 gTilesetTiles_SedgwickConfluence[] = INCGFX_U32("data/tilesets/secondary/sedgwick_confluence/tiles.png", ".4bpp.fastSmol", "-num_tiles 425 -Wnum_tiles");
+const u32 gTilesetTiles_SedgwickConfluence[] = INCGFX_U32("data/tilesets/secondary/sedgwick_confluence/tiles.png", ".4bpp.fastSmol", "-num_tiles 429 -Wnum_tiles");
 
 const u16 gTilesetPalettes_SedgwickConfluence[][16] =
 {

@@ -146,8 +146,9 @@ def pass_downtown(G):
         w, h = units * 4, 5
         color = ('brick', 'beige', 'mint', 'brick')[(hs >> 2) % 4]
         placed = False
-        for x in (lo - 2 - w, hi + 3):              # 1 sidewalk tile + 1 gap
-            if rect_ok(G, x, y, w, h):
+        for x in (lo - 1 - w, hi + 2):              # flush against Main's sidewalk
+            far = x - 1 if x < lo else x + w
+            if G.free(x, y, w, h) and G.free(far, y, 1, h) and all((x + i, y + j) not in G.obj for i in range(w) for j in range(h)):
                 cel(G, x, y, units, 2, color, hs)
                 n += 1
                 placed = True
@@ -156,4 +157,22 @@ def pass_downtown(G):
             w = units * 4
             color = ('brick', 'beige', 'mint', 'brick')[(hs >> 2) % 4]
         y += h + 1 if placed else 1
+    # pave the frontage band on both sides between and around the storefronts
+    ys = sorted(main_x)
+    for y in range(ys[0], ys[-1] + 1):
+        if y not in main_x:
+            continue
+        lo, hi = main_x[y]
+        for x in list(range(lo - 14, lo - 1)) + list(range(hi + 2, hi + 15)):
+            if 0 <= x < G.W and G.road[y, x] == 0 and (x, y) not in G.obj and not G.blocked[y, x]:
+                G.put(x, y, COM, 'sidewalk', True)
+                G.occupied[y, x] = True
     G.stats['storefronts'] = n
+
+
+def _near_store(G, x, y):
+    for dx, dy in ((0, 1), (0, -1), (1, 0), (-1, 0)):
+        o = G.obj.get((x + dx, y + dy))
+        if o and o[0] == COM and o[1].startswith('cel_'):
+            return True
+    return False

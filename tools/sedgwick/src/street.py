@@ -324,4 +324,6 @@ def metatiles():
     out.update(diag21())
     out.update(curves())
     out.update(culdesac())
+    # plain paving for downtown frontages and plazas (one slab per tile)
+    out['sidewalk'] = [[CS if (x == 15 or y == 15) else conc_px(x, y) for x in range(16)] for y in range(16)]
     return {k: (v, 'MB_NORMAL') for k, v in out.items()}

@@ -135,6 +135,9 @@ class Gen:
                 continue
             rc = RCLS[c]
             p = self.local(r['pts'])
+            if c in ('street', 'service'):
+                from geo import octi
+                p = octi.snap(p)
             w = WIDTH[c]
             if c == 'street' and r['name'].endswith('Main Street'):
                 rc, w = R_MAIN, 3
@@ -390,7 +393,7 @@ class Gen:
             for x in range(0, self.W - 1, 2):
                 g = self.ground[y, x]
                 hs = h32(x + self.ox, y + self.oy)
-                want = (g == G_WOOD and hs % 4 != 0) or (g == G_LAWN and self.zone[y, x] and hs % 41 == 0) \
+                want = (g == G_WOOD) or (g == G_LAWN and self.zone[y, x] and hs % 41 == 0) \
                     or (g == G_PARK and hs % 17 == 0) or (g == G_CEMETERY and hs % 9 == 0)
                 if want and free[y:y + 2, x:x + 2].all() and all((x + i, y + j) not in self.obj for i in range(2) for j in range(2)):
                     for (i, j), m in zip(((0, 0), (1, 0), (0, 1), (1, 1)), ('1d4', '1d5', '1e4', '1e5')):
@@ -454,6 +457,18 @@ class Gen:
             else:
                 names[y, x] = 'asphalt'
                 tsg[y, x] = RES
+        # 45-degree streets: road cells at the inner step of a diagonal curb
+        cb = core > 0
+        cpad = np.pad(cb, 1)
+        C = lambda y, x, dx, dy: cpad[y + 1 + dy, x + 1 + dx]
+        DIAG = {(-1, -1): 'nw', (1, -1): 'ne', (-1, 1): 'sw', (1, 1): 'se'}
+        for y, x in zip(*np.nonzero(cb & (tsg == RES))):
+            if names[y, x] != 'asphalt':
+                continue
+            for (sx, sy), k in DIAG.items():
+                if not C(y, x, sx, 0) and not C(y, x, 0, sy) and C(y, x, -sx, sy) and C(y, x, sx, -sy):
+                    names[y, x] = f'diag45_{k}_3'
+                    break
         # centre lines on 3-wide Main Street / highway: middle cell of a straight run
         for y, x in zip(*np.nonzero((core == R_MAIN) | (core == R_HWY))):
             rc = core[y, x]
@@ -513,7 +528,16 @@ class Gen:
                     names[y, x] = 'gravel_corner_se'
             else:
                 tsg[y, x] = RES
-                if (n and s) or (w and e) or (n and e and s) or (n and w and s):
+                diag = None
+                for (sx, sy), k in DIAG.items():
+                    if C(y, x, -sx, 0) and C(y, x, 0, -sy) and not C(y, x, sx, 0) and not C(y, x, 0, sy) \
+                            and not C(y, x, -sx, sy) and not C(y, x, sx, -sy):
+                        diag = f'diag45_{k}_2'
+                    elif C(y, x, -sx, -sy) and not (n or s or w or e) and C(y, x, -sx, -sy):
+                        diag = f'diag45_{k}_1'
+                if diag:
+                    names[y, x] = diag
+                elif (n and s) or (w and e) or (n and e and s) or (n and w and s):
                     names[y, x] = 'asphalt'
                 elif n and e:
                     names[y, x] = 'block_corner_sw'
