@@ -100,7 +100,11 @@ def run_region(raw, cty, warps, ring, i, j, land_cache=None):
     import house_rooms
     from geo.gen import RUR
     hd = [(h['door'], h.get('address', '')) for h in G.houses if h.get('door')]
-    hd += [((x, y), '') for (x, y), (ts, name, wk) in G.obj.items() if ts == RUR and name.startswith('h_wall_door')]
+    flat = {(x, y): k for x, y, k, _ in G.blog}
+    # rural doors: farmhouses, and OSM buildings drawn with the house kit; only the houses count here
+    hd += [((x, y), '') for (x, y), (ts, name, wk) in G.obj.items() if ts == RUR and name.startswith('h_wall_door')
+           and flat.get((x, y), 'house') in ('house', 'farmhouse')]
+    G.blog = [b for b in G.blog if b[2] not in ('house', 'farmhouse')]
     houses = []
     for (x, y), addr in hd:
         if MARGIN <= x < MARGIN + REGION and MARGIN <= y < MARGIN + REGION:
@@ -108,7 +112,32 @@ def run_region(raw, cty, warps, ring, i, j, land_cache=None):
             key = addr if addr and not addr.startswith('#') else f'{int(gx)},{int(gy)}'
             houses.append([int(gx), int(gy), house_rooms.interior_for(key), addr if not addr.startswith('#') else ''])
     G.stats['house_doors'] = len(houses)
-    json.dump({'signs': signs, 'gyms': gyms, 'houses': houses, 'stats': G.stats}, open(f'{OUT}/r_{i:02d}_{j:02d}.json', 'w'))
+    # building inventory: everything that is not a plain house
+    blds = []
+    def keep(x, y):
+        return MARGIN <= x < MARGIN + REGION and MARGIN <= y < MARGIN + REGION
+    def add(x, y, kind, detail=''):
+        x, y = int(x), int(y)
+        if keep(x, y):
+            blds.append([int(i * REGION + x - MARGIN), int(j * REGION + y - MARGIN), kind, detail])
+    for x, y, kind, detail in G.blog:
+        add(x, y, kind, detail)
+    for s_ in getattr(G, 'services', []):
+        k = {'pc': 'Pokemon Center', 'mart': 'Poke Mart', 'gas': 'gas station', 'lab': "Professor's Lab"}[s_['kind']]
+        add(s_['x'] - G.ox, s_['y'] - G.oy, k, s_.get('name', ''))
+    for g in getattr(G, 'gyms', []):
+        if g.get('door'):
+            add(g['door'][0], g['door'][1], 'Gym', g.get('name', ''))
+    # houses drawn where OSM says the building under the address is something else
+    for h in G.houses:
+        if h.get('door') and h.get('under') and h['under'] not in ('house', 'unclassified', 'outbuilding'):
+            add(h['door'][0], h['door'][1], 'address drawn as house, OSM: ' + h['under'], h.get('address', ''))
+    houses = [hh for hh in houses]
+    under = {(int(i * REGION + h['door'][0] - MARGIN), int(j * REGION + h['door'][1] - MARGIN)): h.get('under')
+             for h in G.houses if h.get('door')}
+    for hh in houses:
+        hh.append(under.get((hh[0], hh[1]), 'farm') or '')
+    json.dump({'signs': signs, 'gyms': gyms, 'houses': houses, 'buildings': blds, 'stats': G.stats}, open(f'{OUT}/r_{i:02d}_{j:02d}.json', 'w'))
     thumb(idx, inside, list(table), f'{OUT}/t_{i:02d}_{j:02d}.png')
     return G.stats
 

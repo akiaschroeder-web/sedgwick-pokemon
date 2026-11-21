@@ -167,6 +167,7 @@ def place(G):
         if s:
             _fastfood(G, *s)
             st['fastfood_lots'] += 1
+            G.blog.append((s[0] + 2, s[1] + 2, 'fast food', n['tags'].get('name', '')))
     G.stats.update(st)
 
 
@@ -223,6 +224,7 @@ def _landmarks(G, st):
                     G.put(x0 + ox + int(c), y0 + oy + int(r), CONF, name, (oy + int(r)) < 2)
         G.occupied[y0 - 6:y0 + 7, x0 - 1:x0 + 7] = True
         st['keeper'] = 1
+        G.blog.append((cx, cy, 'landmark', 'Keeper of the Plains'))
     for f in feats:
         t = f['tags']
         if t.get('name') == BOTANICA:
@@ -230,6 +232,7 @@ def _landmarks(G, st):
             s = _spot(G, cx, cy, 5, 3, r=20)
             if s:
                 _grid(G, *s, 5, 3, CITY, 'conservatory')
+                G.blog.append((s[0] + 2, s[1] + 2, 'landmark', 'Botanica conservatory'))
                 G.obj[(s[0] + 2, s[1] + 2)] = (CITY, 'conservatory_22', True)
                 st['botanica'] = 1
         if t.get('tourism') == 'zoo' and f['closed']:
@@ -319,6 +322,7 @@ def building(G, b, x0, y0, w, h):
                 G.put(x0 + c, y + r, AV, f'{prefix}_{piece}', piece in aviation.WALK_IN)
         G.occupied[y - 1:y0 + h + 1, x0 - 1:x0 + width + 1] = True
         G.stats['hangars'] = G.stats.get('hangars', 0) + 1
+        G.blog.append((x0 + width // 2, y0 + h - 1, 'aircraft plant' if prefix == 'plant' else 'hangar', t.get('name', '')))
         return True
     if t.get('shop') in BIGBOX_SHOPS and w >= 8 and h >= 5:
         import retail
@@ -330,6 +334,7 @@ def building(G, b, x0, y0, w, h):
                 G.put(x0 + c, y + r, RETAIL, f'bb_{m:03x}', m == retail.DOOR)
         G.occupied[y - 1:y0 + h + 1, x0 - 1:x0 + width + 1] = True
         G.stats['bigbox'] = G.stats.get('bigbox', 0) + 1
+        G.blog.append((x0 + width // 2, y0 + h - 1, 'big-box store', t.get('name', '')))
         return True
     ff = t.get('amenity') == 'fast_food' or any(
         n['tags'].get('amenity') == 'fast_food' and b_inside(b, n['x'], n['y']) for n in G.F.get('nfeat', ()))
@@ -338,6 +343,7 @@ def building(G, b, x0, y0, w, h):
         y = y0 + max(0, h - 3)
         _fastfood(G, x, y)
         G.stats['fastfood'] = G.stats.get('fastfood', 0) + 1
+        G.blog.append((x + 2, y + 2, 'fast food', t.get('name', '')))
         return True
     return False
 
@@ -920,6 +926,7 @@ def cowtown(G):
     for y in range(1, H):
         P(0, y, RUR, 'corral_v'); P(W, y, RUR, 'corral_v')
     bld('wentry', 'red', ex, -4, 8, 5, {(3, 4), (4, 4), (3, 0), (4, 0)})
+    G.blog.append((X0 + ex + 3, Y0, 'Cowtown (Elite Four)', 'entrance hall'))
     G.doors.append((X0 + ex + 3, Y0 - 4, 'cowtown_gate', 'Old Cowtown'))
     G.doors.append((X0 + ex + 3, Y0, 'cowtown_hall', 'Old Cowtown'))
     # walk from the street-side doorway north to the street
@@ -949,6 +956,7 @@ def cowtown(G):
             church_done = True
             from geo.civic import church
             church(G, X0 + x, Y0 + MAIN - 7, 8, 'brown', 'white')
+            G.blog.append((X0 + x + 4, Y0 + MAIN - 2, 'Cowtown (Elite Four)', 'church'))
             x += 10
             continue
         v = VARIANTS_W[k % len(VARIANTS_W)]
@@ -956,6 +964,7 @@ def cowtown(G):
         for c in range(4):
             P(x + c, MAIN - 1, WEST, 'wwalk', True)
         G.doors.append((X0 + x + 2, Y0 + MAIN - 2, 'cowtown_store', 'Old Cowtown'))
+        G.blog.append((X0 + x + 2, Y0 + MAIN - 2, 'Cowtown (Elite Four)', 'store'))
         n_store += 1
         x += 5 if k % 3 else 6
     # props along the street edge
@@ -976,10 +985,12 @@ def cowtown(G):
             for c in range(4):
                 P(x + c, SECOND - 1, WEST, 'wwalk', True)
             G.doors.append((X0 + x + 2, Y0 + SECOND - 2, 'cowtown_store', 'Old Cowtown'))
+            G.blog.append((X0 + x + 2, Y0 + SECOND - 2, 'Cowtown (Elite Four)', 'store'))
             n_store += 1
         else:
             bld('wcabin', v, x, SECOND - 3, 4, 3, {(1, 2)})
             G.doors.append((X0 + x + 1, Y0 + SECOND - 1, 'cowtown_cabin', 'Old Cowtown'))
+            G.blog.append((X0 + x + 1, Y0 + SECOND - 1, 'Cowtown (Elite Four)', 'cabin'))
         x += 6
     # the south lane: homesteads west, the farm corral east
     x = 3
@@ -991,6 +1002,7 @@ def cowtown(G):
         v = VARIANTS_W[hs(x, 'lane') % len(VARIANTS_W)]
         bld('wcabin', v, x, LANE - 3, 4, 3, {(1, 2)})
         G.doors.append((X0 + x + 1, Y0 + LANE - 1, 'cowtown_cabin', 'Old Cowtown'))
+        G.blog.append((X0 + x + 1, Y0 + LANE - 1, 'Cowtown (Elite Four)', 'cabin'))
         n_cabin += 1
         x += 8
     cx0, cx1, cy0, cy1 = int(W * 0.62), W - 16, LANE + 3, H - 3

@@ -260,4 +260,6 @@ def farmsteads(G):
             G.put(X0 + 6, Y0 + 11, RUR, 'hay_bales', False)
         claim(G, X0, Y0, w, h)
         n += 1
+        G.blog.append((X0 + 4, hy + 2, 'farmhouse', ''))
+        G.blog.append((bx, Y0 + 3, 'barn', ''))
     G.stats['farmsteads'] = n

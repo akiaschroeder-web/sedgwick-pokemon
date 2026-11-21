@@ -68,6 +68,34 @@ def vnoise(H, W, ox, oy, cell, seed):
     return (a * (1 - tx) + b * tx) * (1 - ty) + (c * (1 - tx) + d * tx) * ty
 
 
+def classify(tags):
+    """What an OSM building is, for the building inventory."""
+    b, a = tags.get('building', ''), tags.get('amenity', '')
+    if a in ('hospital', 'clinic') or b == 'hospital':
+        return 'hospital'
+    if a == 'place_of_worship' or b in ('church', 'chapel', 'cathedral', 'mosque', 'temple', 'synagogue', 'religious'):
+        return 'church'
+    if a in ('school', 'university', 'college', 'kindergarten') or b in ('school', 'university', 'college', 'kindergarten'):
+        return 'school'
+    if a in ('fire_station', 'police', 'townhall', 'library', 'post_office', 'courthouse', 'community_centre') or \
+            b in ('government', 'civic', 'public', 'fire_station'):
+        return 'civic'
+    if b in ('industrial', 'warehouse', 'manufacture', 'factory', 'storage_tank', 'service', 'transformer_tower'):
+        return 'industrial'
+    if b in ('commercial', 'retail', 'office', 'supermarket', 'hotel', 'kiosk') or tags.get('shop') or tags.get('office') \
+            or a in ('restaurant', 'fast_food', 'bank', 'cafe', 'bar', 'pharmacy', 'fuel'):
+        return 'commercial'
+    if b in ('apartments', 'dormitory'):
+        return 'apartments'
+    if b in ('house', 'residential', 'detached', 'semidetached_house', 'bungalow', 'terrace', 'farm', 'cabin'):
+        return 'house'
+    if b in ('barn', 'farm_auxiliary', 'shed', 'garage', 'garages', 'greenhouse', 'silo', 'carport', 'stable', 'cowshed'):
+        return 'outbuilding'
+    if b == 'hangar':
+        return 'hangar'
+    return 'unclassified'
+
+
 def h32(*a):
     return zlib.crc32(repr(a).encode()) & 0xffffffff
 
@@ -123,6 +151,7 @@ class Gen:
         self.doors = []              # (x, y, kind, address): door / mat cells for warps
         self.land, self.canopy = land, canopy        # NLCD grids on this map's tiles (or None)
         self.civic_done = []
+        self.blog = []               # building inventory: (x, y, kind, detail)
 
     # downtown Wichita (Old Town, the CBD, Delano's riverfront) is the only metro core
     METRO_BOX = (-97.3600, 37.6680, -97.3180, 37.7040)
@@ -426,10 +455,12 @@ class Gen:
             d = min(match or dirs, key=lambda d: dirs[d][0])
             # footprint from an OSM building under the point, else a typical ranch house
             fw = None
+            self._under = None
             for bx0, by0, bx1, by1, b in bmask.values():
                 if bx0 <= x <= bx1 and by0 <= y <= by1:
                     fw = (bx1 - bx0) if d in 'ns' else (by1 - by0)
                     self.used_buildings.add(b['id'])
+                    self._under = classify(b['tags'])
                     break
             hs = h32(a['num'], a['street'])
             width = max(5, min(9, int(round(fw)) if fw else 6 + hs % 2))
@@ -519,7 +550,7 @@ class Gen:
         self.occupied[y - 1:y + len(rows) + 1, x - 1:x + width + 1] = True
         bottom = y + len(rows) - 1
         self.houses.append({'x': x, 'y': y, 'w': width, 'rows': len(rows), 'd': d, 'edge': edge,
-                            'door': door, 'address': address,
+                            'door': door, 'address': address, 'under': getattr(self, '_under', None),
                             'gar': gar_cols, 'garage': garage, 'hs': h32(address),
                             'style': getattr(self, '_hstyle', {}) or {}})
         if d == 's':
@@ -583,6 +614,7 @@ class Gen:
     def pass_infill(self):
         """Houses on empty residential frontage where the address data has gaps.
         Real address points were placed first, so these only take what's left."""
+        self._under = None
         core = (self.road == R_STREET)
         ok = self.zone & (self.ground == G_LAWN) & ~self.metro
         H, W = self.H, self.W
@@ -627,6 +659,7 @@ class Gen:
             cy, cx = min((y0 + y1) // 2, self.H - 1), min((x0 + x1) // 2, self.W - 1)
             if self.metro[cy, cx]:
                 if self.metro_building(x0, y0, w, h, b['tags'], h32(b['id'])):
+                    self.blog.append((x0 + w // 2, y0 + h - 1, 'downtown ' + classify(b['tags']), b['tags'].get('name', '')))
                     n += 1
                 continue
             if not self.zone[min(y1, self.H - 1), min(x1, self.W - 1)]:
@@ -642,6 +675,7 @@ class Gen:
                         if not self.blocked[yy, xx] and (xx, yy) not in self.obj and self.ground[yy, xx] != G_WATER:
                             self.put(xx, yy, RUR, 'gravel' if yy >= y0 + h else 'lawn', True)
             self.flat_building(x0, y0, w, h, ts, h32(b['id']))
+            self.blog.append((x0 + w // 2, y0 + h - 1, classify(b['tags']), b['tags'].get('name', '')))
             n += 1
         self.stats['buildings'] = n
 

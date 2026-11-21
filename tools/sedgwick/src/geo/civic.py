@@ -73,6 +73,7 @@ def pass_elevators(G):
                 for rr in range(7):
                     G.put(s[0] + c, s[1] + rr, 1, f'elevator_{c}{rr}', False)
             G.occupied[s[1] - 1:s[1] + 8, s[0] - 1:s[0] + 7] = True
+            G.blog.append((s[0] + 3, s[1] + 6, 'grain elevator', ''))
             n += 1
     G.stats['elevators'] = n
 
@@ -95,11 +96,13 @@ def pass_civic(G):
                     for c in range(2):
                         G.put(s[0] + c, s[1] + r, RES, f'water_tower_{c}{r}', False)
                 G.occupied[s[1] - 1:s[1] + 5, s[0] - 1:s[0] + 3] = True
+                G.blog.append((s[0], s[1] + 3, 'water tower', t.get('name', '')))
                 n += 1
         elif kind == 'place_of_worship':
             s = spot(G, x, y, 8, 7)
             if s:
                 church(G, s[0], s[1], 8, ('charcoal', 'brown', 'red')[hs % 3], 'white')
+                G.blog.append((s[0] + 4, s[1] + 5, 'church', t.get('name', '')))
                 n += 1
         elif kind in ('school', 'university', 'college'):
             if any(abs(x - qx) < 30 and abs(y - qy) < 30 for qx, qy in G.civic_done):
@@ -108,6 +111,7 @@ def pass_civic(G):
             if s:
                 cel(G, s[0], s[1], 4, 2, 'beige', hs)
                 G.civic_done.append((x, y))
+                G.blog.append((s[0] + 8, s[1] + 4, 'school', t.get('name', '')))
                 n += 1
         elif kind in ('library', 'post_office', 'police', 'fire_station', 'townhall', 'supermarket',
                       'social_facility', 'convenience', 'bank'):
@@ -119,6 +123,7 @@ def pass_civic(G):
             s = spot(G, x, y, units * 4, 4 if units == 3 else 5)
             if s:
                 cel(G, s[0], s[1], units, 1 if units == 3 else 2, 'brick' if hs & 1 else 'mint', hs)
+                G.blog.append((s[0] + units * 2, s[1] + 3, kind.replace('_', ' '), t.get('name', '')))
                 n += 1
     G.stats['civic'] = n
 
@@ -176,6 +181,7 @@ def pass_downtown(G):
             far = x - 1 if x < lo else x + w
             if G.free(x, y, w, h) and G.free(far, y, 1, h) and all((x + i, y + j) not in G.obj for i in range(w) for j in range(h)):
                 cel(G, x, y, units, 2, color, hs)
+                G.blog.append((x + w // 2, y + h - 1, 'storefront', 'Main Street'))
                 n += 1
                 placed = True
             hs = h32('dt2', y + G.oy, x)
