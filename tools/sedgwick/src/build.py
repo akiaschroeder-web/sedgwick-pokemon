@@ -476,6 +476,32 @@ def metro_ts():
     return ts
 
 
+def landmarks_ts():
+    """FireRed Gym, Pewter museum, Fuchsia Safari Zone entrance and zoo pens."""
+    import landmarks
+    ts = Tileset('sedgwick_landmarks')
+    P_STREET = 6
+    ts.palettes[P_STREET] = street.PAL_STREET
+    ts.add('lawn', GRASS_BOTTOM, P_STREET)
+    lp = landmarks.pieces()
+    plist = [p for p, _ in lp.values()]
+    orig.merge_close_colors(plist, 6)
+    pals, assign = orig.pack(plist)
+    for k, pl in enumerate(pals):
+        ts.palettes[7 + k] = pl
+    lawn_q = quads(GRASS_BOTTOM)
+    def conv(g, q):
+        if g == 'LAWN':
+            return (lawn_q[q], P_STREET)
+        if g is None:
+            return (None, 0)
+        return (orig.index_quad(g, pals[assign[id(g)]]), 7 + assign[id(g)])
+    for name, (p, door) in lp.items():
+        ts.add_q(name, [conv(g, q) for q, g in enumerate(p['bottom'])], [conv(g, q) for q, g in enumerate(p['top'])],
+                 layer=p['layer'], beh='MB_NON_ANIMATED_DOOR' if door else 'MB_NORMAL')
+    return ts
+
+
 def register_downtown_doors(ts):
     """Rustboro tower/tan doors and the Battle Dome door keep their own animations."""
     C = camel(ts.name)
@@ -760,6 +786,12 @@ if __name__ == '__main__':
     register(ts, ntiles)
     write_labels(ts, index)
     register_downtown_doors(ts)
+    json.dump(index, open(os.path.join(here, '..', f'{ts.name}_metatiles.json'), 'w'), indent=1)
+    print(f'{ts.name}: {ntiles} tiles, {len(ts.metatiles)} metatiles, palettes {sorted(ts.palettes)}')
+    ts = landmarks_ts()
+    ntiles, index = ts.write()
+    register(ts, ntiles)
+    write_labels(ts, index)
     json.dump(index, open(os.path.join(here, '..', f'{ts.name}_metatiles.json'), 'w'), indent=1)
     print(f'{ts.name}: {ntiles} tiles, {len(ts.metatiles)} metatiles, palettes {sorted(ts.palettes)}')
     ts = metro_ts()

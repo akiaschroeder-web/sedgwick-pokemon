@@ -61,7 +61,7 @@ AREA = [  # (tag, values, class) checked in order
     ('landuse', ('cemetery',), 'cemetery'), ('amenity', ('grave_yard',), 'cemetery'),
     ('leisure', ('park', 'recreation_ground', 'playground', 'pitch', 'golf_course', 'sports_centre'), 'park'),
     ('landuse', ('recreation_ground', 'village_green'), 'park'),
-    ('amenity', ('parking',), 'parking'),
+    ('amenity', ('parking',), 'parking'), ('aeroway', ('apron',), 'apron'),
     ('landuse', ('residential',), 'residential'), ('landuse', ('commercial', 'retail'), 'commercial'),
     ('landuse', ('industrial',), 'industrial'),
 ]

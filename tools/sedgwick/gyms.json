@@ -1,0 +1,20 @@
+{
+  "_doc": "Gym sites. kind decides the build; lon/lat is the anchor (OSM where available). Leaders and interiors come later.",
+  "gyms": [
+    {"id": "tanganyika", "name": "Tanganyika Wildlife Park", "kind": "zoo", "lon": -97.55638, "lat": 37.67377, "osm_way": 578453451,
+     "note": "park stays outdoors; the entrance building is a FireRed Gym"},
+    {"id": "aviation_museum", "name": "Kansas Aviation Museum", "kind": "museum", "lon": -97.27326, "lat": 37.63343, "osm_way": 178601186,
+     "ramp_way": 139824915, "note": "its own building: the 1935 terminal with its control tower, aircraft on the ramp"},
+    {"id": "hartman_arena", "name": "Hartman Arena", "kind": "arena", "lon": -97.33104, "lat": 37.83101, "osm_way": 656566932,
+     "note": "its own building; OSM now names it Heartland Credit Union Arena"},
+    {"id": "rock_river_rapids", "name": "Rock River Rapids", "kind": "waterpark", "lon": -97.24154, "lat": 37.55648, "osm_way": 477183270,
+     "note": "water park outdoors; the entrance building is a FireRed Gym"},
+    {"id": "lions_park", "name": "Lions Park (Valley Center)", "kind": "park_gym", "lon": -97.36959, "lat": 37.82993, "osm_way": 505907076},
+    {"id": "haysville_historic", "name": "Haysville Historic Park", "kind": "park_gym", "lon": -97.35120, "lat": 37.56300,
+     "note": "200 S Main St, beside the Vickers Petroleum station"},
+    {"id": "maize_farm", "name": "Maize farm country", "kind": "farm_gym", "lon": -97.50500, "lat": 37.80500,
+     "note": "northwest of Maize in the farmland; exact farm can be moved"},
+    {"id": "cheney_safari", "name": "Cheney State Park Safari Zone", "kind": "safari_gate", "lon": -97.80760, "lat": 37.71912,
+     "note": "booth at the west county line on W 21st St N; the state park is its own map (Safari Zone with the Gym built in)"}
+  ]
+}

@@ -15,7 +15,8 @@ from PIL import Image, ImageDraw
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 TSDIR = os.path.join(HERE, '..', '..')
-TILESETS = ['sedgwick_residential', 'sedgwick_rural', 'sedgwick_commercial', 'sedgwick_downtown', 'sedgwick_metro']
+TILESETS = ['sedgwick_residential', 'sedgwick_rural', 'sedgwick_commercial', 'sedgwick_downtown', 'sedgwick_metro',
+            'sedgwick_landmarks', 'sedgwick_aviation']
 METRO = 4
 RES, RUR = 0, 1
 
@@ -102,7 +103,7 @@ class Gen:
             dense = box_mean(np.isin(land, (22, 23, 24)), 20) > 0.3
             self.zone = ((limits | dense) & dev) | lu
             # downtown core: mostly high-intensity development (NLCD 23/24) all around
-            self.metro = self.zone & (box_mean(np.isin(land, (23, 24)), 40) > 0.5)
+            self.metro = self.zone & (box_mean(np.isin(land, (23, 24)), 40) > 0.5) & self.metro_area()
         else:
             self.zone = (limits & dev) | lu
         self.ground = np.full((H, W), G_FIELD, np.uint8)
@@ -121,6 +122,20 @@ class Gen:
         self.doors = []              # (x, y, kind, address): door / mat cells for warps
         self.land, self.canopy = land, canopy        # NLCD grids on this map's tiles (or None)
         self.civic_done = []
+
+    # downtown Wichita (Old Town, the CBD, Delano's riverfront) is the only metro core
+    METRO_BOX = (-97.3600, 37.6680, -97.3180, 37.7040)
+
+    def metro_area(self):
+        from geo import extract
+        x0, y0 = extract.proj(self.METRO_BOX[0], self.METRO_BOX[3])
+        x1, y1 = extract.proj(self.METRO_BOX[2], self.METRO_BOX[1])
+        m = np.zeros((self.H, self.W), bool)
+        a, b = int(max(0, x0 - self.ox)), int(min(self.W, x1 - self.ox))
+        c, d = int(max(0, y0 - self.oy)), int(min(self.H, y1 - self.oy))
+        if a < b and c < d:
+            m[c:d, a:b] = True
+        return m
 
     # ------------------------------------------------------------ helpers
     def local(self, p):
@@ -215,6 +230,7 @@ class Gen:
             self.brush_line(p, w, f)
         # parking lots: asphalt with curbs, drawn as low-priority street cores
         self.parking = np.zeros((self.H, self.W), bool)
+        self.apron = self.poly_mask([self.local(a['poly']) for a in self.F['areas'] if a['cls'] == 'apron'])
         self.reserved = np.zeros((self.H, self.W), bool)
         self.bulbs = []
         for a in self.F['areas']:
@@ -796,6 +812,9 @@ class Gen:
         names[(g == G_PARKING) & (tsg == RUR)] = 'gravel'
         names[g == G_WATER] = 'prim:170'
         self._shore(names, g == G_WATER)
+        ap = self.apron & (core == 0)
+        names[ap] = 'apron'
+        tsg[ap] = 6                       # airport concrete (aviation set)
         # prairie / pasture grass: short with drifts of tall grass (wild encounters)
         pr = (g == G_PRAIRIE) & (tsg == RUR)
         if pr.any():
@@ -998,6 +1017,8 @@ class Gen:
         from geo import civic
         roads = self.road_ring()
         self.blocked = roads | self.rail | (self.ground == G_WATER) | self.reserved
+        from geo import gyms
+        gyms.build(self)
         civic.pass_elevators(self)
         civic.pass_downtown(self)
         civic.pass_civic(self)
