@@ -41,8 +41,13 @@ def vnoise(H, W, ox, oy, cell, seed):
     """Smooth value noise in [0, 1) on world coordinates (stable across map edges)."""
     gx0, gy0 = ox // cell, oy // cell
     gw, gh = (ox + W) // cell - gx0 + 2, (oy + H) // cell - gy0 + 2
-    g = np.array([[(zlib.crc32(f'{seed},{gx0 + i},{gy0 + j}'.encode()) & 0xffff) / 65536.0 for i in range(gw)]
-                  for j in range(gh)])
+    jj, ii = np.mgrid[0:gh, 0:gw]
+    v = ((ii + gx0).astype(np.uint64) * np.uint64(0x9E3779B97F4A7C15)) ^ \
+        ((jj + gy0).astype(np.uint64) * np.uint64(0xC2B2AE3D27D4EB4F)) ^ np.uint64(zlib.crc32(seed.encode()))
+    v ^= v >> np.uint64(31); v *= np.uint64(0xBF58476D1CE4E5B9)          # splitmix64 finaliser
+    v ^= v >> np.uint64(27); v *= np.uint64(0x94D049BB133111EB)
+    v ^= v >> np.uint64(31)
+    g = (v >> np.uint64(40)).astype(np.float64) / float(1 << 24)
     ys, xs = np.mgrid[0:H, 0:W]
     fx, fy = (xs + ox) / cell - gx0, (ys + oy) / cell - gy0
     ix, iy = fx.astype(int), fy.astype(int)
@@ -498,26 +503,40 @@ class Gen:
 
     # ------------------------------------------------------------ trees
     def pass_trees(self):
+        """Trees in groves, not sprinkles: smooth noise picks where groves sit, the
+        canopy % (or a per-ground default) picks how much of the land they cover.
+        Inside a grove every free 2x2 spot gets a tree, so stands read as solid."""
         free = ~(self.road_ring() | self.rail | self.occupied | (self.ground == G_WATER))
+        H, W = self.H, self.W
+        nz = 0.9 * vnoise(H, W, self.ox, self.oy, 10, 'grove') + 0.1 * vnoise(H, W, self.ox, self.oy, 3, 'grove2')
+        # rank-transform to uniform so "cover fraction f" means f of the land
+        u = np.empty(nz.size, np.float32)
+        u[np.argsort(nz, axis=None)] = np.linspace(0, 1, nz.size, dtype=np.float32)
+        u = u.reshape(H, W)
+        g = self.ground
+        if self.canopy is not None:
+            c = np.where(self.canopy <= 100, self.canopy, 0).astype(np.float32) / 100
+        else:
+            c = np.zeros((H, W), np.float32)
+        base = np.select([g == G_WOOD, g == G_PARK, g == G_CEMETERY, self.zone & (g == G_LAWN),
+                          g == G_PRAIRIE, g == G_MEADOW, g == G_LAWN],
+                         [1.0, 0.30, 0.35, 0.30, 0.12, 0.08, 0.12], 0.0)
+        f = np.where(g == G_WOOD, 1.0, np.maximum(base, np.minimum(1.0, c * 1.4)))
+        f[np.isin(g, (G_FIELD, G_WATER, G_PARKING, G_FARMYARD))] = 0
+        want = u > 1 - f
         n = 0
-        for y in range(0, self.H - 1, 2):
-            for x in range(0, self.W - 1, 2):
-                g = self.ground[y, x]
-                hs = h32(x + self.ox, y + self.oy)
-                if self.canopy is not None and self.canopy[y, x] <= 100:
-                    # tree canopy %: dense where the satellite sees trees, none where it doesn't
-                    c = int(self.canopy[y, x])
-                    if self.zone[y, x]:
-                        c = max(c, 10)        # the canopy product misses most small-town yard trees
-                    want = (g == G_WOOD and c >= 15) or (g not in (G_FIELD, G_WATER, G_PARKING) and hs % 100 < c * 0.9)
-                else:
-                    want = (g == G_WOOD) or (g == G_LAWN and self.zone[y, x] and hs % 41 == 0) \
-                        or (g == G_PARK and hs % 17 == 0) or (g == G_CEMETERY and hs % 9 == 0)
-                if want and free[y:y + 2, x:x + 2].all() and all((x + i, y + j) not in self.obj for i in range(2) for j in range(2)):
-                    for (i, j), m in zip(((0, 0), (1, 0), (0, 1), (1, 1)), ('1d4', '1d5', '1e4', '1e5')):
-                        self.put(x + i, y + j, RES if self.zone[y, x] else RUR, 'prim:' + m, False)
-                    free[y:y + 2, x:x + 2] = False
+        slot = np.zeros((H // 2, W // 2), bool)
+        for y in range(0, H - 1, 2):
+            for x in range(0, W - 1, 2):
+                if want[y, x] and free[y:y + 2, x:x + 2].all() and \
+                        not any((x + i, y + j) in self.obj for i in range(2) for j in range(2)):
+                    slot[y // 2, x // 2] = True
                     n += 1
+        for sy, sx in zip(*np.nonzero(slot)):
+            y, x = sy * 2, sx * 2
+            ts_ = RES if self.zone[y, x] else RUR
+            for (i, j), m in zip(((0, 0), (1, 0), (0, 1), (1, 1)), ('1d4', '1d5', '1e4', '1e5')):
+                self.put(x + i, y + j, ts_, 'prim:' + m, False)
         self.stats['trees'] = n
 
     # ------------------------------------------------------------ final autotile
