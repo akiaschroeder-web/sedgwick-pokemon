@@ -100,6 +100,7 @@ class Gen:
         self.stats = {}
         self.houses = []
         self.featured = []
+        self.no_infill = []
         self.doors = []              # (x, y, kind, address): door / mat cells for warps
         self.land, self.canopy = land, canopy        # NLCD grids on this map's tiles (or None)
         self.civic_done = []
@@ -333,6 +334,8 @@ class Gen:
                 self.featured.append((x, y, f"{a['num']} {a['street']}"))
             if self.place_house(x, y, d, dirs[d][0], width, storeys, hs, f"{a['num']} {a['street']}"):
                 placed += 1
+                if st.get('neighbors_east') and d == 's':
+                    self.fix_neighbors_east(self.houses[-1], st['neighbors_east'])
             elif self.place_house(x, y, d, dirs[d][0], 5, 1, hs, f"{a['num']} {a['street']}"):
                 placed += 1
             else:
@@ -344,6 +347,7 @@ class Gen:
         rows = 3 if storeys == 1 else 5
         st = getattr(self, 'style', {}) or {}
         self.style = {}
+        self._hstyle = st
         roof = st.get('roof', ('red', 'brown', 'charcoal')[hs % 3])
         wall = st.get('wall', ('white', 'tan')[(hs >> 3) % 2])
         garage = st.get('garage', 'l' if (hs >> 5) % 2 else 'r')
@@ -408,7 +412,8 @@ class Gen:
         self.occupied[y - 1:y + len(rows) + 1, x - 1:x + width + 1] = True
         bottom = y + len(rows) - 1
         self.houses.append({'x': x, 'y': y, 'w': width, 'rows': len(rows), 'd': d, 'edge': edge,
-                            'gar': gar_cols, 'garage': garage, 'hs': h32(address)})
+                            'gar': gar_cols, 'garage': garage, 'hs': h32(address),
+                            'style': getattr(self, '_hstyle', {}) or {}})
         if d == 's':
             mx = x + width + 1 if garage != 'r' else x - 2
             if gar_cols and edge + 1 < self.H and self.road[edge + 1, gar_cols[0]] and self.road[edge + 1, gar_cols[0] + 1] \
@@ -442,6 +447,22 @@ class Gen:
             if not address.startswith('#'):
                 self.signs.append((x, y, address))
 
+    def fix_neighbors_east(self, h, n):
+        """The owner told us how many houses lie between theirs and the street's east
+        end: reserve that frontage and put exactly n evenly spaced houses on it."""
+        edge = h['edge']
+        x = h['x'] + h['w']
+        while x < self.W - 1 and self.road[edge + 1, x] and not self.road[edge, x]:
+            x += 1
+        x0, x1 = h['x'] + h['w'] + 1, x - 1
+        top = edge - 12
+        self.no_infill.append((x0, top, x1, edge))
+        L = (x1 - x0 + 1) / n
+        for k in range(n):
+            ax = int(x0 + L * (k + 0.5))
+            hs = h32('nbr', k, h['x'])
+            self.place_house(ax, edge - 4, 's', 5, max(5, min(7, int(L) - 2)), 1, hs, f'#{ax},{edge}')
+
     def pass_infill(self):
         """Houses on empty residential frontage where the address data has gaps.
         Real address points were placed first, so these only take what's left."""
@@ -463,6 +484,8 @@ class Gen:
                 cand.append((x + 5, y, 'w', 5))
         for ax, ay, d, dist in cand:
             if not (0 <= ax < W and 0 <= ay < H) or not ok[ay, ax]:
+                continue
+            if any(bx0 - 4 <= ax <= bx1 + 4 and by0 <= ay <= by1 + 6 for bx0, by0, bx1, by1 in self.no_infill):
                 continue
             hs = h32('infill', ax + self.ox, ay + self.oy)
             if hs % 6 == 0:

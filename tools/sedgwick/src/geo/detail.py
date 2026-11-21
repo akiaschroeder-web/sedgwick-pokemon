@@ -80,8 +80,9 @@ def backyard(G, hrec):
     x, y, w, d, hs = hrec['x'], hrec['y'], hrec['w'], hrec['d'], hrec['hs']
     if d != 's':
         return
-    kind = ('chainlink', 'privacy', None, 'privacy', 'chainlink')[(hs >> 11) % 5]
-    depth = 4 + (hs >> 13) % 4
+    st = hrec.get('style', {})
+    kind = st.get('fence', ('chainlink', 'privacy', None, 'privacy', 'chainlink')[(hs >> 11) % 5])
+    depth = st.get('yard_depth', 6) if st else 4 + (hs >> 13) % 4
     # shrink the yard until it fits
     while depth >= 3:
         top = y - depth - 1
@@ -100,6 +101,16 @@ def backyard(G, hrec):
             G.put(x - 1, cy, RES, f'{kind}_v', False)
             G.put(x + w, cy, RES, f'{kind}_v', False)
     claim(G, x - 1, top, w + 2, 1)                 # the fence line; the yard stays open for trees
+    if st.get('back_trees'):
+        # the owner's description: n small trees spread across the yard
+        k = st['back_trees']
+        for t in range(k):
+            tx = x + round(t * (w - 2) / max(1, k - 1)) if k > 1 else x + w // 2 - 1
+            ty = top + 1 + (t % 2) * max(0, depth - 3)
+            if all((tx + i, ty + j) not in G.obj for i in range(2) for j in range(2)):
+                tree(G, tx, ty, RES)
+                claim(G, tx, ty, 2, 2)
+        return
     # inside the yard: a shed, or a tree
     roll = (hs >> 15) % 4
     if roll == 0 and depth >= 4 and w >= 5:
@@ -125,10 +136,18 @@ def tree(G, x, y, ts):
 def front_tree(G, hrec):
     """A shade tree in the front yard on the side away from the driveway."""
     x, y, w, rows, d, edge, hs = (hrec[k] for k in ('x', 'y', 'w', 'rows', 'd', 'edge', 'hs'))
-    if d != 's' or (hs >> 21) % 3 == 0:
+    st = hrec.get('style', {})
+    if d != 's' or ((hs >> 21) % 3 == 0 and not st.get('front_tree')):
         return
     bottom = y + rows - 1
     tx = x - 3 if hrec.get('garage') == 'r' else x + w + 1
+    if st.get('front_tree') == 'e':
+        # east of the driveway, in the front yard
+        tx = (hrec['gar'][0] + 2) if hrec['gar'] else x + w - 2
+        cells = [(tx + i, bottom + 1 + j) for i in range(2) for j in range(2)]
+        if bottom + 3 <= edge and all(c not in G.obj and not G.blocked[c[1], c[0]] for c in cells):
+            tree(G, tx, bottom + 1, RES); claim(G, tx, bottom + 1, 2, 2)
+        return
     ty = bottom - 1
     if ok(G, tx, ty, 2, 2) and ty + 2 < edge:
         tree(G, tx, ty, RES)
