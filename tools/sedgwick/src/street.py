@@ -250,11 +250,15 @@ def culdesac():
         return d
     reg = paint(6, 6, sdf)
     out = {}
+    T = lambda g: [list(r) for r in zip(*g)]
     for (c, r), g in reg.items():
         if c >= 3:
             g = hflip(reg[(5 - c, r)])
         if not is_plain(g):
-            out[f'culdesac_{c}{r}'] = g
+            out[f'culdesac_{c}{r}'] = g                      # street from the north, bulb south
+            out[f'culdesacN_{c}{5 - r}'] = vflip(g)          # street from the south, bulb north
+            out[f'culdesacE_{r}{c}'] = T(g)                  # street from the west, bulb east
+            out[f'culdesacW_{5 - r}{c}'] = hflip(T(g))       # street from the east, bulb west
     return out
 
 

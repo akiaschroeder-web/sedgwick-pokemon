@@ -86,7 +86,8 @@ class Gen:
         self.ground = np.full((H, W), G_FIELD, np.uint8)
         self.ground[self.zone] = G_LAWN
         self.road = np.zeros((H, W), np.uint8)
-        self.roadid = np.zeros((H, W), np.int32)      # index+1 into F['roads'] for name lookups
+        self.roadid = np.zeros((H, W), np.int32)
+        self.oneway = np.zeros((H, W), bool)      # index+1 into F['roads'] for name lookups
         self.rail = np.zeros((H, W), bool)
         self.obj = {}                                # (x, y) -> (ts, name, walk)   placed pieces
         self.occupied = np.zeros((H, W), bool)       # footprint reservations
@@ -172,24 +173,31 @@ class Gen:
                 continue
             rc = RCLS[c]
             p = self.local(r['pts'])
+            if r.get('link') and sum(math.hypot(b[0] - a[0], b[1] - a[1]) for a, b in zip(p, p[1:])) < 80:
+                continue                     # short turn ramps only clutter a Gen 3 junction
             if c in ('street', 'service'):
                 from geo import octi
                 p = octi.snap(p)
             w = WIDTH[c]
             if c == 'street' and r['name'].endswith('Main Street'):
                 rc, w = R_MAIN, 3
-            def f(x, y, rc=rc, i=i):
+            ow = bool(r.get('oneway'))
+            def f(x, y, rc=rc, i=i, ow=ow):
                 if prio[rc] > prio.get(int(self.road[y, x]), 0):
                     self.road[y, x] = rc
                     self.roadid[y, x] = i + 1
+                    self.oneway[y, x] = ow
             self.brush_line(p, w, f)
         # parking lots: asphalt with curbs, drawn as low-priority street cores
         self.parking = np.zeros((self.H, self.W), bool)
+        self.reserved = np.zeros((self.H, self.W), bool)
+        self.bulbs = []
         for a in self.F['areas']:
             if a['cls'] == 'parking':
                 m = self.poly_mask([self.local(a['poly'])]) & (self.road == 0)
                 self.road[m] = R_STREET
                 self.parking |= m
+        self.find_bulbs()
         for r in self.F['rail']:
             if r['state'] == 'abandoned':
                 continue
@@ -212,6 +220,64 @@ class Gen:
                     break
         return out
 
+    def find_bulbs(self):
+        """Cul-de-sac bulbs at OSM turning circles on 2-lane streets."""
+        core = self.road == R_STREET
+        for t in self.F.get('turns', []):
+            px, py = int(round(t['x'] - self.ox)), int(round(t['y'] - self.oy))
+            if not (8 <= px < self.W - 8 and 8 <= py < self.H - 8):
+                continue
+            # which way does the street leave the circle?
+            runs = {}
+            for d, (dx, dy) in (('n', (0, -1)), ('s', (0, 1)), ('w', (-1, 0)), ('e', (1, 0))):
+                k = 0
+                while k < 10 and core[py + dy * (k + 1), px + dx * (k + 1)] if 0 <= py + dy * (k + 1) < self.H and 0 <= px + dx * (k + 1) < self.W else False:
+                    k += 1
+                runs[d] = k
+            d = max(runs, key=runs.get)
+            if runs[d] < 4 or sorted(runs.values())[-2] >= 3:
+                continue                       # not a clean dead end
+            if d in 'ns':
+                xs = [x for x in range(px - 3, px + 4) if core[py + (-3 if d == 'n' else 3), x]]
+                if len(xs) != 2:
+                    continue
+                x0, y0 = xs[0] - 2, py - 3
+                kind = '' if d == 'n' else 'N'
+            else:
+                ys = [y for y in range(py - 3, py + 4) if core[y, px + (-3 if d == 'w' else 3)]]
+                if len(ys) != 2:
+                    continue
+                x0, y0 = px - 3, ys[0] - 2
+                kind = 'E' if d == 'w' else 'W'
+            if x0 < 1 or y0 < 1 or x0 + 7 > self.W or y0 + 7 > self.H:
+                continue
+            self.bulbs.append((x0, y0, kind))
+            self.reserved[y0 - 1:y0 + 7, x0 - 1:x0 + 7] = True
+
+    def stamp_bulbs(self, tsg, names):
+        import math as m
+        for x0, y0, kind in self.bulbs:
+            for r in range(6):
+                for c in range(6):
+                    # native frame (street from the north) for the inside test
+                    if kind == '':
+                        nc, nr = c, r
+                    elif kind == 'N':
+                        nc, nr = c, 5 - r
+                    elif kind == 'E':
+                        nc, nr = r, c
+                    else:
+                        nc, nr = r, 5 - c
+                    name = f'culdesac{kind}_{c}{r}'
+                    if name not in self.ids[RES]:
+                        px, py = nc * 16 + 8, nr * 16 + 8
+                        inside = m.hypot(px - 48, py - 52) < 40 or (py < 52 and abs(px - 48) < 20)
+                        name = 'asphalt' if inside else 'lawn'
+                    if (x0 + c, y0 + r) in self.obj and name == 'lawn':
+                        continue
+                    names[y0 + r, x0 + c] = name
+                    tsg[y0 + r, x0 + c] = RES
+
     def road_ring(self):
         core = self.road > 0
         ring = np.zeros_like(core)
@@ -221,7 +287,7 @@ class Gen:
 
     def pass_houses(self):
         roads = self.road_ring()
-        self.blocked = roads | self.rail | (self.ground == G_WATER)
+        self.blocked = roads | self.rail | (self.ground == G_WATER) | self.reserved
         bmask = {}
         for b in self.F['buildings']:
             xs = [p[0] - self.ox for p in b['poly']]; ys = [p[1] - self.oy for p in b['poly']]
@@ -320,7 +386,8 @@ class Gen:
                             'gar': gar_cols, 'garage': garage, 'hs': h32(address)})
         if d == 's':
             mx = x + width + 1 if garage != 'r' else x - 2
-            if gar_cols:
+            if gar_cols and edge + 1 < self.H and self.road[edge + 1, gar_cols[0]] and self.road[edge + 1, gar_cols[0] + 1] \
+                    and not self.road[edge, gar_cols[0]] and not self.road[edge, gar_cols[0] + 1]:
                 gx = gar_cols[0]
                 for yy in range(bottom + 1, edge):
                     self.put(gx, yy, RES, 'drive_l', True); self.put(gx + 1, yy, RES, 'drive_r', True)
@@ -392,6 +459,11 @@ class Gen:
             w = max(4, w); h = max(3, h)
             if self.occupied[y0:y0 + h, x0:x0 + w].any() or self.blocked[y0:y0 + h, x0:x0 + w].any():
                 continue
+            if ts == RUR:
+                for yy in range(max(0, y0 - 2), min(self.H, y0 + h + 3)):
+                    for xx in range(max(0, x0 - 2), min(self.W, x0 + w + 2)):
+                        if not self.blocked[yy, xx] and (xx, yy) not in self.obj and self.ground[yy, xx] != G_WATER:
+                            self.put(xx, yy, RUR, 'gravel' if yy >= y0 + h else 'lawn', True)
             self.flat_building(x0, y0, w, h, ts, h32(b['id']))
             n += 1
         self.stats['buildings'] = n
@@ -466,6 +538,7 @@ class Gen:
         names[(g == G_PARKING) & (tsg == RES)] = 'asphalt'
         names[(g == G_PARKING) & (tsg == RUR)] = 'gravel'
         names[g == G_WATER] = 'prim:170'
+        self._shore(names, g == G_WATER)
         # prairie / pasture grass: short with drifts of tall grass (wild encounters)
         pr = (g == G_PRAIRIE) & (tsg == RUR)
         if pr.any():
@@ -539,10 +612,10 @@ class Gen:
                 pass
             if (y > 0 and y < H - 1 and core[y - 1, x] == rc and core[y + 1, x] == rc and
                     (y < 2 or core[y - 2, x] != rc) and (y > H - 3 or core[y + 2, x] != rc)):
-                names[y, x] = 'center_yellow_h' if rc == R_MAIN else 'hwy_center_h'
+                names[y, x] = 'center_yellow_h' if rc == R_MAIN else ('hwy_center_dash_h' if self.oneway[y, x] else 'hwy_center_h')
             elif (x > 0 and x < W - 1 and core[y, x - 1] == rc and core[y, x + 1] == rc and
                   (x < 2 or core[y, x - 2] != rc) and (x > W - 3 or core[y, x + 2] != rc)):
-                names[y, x] = 'center_yellow_v' if rc == R_MAIN else 'hwy_center_v'
+                names[y, x] = 'center_yellow_v' if rc == R_MAIN else ('hwy_center_dash_v' if self.oneway[y, x] else 'hwy_center_v')
         # edge ring
         ry, rx = np.nonzero(ring & (core == 0))
         for y, x in zip(ry, rx):
@@ -618,6 +691,7 @@ class Gen:
                     names[y, x] = 'road_edge_n'
                 else:
                     names[y, x] = 'road_edge_s'
+        self.stamp_bulbs(tsg, names)
         # rail over everything below it
         for y, x in zip(*np.nonzero(self.rail)):
             horiz = (x > 0 and self.rail[y, x - 1]) or (x < W - 1 and self.rail[y, x + 1])
@@ -636,12 +710,33 @@ class Gen:
         # tileset fallbacks: residential has no crops etc; rural has no sidewalks
         return tsg, names, walk
 
+    SHORE = {'n': 0x1be, 's': 0x1ae, 'w': 0x1b7, 'e': 0x1b5,
+             'nw': 0x1a4, 'ne': 0x1a3, 'sw': 0x19c, 'se': 0x19b,
+             'inw': 0x1bf, 'ine': 0x1bd, 'isw': 0x1af, 'ise': 0x1ad}
+
+    def _shore(self, names, wm):
+        """Hoenn pond banks on the edge cells of every water body."""
+        p = np.pad(wm, 1, constant_values=True)
+        N, S, Wd, E = ~p[:-2, 1:-1], ~p[2:, 1:-1], ~p[1:-1, :-2], ~p[1:-1, 2:]
+        NW, NE, SW, SE = ~p[:-2, :-2], ~p[:-2, 2:], ~p[2:, :-2], ~p[2:, 2:]
+        K = self.SHORE
+        def put(mask, key):
+            names[wm & mask] = 'prim:%03x' % K[key]
+        put(~N & ~S & ~Wd & ~E & SE, "ise")
+        put(~N & ~S & ~Wd & ~E & SW, 'isw')
+        put(~N & ~S & ~Wd & ~E & NE, 'ine')
+        put(~N & ~S & ~Wd & ~E & NW, 'inw')
+        put(N & ~S & ~Wd & ~E, 'n'); put(S & ~N & ~Wd & ~E, 's')
+        put(Wd & ~E & ~N & ~S, 'w'); put(E & ~Wd & ~N & ~S, 'e')
+        put(N & Wd & ~S & ~E, 'nw'); put(N & E & ~S & ~Wd, 'ne')
+        put(S & Wd & ~N & ~E, 'sw'); put(S & E & ~N & ~Wd, 'se')
+
     def run(self):
         self.pass_ground()
         self.pass_roads()
         from geo import civic
         roads = self.road_ring()
-        self.blocked = roads | self.rail | (self.ground == G_WATER)
+        self.blocked = roads | self.rail | (self.ground == G_WATER) | self.reserved
         civic.pass_elevators(self)
         civic.pass_downtown(self)
         civic.pass_civic(self)

@@ -25,6 +25,8 @@ def driveway(G, hrec):
     if d == 'n':
         for side in ((x + w + 1,) if hs & 1 else ()) + (x - 3, x + w + 1):
             cells = [(side + i, yy) for yy in range(edge + 1, bottom + 1) for i in range(2)]
+            if edge < 1 or side < 0 or side + 2 >= G.W or not (G.road[edge - 1, side] and G.road[edge - 1, side + 1]) or G.road[edge, side] or G.road[edge, side + 1]:
+                continue
             if all(G.free(cx, cy) and (cx, cy) not in G.obj for cx, cy in cells):
                 for yy in range(edge + 1, bottom + 1):
                     G.put(side, yy, RES, 'drive_l', True); G.put(side + 1, yy, RES, 'drive_r', True)
@@ -42,6 +44,9 @@ def driveway(G, hrec):
             xs = range(edge + 1, x)
             apron = 'drive_apron_e'
         cells = [(cx, top + j) for cx in xs for j in range(2)]
+        street = edge + 1 if d == 'e' else edge - 1
+        if not (0 <= street < G.W) or not (G.road[top, street] and G.road[top + 1, street]) or G.road[top, edge] or G.road[top + 1, edge]:
+            return
         if cells and all((cx, cy) not in G.obj and not G.blocked[cy, cx] for cx, cy in cells):
             for cx in xs:
                 G.put(cx, top, RES, 'drive_t', True); G.put(cx, top + 1, RES, 'drive_b', True)

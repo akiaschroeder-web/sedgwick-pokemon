@@ -94,7 +94,7 @@ def extract(raw, bbox=None):
         xs = [q[0] for q in p]; ys = [q[1] for q in p]
         return max(xs) >= x0 and min(xs) <= x1 and max(ys) >= y0 and min(ys) <= y1
 
-    F = {'roads': [], 'areas': [], 'buildings': [], 'rail': [], 'addresses': [], 'pois': []}
+    F = {'roads': [], 'areas': [], 'buildings': [], 'rail': [], 'addresses': [], 'pois': [], 'turns': []}
     for wid, (refs, t) in ways.items():
         if not t:
             continue
@@ -108,6 +108,7 @@ def extract(raw, bbox=None):
         if rc:
             F['roads'].append({'id': wid, 'cls': rc, 'pts': p, 'name': t.get('name', ''),
                                'bridge': t.get('bridge') == 'yes', 'oneway': t.get('oneway') == 'yes',
+                               'link': t.get('highway', '').endswith('_link'),
                                'lanes': t.get('lanes')})
             continue
         if t.get('railway') in ('rail', 'disused', 'abandoned', 'spur', 'siding') and 'area' not in t:
@@ -138,6 +139,8 @@ def extract(raw, bbox=None):
         x, y = proj(lo, la)
         if bbox and not (bbox[0] <= x <= bbox[2] and bbox[1] <= y <= bbox[3]):
             continue
+        if t.get('highway') in ('turning_circle', 'turning_loop'):
+            F['turns'].append({'x': x, 'y': y})
         if 'addr:housenumber' in t:
             F['addresses'].append({'x': x, 'y': y, 'num': t['addr:housenumber'], 'street': t.get('addr:street', ''), 'tags': t})
         elif any(k in t for k in ('amenity', 'shop', 'man_made', 'leisure', 'tourism', 'office')):

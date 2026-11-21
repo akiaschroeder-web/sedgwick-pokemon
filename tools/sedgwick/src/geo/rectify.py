@@ -32,7 +32,10 @@ def detect(F, min_len=20, tol=2.5):
         return None
     a0 = max(tilted, key=tilted.get)
     ang = sum(a * v for a, v in votes.items() if abs(a - a0) <= tol) / sum(v for a, v in votes.items() if abs(a - a0) <= tol)
-    if abs(ang) < 2:
+    # only a real turned grid: at least 4 degrees, and a big share of all straight street length
+    total = sum(votes.values())
+    share = sum(v for a, v in votes.items() if abs(a - a0) <= tol) / total
+    if abs(ang) < 4 or share < 0.25:
         return None
     pts = []
     for r in F['roads']:
@@ -152,7 +155,7 @@ def apply(F, extra_rings=()):
         b['poly'] = [f(p) for p in b['poly']]
         if b.get('holes'):
             b['holes'] = [[f(p) for p in h] for h in b['holes']]
-    for a in F['addresses'] + F['pois']:
+    for a in F['addresses'] + F['pois'] + F.get('turns', []):
         a['x'], a['y'] = f((a['x'], a['y']))
     rings = [[f(p) for p in r] for r in extra_rings]
     return F, (ang, poly, rings)
