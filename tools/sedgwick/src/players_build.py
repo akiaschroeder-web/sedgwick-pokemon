@@ -30,7 +30,8 @@ def sprites():
             players.save_frames(out, pal, f'{OUT}/{who}/{sheet}.png')
         open(f'{EXP}/graphics/object_events/palettes/sedgwick_{who}.pal', 'w').write(jasc(pal))
         backs = [getattr(players_back, who)(g) for g in players_back.frames(c['back'])]
-        players_back.save(backs, pal, f'{EXP}/graphics/trainers/back_pics/sedgwick_{who}.png')
+        players_back.save(backs, players_back.BOY_BACK_PAL if who == 'boy' else pal,
+                          f'{EXP}/graphics/trainers/back_pics/sedgwick_{who}.png')
 
 
 # ---------------------------------------------------------------- C hookup
