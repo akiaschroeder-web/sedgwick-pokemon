@@ -149,3 +149,65 @@ def girl_drawn():
                 g[y][8 + i + dx] = 4
     # shift the whole figure to sit centred like Leaf (x 12..52)
     return [[0] * 4 + row[:60] for row in g]
+
+
+# ---------------------------------------------------------------- girl, edited from Leaf's front sprite
+GK = {'d': 4, 'm': 12, 'l': 11, 'y': 10, 'Y': 3, 'c': 14, 's': 1, 'S': 2, 't': 3, 'o': 15, '_': 0}
+
+GIRL_HAIR_TOP = [            # x 18.., y 0..: big high ponytail, bow at its base, crown, bangs
+    "........dddddd.............",
+    "......ddllllmmd............",
+    ".....dllllmmmmmd...........",
+    "....dllmmmmmmmmmd..........",
+    "...dlmmmmmdmmmmmmd.........",
+    "..dlmmmmddmmmmmmmd...dd.dd.",
+    ".dmmdmmd..dmmmmmmd..dyydyyd",
+    ".dmd.dd...dmmmmmmmddyyyyyd.",
+    "..d.......dmmmmmmmdyyyyyyd.",
+    ".........ddmmmmmmmmdyyyd...",
+    "........dmmllllmmmmmddd....",
+    ".......dmllllllmmmmmmd.....",
+    "......dmllmmmmmmmmmmmmd....",
+    ".....dmlmmmmmmmmmmmmmmmd...",
+    ".....dmlmmmmdmmmmmmmmmmd...",
+    ".....dmmmcmdmmmmmdmmmmmmd..",
+    ".....dmmccmdmmmmdmmmmdmmmd.",
+    ".....dmdccdsdmmdsdmmdsdmmd.",
+]
+GIRL_LEFT_LOCKS = [          # x 20.., y 18..: wavy hair down her right side
+    "dmd.",
+    "dmmd",
+    "dlmd",
+    "dmmd",
+    ".dmd",
+    "dmmd",
+    "dlmd",
+    "dmd.",
+    ".dd.",
+]
+
+
+def girl():
+    g = load('leaf')
+    src = [r[:] for r in g]
+    for y in range(64):
+        for x in range(64):
+            v = src[y][x]
+            if y <= 17 and 20 <= x <= 44:
+                g[y][x] = 0                                  # the hat comes off
+                continue
+            ball = x <= 20 and 32 <= y <= 38
+            if ball and v in (12, 13):
+                g[y][x] = 9                                  # Poke Ball red
+            elif v == 9:
+                g[y][x] = 14
+            # Leaf's long hair: auburn
+            elif v in (4, 3, 8) and ((x >= 36 and 16 <= y <= 31) or (y == 18 and 29 <= x <= 31)):
+                g[y][x] = {4: 12, 3: 11, 8: 4}[v]
+    overlay(g, 18, 0, GIRL_HAIR_TOP, GK)
+    overlay(g, 20, 18, GIRL_LEFT_LOCKS, GK)
+    for y in range(18, 21):                                  # grey-green eyes, not Leaf's blue
+        for x in range(24, 37):
+            if src[y][x] in (6, 7):
+                g[y][x] = 8
+    return g
