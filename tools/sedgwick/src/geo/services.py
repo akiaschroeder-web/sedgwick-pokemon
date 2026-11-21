@@ -24,8 +24,8 @@ MART_W, MART_H, MART_DOOR = 4, 4, (2, 3)
 STN_W, STN_H = 11, 6
 LAB_W, LAB_H, LAB_DOOR = 7, 5, (3, 4)
 # hand-placed from local knowledge where OSM is off: (name, OSM position) -> top-left tile
-PINS = {('Kwik Shop', (8204, 11011)): (8092, 11013)}      # Goddard: NW corner of Kellogg Dr / Hopper Dr
-LAB_PIN = (8111, 11014)                                    # just east of that Kwik Shop, across Hopper
+PINS = {('Kwik Shop', (8204, 11011)): (8111, 11013)}      # Goddard: NE corner of Kellogg Dr / Hopper Dr
+LAB_PIN = (8125, 11014)                                    # just east of that Kwik Shop
 CEL_COLORS = ('mint', 'brick', 'beige')
 TWO_CENTERS = 10000                      # towns at least this big get a second Center
 ROAD_HALF = {'street': 3, 'service': 3, 'highway': 4, 'gravel': 3, 'alley': 2, 'track': 2, 'motorway': 6}

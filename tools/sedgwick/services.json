@@ -1027,7 +1027,7 @@
   {
    "kind": "mart",
    "name": "Kwik Shop",
-   "x": 8092,
+   "x": 8111,
    "y": 11013,
    "layout": "station",
    "store": "mart",
@@ -1910,7 +1910,7 @@
   {
    "kind": "lab",
    "name": "Professor's Lab",
-   "x": 8111,
+   "x": 8125,
    "y": 11014,
    "near": "Kwik Shop"
   }
