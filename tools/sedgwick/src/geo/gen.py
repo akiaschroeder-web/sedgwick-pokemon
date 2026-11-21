@@ -75,8 +75,14 @@ class Gen:
         for a in F['addresses']:
             d.point((a['x'] - self.ox, a['y'] - self.oy), fill=1)
         dev = box_dilate(np.array(im, bool), 28)
-        self.zone = (limits & dev) | self.poly_mask(
-            [self.local(a['poly']) for a in F['areas'] if a['cls'] in ('residential', 'commercial')])
+        if land is not None:
+            # satellite built-up land (NLCD developed 21-24) bounds the town style
+            built = np.isin(land, (21, 22, 23, 24)) | (land == 250)
+            dev &= box_dilate(built, 6)
+        lu = self.poly_mask([self.local(a['poly']) for a in F['areas'] if a['cls'] in ('residential', 'commercial')])
+        if land is not None:
+            lu &= dev
+        self.zone = (limits & dev) | lu
         self.ground = np.full((H, W), G_FIELD, np.uint8)
         self.ground[self.zone] = G_LAWN
         self.road = np.zeros((H, W), np.uint8)
@@ -452,7 +458,7 @@ class Gen:
         # ground first
         g = self.ground
         names[:] = 'CROP'
-        names[(tsg == RES) | np.isin(g, (G_LAWN, G_PARK, G_CEMETERY, G_MEADOW, G_FARMYARD, G_WOOD))] = 'lawn'
+        names[(tsg == RES) | np.isin(g, (G_LAWN, G_PARK, G_CEMETERY, G_MEADOW, G_FARMYARD, G_WOOD, G_PRAIRIE))] = "lawn"
         names[(g == G_PARKING) & (tsg == RES)] = 'asphalt'
         names[(g == G_PARKING) & (tsg == RUR)] = 'gravel'
         names[g == G_WATER] = 'prim:170'

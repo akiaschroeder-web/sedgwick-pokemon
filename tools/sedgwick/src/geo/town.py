@@ -18,6 +18,22 @@ def box_mean(a, r):
     return s / (2 * r + 1) ** 2
 
 
+GROUPS = [(82,), (71, 52, 95), (81,), (41, 42, 43, 90), (11,), (21,), (22, 23, 24), (31,)]
+
+
+def mode_filter(land, r):
+    """Majority vote over a (2r+1)^2 window per class group: removes 30 m speckle
+    (single misclassified cells) while keeping real field and wood shapes."""
+    scores = np.stack([box_mean(np.isin(land, g), r) for g in GROUPS])
+    best = scores.argmax(0)
+    rep = np.array([g[0] for g in GROUPS], land.dtype)
+    out = rep[best]
+    keep = np.isin(land, (22, 23, 24, 11))         # never smooth away buildings or ponds
+    out[keep] = land[keep]
+    out[land == 250] = 250
+    return out
+
+
 def nlcd_grids(bb, warp=None):
     lcf = glob.glob(f'{NLCD_DIR}/Annual_NLCD_LndCov_2025*.tiff')
     tcf = glob.glob(f'{NLCD_DIR}/nlcd_tcc_*_2025*.tiff')
@@ -29,7 +45,7 @@ def nlcd_grids(bb, warp=None):
     wx = 4 * np.sin(ys / 9.0) + 3 * np.sin((xs + ys) / 13.0)
     wy = 4 * np.sin(xs / 11.0) + 3 * np.cos((xs - ys) / 15.0)
     lon, lat = extract.unproj(xs + wx, ys + wy)
-    land = nlcd.Raster(lcf[0]).sample(lon, lat)
+    land = mode_filter(nlcd.Raster(lcf[0]).sample(lon, lat), 30)
     canopy = None
     if tcf:
         t = nlcd.Raster(tcf[0]).sample(lon, lat).astype(np.float32)
