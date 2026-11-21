@@ -99,6 +99,7 @@ class Gen:
         self.signs = []
         self.stats = {}
         self.houses = []
+        self.doors = []              # (x, y, kind, address): door / mat cells for warps
         self.land, self.canopy = land, canopy        # NLCD grids on this map's tiles (or None)
         self.civic_done = []
 
@@ -374,6 +375,17 @@ class Gen:
     def draw_house(self, x, y, width, storeys, roof, wall, garage, d, edge, address):
         import house2
         rows = house2.plan(width, storeys, garage, windows=1 if width < 7 else 2)
+        if d == 'n':
+            # street is to the north: we see the back of the house, so the south wall
+            # gets windows instead of the door; the door is on the hidden north side
+            low = rows[-1]
+            i = low.index('wall_door')
+            if i + 1 < len(low) - 1 and low[i + 1] == 'wall_sid':
+                low[i], low[i + 1] = 'wall_win_a', 'wall_win_b'
+            elif i - 1 > 0 and low[i - 1] == 'wall_sid':
+                low[i - 1], low[i] = 'wall_win_a', 'wall_win_b'
+            else:
+                low[i] = 'wall_sid'
         gar_cols = []
         door = None
         for r, row in enumerate(rows):
@@ -402,7 +414,14 @@ class Gen:
                 mx = gx + 2 if garage == 'l' else gx - 1
             self.mailbox(mx, edge - 1, address)
         elif d == 'n':
-            self.mailbox(x + width // 2, edge + 1, address)
+            # front walk from the sidewalk to the stoop at the roof's north edge
+            dx = x + width // 2
+            for yy in range(edge + 1, y - 1):
+                self.put(dx, yy, RES, 'sidewalk', True)
+            self.put(dx, y - 1, RES, 'porch_mat', True)
+            self.doors.append((dx, y - 1, 'mat', address))
+            self.occupied[edge + 1:y, dx] = True
+            self.mailbox(dx + 1, edge + 1, address)
         elif d == 'e':
             self.mailbox(edge - 1, bottom - 2, address)     # clear of the side drive
         else:

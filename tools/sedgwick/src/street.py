@@ -330,4 +330,13 @@ def metatiles():
     out.update(culdesac())
     # plain paving for downtown frontages and plazas (one slab per tile)
     out['sidewalk'] = [[CS if (x == 15 or y == 15) else conc_px(x, y) for x in range(16)] for y in range(16)]
-    return {k: (v, 'MB_NORMAL') for k, v in out.items()}
+    # front step of a house whose door faces north (back of the house is what we see):
+    # a concrete stoop with a dark doormat; pressing down on it enters the house
+    stoop = [row[:] for row in out['sidewalk']]
+    for y in range(3, 13):
+        for x in range(2, 14):
+            edge = y in (3, 12) or x in (2, 13)
+            stoop[y][x] = KD if edge else (A if (x + y) % 3 else B)
+    out['porch_mat'] = stoop
+    beh = {'porch_mat': 'MB_SOUTH_ARROW_WARP'}
+    return {k: (v, beh.get(k, 'MB_NORMAL')) for k, v in out.items()}
