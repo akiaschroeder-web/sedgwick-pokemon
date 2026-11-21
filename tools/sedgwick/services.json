@@ -158,17 +158,21 @@
   {
    "kind": "mart",
    "name": "Dillons",
-   "x": 20496,
-   "y": 11002,
+   "x": 20489,
+   "y": 11000,
+   "layout": "station",
+   "store": "mart",
    "replaces": [
     137652802
    ]
   },
   {
-   "kind": "mart",
+   "kind": "gas",
    "name": "QuikTrip",
-   "x": 12225,
-   "y": 10953,
+   "x": 12221,
+   "y": 10938,
+   "layout": "station",
+   "store": "cel:brick",
    "replaces": [
     160663903,
     160663919
@@ -177,18 +181,22 @@
   {
    "kind": "mart",
    "name": "Kwik Shop",
-   "x": 18138,
-   "y": 13641,
+   "x": 18133,
+   "y": 13658,
+   "layout": "station",
+   "store": "mart",
    "replaces": [
     263908091,
     1234504701
    ]
   },
   {
-   "kind": "mart",
+   "kind": "gas",
    "name": "Kwik Shop",
-   "x": 13447,
-   "y": 10309,
+   "x": 13484,
+   "y": 10324,
+   "layout": "station",
+   "store": "cel:brick",
    "replaces": [
     336213917,
     336213918
@@ -197,17 +205,21 @@
   {
    "kind": "mart",
    "name": "Gas station",
-   "x": 19909,
-   "y": 15537,
+   "x": 19889,
+   "y": 15534,
+   "layout": "station",
+   "store": "mart",
    "replaces": [
     350410660
    ]
   },
   {
-   "kind": "mart",
+   "kind": "gas",
    "name": "Dillons",
-   "x": 12208,
-   "y": 8412,
+   "x": 12203,
+   "y": 8409,
+   "layout": "station",
+   "store": "cel:brick",
    "replaces": [
     385784363
    ]
@@ -216,7 +228,9 @@
    "kind": "mart",
    "name": "Kwik Shop",
    "x": 13481,
-   "y": 7164,
+   "y": 7161,
+   "layout": "station",
+   "store": "mart",
    "replaces": [
     391699986,
     391699987,
@@ -224,10 +238,12 @@
    ]
   },
   {
-   "kind": "mart",
+   "kind": "gas",
    "name": "Kwik Shop",
-   "x": 12171,
-   "y": 5892,
+   "x": 12169,
+   "y": 5865,
+   "layout": "station",
+   "store": "cel:mint",
    "replaces": [
     391800130,
     391800131,
@@ -235,10 +251,12 @@
    ]
   },
   {
-   "kind": "mart",
+   "kind": "gas",
    "name": "Kwik Shop",
    "x": 17802,
    "y": 10068,
+   "layout": "store",
+   "store": "cel:brick",
    "replaces": [
     398287928,
     398287929
@@ -247,18 +265,22 @@
   {
    "kind": "mart",
    "name": "QuikTrip",
-   "x": 16998,
-   "y": 10051,
+   "x": 16996,
+   "y": 10050,
+   "layout": "station",
+   "store": "mart",
    "replaces": [
     398859710,
     398859711
    ]
   },
   {
-   "kind": "mart",
+   "kind": "gas",
    "name": "QuikTrip",
-   "x": 16029,
-   "y": 10137,
+   "x": 16025,
+   "y": 10114,
+   "layout": "station",
+   "store": "cel:beige",
    "replaces": [
     403395686,
     403395687
@@ -267,28 +289,34 @@
   {
    "kind": "mart",
    "name": "Midway",
-   "x": 14876,
-   "y": 10137,
+   "x": 14872,
+   "y": 10135,
+   "layout": "station",
+   "store": "mart",
    "replaces": [
     404811407,
     404811446
    ]
   },
   {
-   "kind": "mart",
+   "kind": "gas",
    "name": "Conoco",
    "x": 12056,
    "y": 11031,
+   "layout": "store",
+   "store": "cel:beige",
    "replaces": [
     638097977,
     638097978
    ]
   },
   {
-   "kind": "mart",
+   "kind": "gas",
    "name": "Casey's General Store",
    "x": 15396,
    "y": 3678,
+   "layout": "store",
+   "store": "cel:brick",
    "replaces": [
     656566839,
     656566840,
@@ -297,10 +325,12 @@
    ]
   },
   {
-   "kind": "mart",
+   "kind": "gas",
    "name": "Kwik Shop",
-   "x": 18904,
-   "y": 14893,
+   "x": 18900,
+   "y": 14891,
+   "layout": "station",
+   "store": "cel:beige",
    "replaces": [
     665449486,
     665449487,
@@ -308,10 +338,12 @@
    ]
   },
   {
-   "kind": "mart",
+   "kind": "gas",
    "name": "QuikTrip",
-   "x": 19842,
-   "y": 14886,
+   "x": 19836,
+   "y": 14882,
+   "layout": "station",
+   "store": "cel:mint",
    "replaces": [
     665709972,
     1232787490
@@ -320,17 +352,21 @@
   {
    "kind": "mart",
    "name": "Kwik Shop",
-   "x": 15712,
-   "y": 8401,
+   "x": 15716,
+   "y": 8397,
+   "layout": "station",
+   "store": "mart",
    "replaces": [
     668025272
    ]
   },
   {
-   "kind": "mart",
+   "kind": "gas",
    "name": "Gas station",
-   "x": 16036,
-   "y": 10300,
+   "x": 16028,
+   "y": 10280,
+   "layout": "station",
+   "store": "cel:beige",
    "replaces": [
     669358047,
     669358049,
@@ -343,7 +379,9 @@
    "kind": "mart",
    "name": "Phillips 66",
    "x": 16054,
-   "y": 10621,
+   "y": 10619,
+   "layout": "station",
+   "store": "mart",
    "replaces": [
     669368340,
     669368342,
@@ -353,8 +391,10 @@
   {
    "kind": "mart",
    "name": "Kwik Shop",
-   "x": 19877,
-   "y": 15574,
+   "x": 19880,
+   "y": 15550,
+   "layout": "station",
+   "store": "mart",
    "replaces": [
     669660588,
     669660590,
@@ -362,10 +402,12 @@
    ]
   },
   {
-   "kind": "mart",
+   "kind": "gas",
    "name": "Casey's General Store",
-   "x": 19876,
-   "y": 18922,
+   "x": 19872,
+   "y": 18920,
+   "layout": "station",
+   "store": "cel:beige",
    "replaces": [
     669859001,
     669859024,
@@ -375,47 +417,57 @@
   {
    "kind": "mart",
    "name": "Gas station",
-   "x": 17971,
-   "y": 10199,
+   "x": 17961,
+   "y": 10175,
+   "layout": "station",
+   "store": "mart",
    "replaces": [
     852727008,
     852727009
    ]
   },
   {
-   "kind": "mart",
+   "kind": "gas",
    "name": "Sam's Club",
-   "x": 13845,
-   "y": 10629,
+   "x": 13841,
+   "y": 10627,
+   "layout": "station",
+   "store": "cel:beige",
    "replaces": [
     852733140
    ]
   },
   {
-   "kind": "mart",
+   "kind": "gas",
    "name": "Kwik Shop",
    "x": 18626,
-   "y": 10398,
+   "y": 10397,
+   "layout": "station",
+   "store": "cel:mint",
    "replaces": [
     535400320,
     868829410
    ]
   },
   {
-   "kind": "mart",
+   "kind": "gas",
    "name": "Valero",
-   "x": 21795,
-   "y": 9703,
+   "x": 21761,
+   "y": 9701,
+   "layout": "station",
+   "store": "cel:brick",
    "replaces": [
     854027640,
     868913914
    ]
   },
   {
-   "kind": "mart",
+   "kind": "gas",
    "name": "Casey's General Store",
-   "x": 18938,
-   "y": 14912,
+   "x": 18950,
+   "y": 14891,
+   "layout": "station",
+   "store": "cel:mint",
    "replaces": [
     1160465769,
     1160465770
@@ -424,8 +476,10 @@
   {
    "kind": "mart",
    "name": "Murphy Express",
-   "x": 8984,
-   "y": 11119,
+   "x": 8974,
+   "y": 11084,
+   "layout": "station",
+   "store": "mart",
    "replaces": [
     1232030117,
     1232030118
@@ -434,8 +488,10 @@
   {
    "kind": "mart",
    "name": "QuikTrip",
-   "x": 15373,
-   "y": 11593,
+   "x": 15365,
+   "y": 11591,
+   "layout": "station",
+   "store": "mart",
    "replaces": [
     1235087122
    ]
@@ -443,45 +499,55 @@
   {
    "kind": "mart",
    "name": "Love's",
-   "x": 17176,
-   "y": 8429,
+   "x": 17172,
+   "y": 8427,
+   "layout": "station",
+   "store": "mart",
    "replaces": [
     1446020455
    ]
   },
   {
-   "kind": "mart",
+   "kind": "gas",
    "name": "Love's",
-   "x": 17205,
-   "y": 8394,
+   "x": 17201,
+   "y": 8407,
+   "layout": "station",
+   "store": "cel:brick",
    "replaces": [
     1446020456
    ]
   },
   {
-   "kind": "mart",
+   "kind": "gas",
    "name": "Gas station",
-   "x": 19809,
-   "y": 7433,
+   "x": 19805,
+   "y": 7431,
+   "layout": "station",
+   "store": "cel:brick",
    "replaces": [
     655693621
    ]
   },
   {
-   "kind": "mart",
+   "kind": "gas",
    "name": "Gas station",
-   "x": 6430,
-   "y": 5418,
+   "x": 6426,
+   "y": 5416,
+   "layout": "station",
+   "store": "cel:brick",
    "replaces": [
     654410472,
     654410473
    ]
   },
   {
-   "kind": "mart",
+   "kind": "gas",
    "name": "QuikTrip",
-   "x": 12840,
-   "y": 10332,
+   "x": 12841,
+   "y": 10309,
+   "layout": "station",
+   "store": "cel:brick",
    "replaces": [
     852735853,
     852735854,
@@ -491,8 +557,10 @@
   {
    "kind": "mart",
    "name": "Phillips 66",
-   "x": 12854,
-   "y": 10707,
+   "x": 12884,
+   "y": 10701,
+   "layout": "station",
+   "store": "mart",
    "replaces": [
     853335968,
     853335972
@@ -501,8 +569,10 @@
   {
    "kind": "mart",
    "name": "KD Shop",
-   "x": 12167,
-   "y": 10386,
+   "x": 12195,
+   "y": 10396,
+   "layout": "station",
+   "store": "mart",
    "replaces": [
     638351203,
     638351205
@@ -511,15 +581,19 @@
   {
    "kind": "mart",
    "name": "Gas station",
-   "x": 20532,
-   "y": 9682,
+   "x": 20554,
+   "y": 9692,
+   "layout": "station",
+   "store": "mart",
    "replaces": []
   },
   {
-   "kind": "mart",
+   "kind": "gas",
    "name": "Gas station",
-   "x": 19771,
-   "y": 9725,
+   "x": 19761,
+   "y": 9728,
+   "layout": "station",
+   "store": "cel:beige",
    "replaces": [
     692390693
    ]
@@ -529,6 +603,8 @@
    "name": "QuikTrip",
    "x": 17286,
    "y": 12026,
+   "layout": "store",
+   "store": "mart",
    "replaces": [
     853997821,
     853997829
@@ -539,6 +615,8 @@
    "name": "QuikTrip",
    "x": 18563,
    "y": 9710,
+   "layout": "store",
+   "store": "mart",
    "replaces": [
     266074137
    ]
@@ -548,6 +626,8 @@
    "name": "QuikTrip",
    "x": 20546,
    "y": 11018,
+   "layout": "store",
+   "store": "mart",
    "replaces": [
     668492169
    ]
@@ -555,8 +635,10 @@
   {
    "kind": "mart",
    "name": "Epp's Service",
-   "x": 21060,
-   "y": 1458,
+   "x": 21083,
+   "y": 1498,
+   "layout": "station",
+   "store": "mart",
    "replaces": [
     656567139
    ]
@@ -566,6 +648,8 @@
    "name": "Phillips 66",
    "x": 16857,
    "y": 5264,
+   "layout": "store",
+   "store": "mart",
    "replaces": [
     655684489,
     853988926
@@ -574,8 +658,10 @@
   {
    "kind": "mart",
    "name": "Dillons",
-   "x": 10962,
-   "y": 10399,
+   "x": 10958,
+   "y": 10397,
+   "layout": "station",
+   "store": "mart",
    "replaces": [
     638228856
    ]
@@ -584,7 +670,9 @@
    "kind": "mart",
    "name": "Casey's General Store",
    "x": 11567,
-   "y": 9752,
+   "y": 9747,
+   "layout": "station",
+   "store": "mart",
    "replaces": [
     637964274,
     654994106
@@ -593,8 +681,10 @@
   {
    "kind": "mart",
    "name": "Phillips 66",
-   "x": 16647,
-   "y": 10332,
+   "x": 16644,
+   "y": 10329,
+   "layout": "station",
+   "store": "mart",
    "replaces": [
     572803341,
     574696537,
@@ -606,6 +696,8 @@
    "name": "Dillons",
    "x": 19157,
    "y": 7117,
+   "layout": "store",
+   "store": "mart",
    "replaces": [
     655684349
    ]
@@ -613,18 +705,22 @@
   {
    "kind": "mart",
    "name": "QuikTrip",
-   "x": 19893,
-   "y": 7116,
+   "x": 19915,
+   "y": 7101,
+   "layout": "station",
+   "store": "mart",
    "replaces": [
     655457143,
     1236193703
    ]
   },
   {
-   "kind": "mart",
+   "kind": "gas",
    "name": "Casey's General Store",
-   "x": 19259,
-   "y": 7331,
+   "x": 19255,
+   "y": 7329,
+   "layout": "station",
+   "store": "cel:beige",
    "replaces": [
     655684352,
     1236221632
@@ -635,6 +731,8 @@
    "name": "QuikTrip",
    "x": 13429,
    "y": 6916,
+   "layout": "store",
+   "store": "mart",
    "replaces": [
     1234505175,
     1234505176
@@ -643,28 +741,34 @@
   {
    "kind": "mart",
    "name": "Dillons Fuel Center",
-   "x": 12807,
-   "y": 9023,
+   "x": 12781,
+   "y": 9031,
+   "layout": "station",
+   "store": "mart",
    "replaces": [
     974404058,
     1235088664
    ]
   },
   {
-   "kind": "mart",
+   "kind": "gas",
    "name": "QuikTrip",
-   "x": 16081,
-   "y": 12273,
+   "x": 16077,
+   "y": 12271,
+   "layout": "station",
+   "store": "cel:brick",
    "replaces": [
     1234947389,
     1234947390
    ]
   },
   {
-   "kind": "mart",
+   "kind": "gas",
    "name": "JumpStart",
    "x": 16665,
    "y": 9558,
+   "layout": "store",
+   "store": "cel:brick",
    "replaces": [
     692479107,
     1236749892
@@ -673,8 +777,10 @@
   {
    "kind": "mart",
    "name": "Phillips 66",
-   "x": 14587,
-   "y": 10294,
+   "x": 14606,
+   "y": 10310,
+   "layout": "station",
+   "store": "mart",
    "replaces": [
     669442296,
     669442298,
@@ -682,20 +788,24 @@
    ]
   },
   {
-   "kind": "mart",
+   "kind": "gas",
    "name": "QuikTrip",
-   "x": 17938,
-   "y": 11637,
+   "x": 17934,
+   "y": 11635,
+   "layout": "station",
+   "store": "cel:mint",
    "replaces": [
     762717658,
     854556806
    ]
   },
   {
-   "kind": "mart",
+   "kind": "gas",
    "name": "QuikTrip",
-   "x": 12874,
-   "y": 9059,
+   "x": 12854,
+   "y": 9060,
+   "layout": "station",
+   "store": "cel:mint",
    "replaces": [
     1235088663
    ]
@@ -703,8 +813,10 @@
   {
    "kind": "mart",
    "name": "JumpStart",
-   "x": 13490,
-   "y": 9081,
+   "x": 13496,
+   "y": 9068,
+   "layout": "station",
+   "store": "mart",
    "replaces": [
     974404079,
     1235095146
@@ -713,18 +825,22 @@
   {
    "kind": "mart",
    "name": "Pe",
-   "x": 13438,
-   "y": 9655,
+   "x": 13431,
+   "y": 9653,
+   "layout": "station",
+   "store": "mart",
    "replaces": [
     1235184564,
     1235184565
    ]
   },
   {
-   "kind": "mart",
+   "kind": "gas",
    "name": "QuikTrip",
-   "x": 13472,
-   "y": 8385,
+   "x": 13497,
+   "y": 8399,
+   "layout": "station",
+   "store": "cel:mint",
    "replaces": [
     971259282,
     1235093869
@@ -733,27 +849,33 @@
   {
    "kind": "mart",
    "name": "QuikTrip",
-   "x": 12207,
-   "y": 7808,
+   "x": 12201,
+   "y": 7806,
+   "layout": "station",
+   "store": "mart",
    "replaces": [
     983968819
    ]
   },
   {
-   "kind": "mart",
+   "kind": "gas",
    "name": "Kwik Shop",
    "x": 12195,
-   "y": 7182,
+   "y": 7180,
+   "layout": "station",
+   "store": "cel:beige",
    "replaces": [
     983968826,
     1234514003
    ]
   },
   {
-   "kind": "mart",
+   "kind": "gas",
    "name": "Costco Gasoline",
    "x": 20535,
    "y": 10276,
+   "layout": "store",
+   "store": "cel:brick",
    "replaces": [
     851694365
    ]
@@ -761,8 +883,10 @@
   {
    "kind": "mart",
    "name": "Cenex",
-   "x": 14108,
-   "y": 12883,
+   "x": 14106,
+   "y": 12881,
+   "layout": "station",
+   "store": "mart",
    "replaces": [
     1234773529,
     1234773530,
@@ -772,8 +896,10 @@
   {
    "kind": "mart",
    "name": "QuikTrip",
-   "x": 15395,
-   "y": 12840,
+   "x": 15388,
+   "y": 12838,
+   "layout": "station",
+   "store": "mart",
    "replaces": [
     637964304
    ]
@@ -781,8 +907,10 @@
   {
    "kind": "mart",
    "name": "Jump Start Stores",
-   "x": 11046,
-   "y": 18088,
+   "x": 11054,
+   "y": 18083,
+   "layout": "station",
+   "store": "mart",
    "replaces": [
     1230985408,
     1230985409
@@ -791,28 +919,34 @@
   {
    "kind": "mart",
    "name": "Casey's General Store",
-   "x": 10989,
-   "y": 18059,
+   "x": 10987,
+   "y": 18041,
+   "layout": "station",
+   "store": "mart",
    "replaces": [
     638380104,
     638380209
    ]
   },
   {
-   "kind": "mart",
+   "kind": "gas",
    "name": "JumpStart",
-   "x": 19892,
-   "y": 18884,
+   "x": 19895,
+   "y": 18880,
+   "layout": "station",
+   "store": "cel:beige",
    "replaces": [
     669859020,
     1231076602
    ]
   },
   {
-   "kind": "mart",
+   "kind": "gas",
    "name": "JumpStart",
    "x": 18604,
-   "y": 4983,
+   "y": 4981,
+   "layout": "station",
+   "store": "cel:mint",
    "replaces": [
     655350416,
     1231728385
@@ -821,8 +955,10 @@
   {
    "kind": "mart",
    "name": "Kwik Shop",
-   "x": 15390,
-   "y": 3244,
+   "x": 15386,
+   "y": 3242,
+   "layout": "station",
+   "store": "mart",
    "replaces": [
     656566825,
     1536299440
@@ -831,18 +967,22 @@
   {
    "kind": "mart",
    "name": "Sinclair",
-   "x": 16633,
-   "y": 5175,
+   "x": 16653,
+   "y": 5157,
+   "layout": "station",
+   "store": "mart",
    "replaces": [
     655684484,
     655684485
    ]
   },
   {
-   "kind": "mart",
+   "kind": "gas",
    "name": "JumpStart",
-   "x": 16902,
-   "y": 5839,
+   "x": 16931,
+   "y": 5852,
+   "layout": "station",
+   "store": "cel:mint",
    "replaces": [
     1232012239,
     1232012240
@@ -851,8 +991,10 @@
   {
    "kind": "mart",
    "name": "Kwik Shop",
-   "x": 16938,
-   "y": 5796,
+   "x": 16919,
+   "y": 5818,
+   "layout": "station",
+   "store": "mart",
    "replaces": [
     1232012241,
     1232012242
@@ -861,8 +1003,10 @@
   {
    "kind": "mart",
    "name": "JumpStart",
-   "x": 9585,
-   "y": 5923,
+   "x": 9581,
+   "y": 5921,
+   "layout": "station",
+   "store": "mart",
    "replaces": [
     336156891,
     336156910,
@@ -873,7 +1017,9 @@
    "kind": "mart",
    "name": "Phillips 66",
    "x": 15396,
-   "y": 5811,
+   "y": 5809,
+   "layout": "station",
+   "store": "mart",
    "replaces": [
     1536016791
    ]
@@ -881,28 +1027,34 @@
   {
    "kind": "mart",
    "name": "Kwik Shop",
-   "x": 8204,
-   "y": 11008,
+   "x": 8200,
+   "y": 11006,
+   "layout": "station",
+   "store": "mart",
    "replaces": [
     637503711,
     1232030120
    ]
   },
   {
-   "kind": "mart",
+   "kind": "gas",
    "name": "Phillips 66",
-   "x": 11965,
-   "y": 12909,
+   "x": 11963,
+   "y": 12903,
+   "layout": "station",
+   "store": "cel:beige",
    "replaces": [
     853909169,
     1232053272
    ]
   },
   {
-   "kind": "mart",
+   "kind": "gas",
    "name": "Casey's General Store",
-   "x": 19886,
-   "y": 16189,
+   "x": 19884,
+   "y": 16174,
+   "layout": "station",
+   "store": "cel:brick",
    "replaces": [
     665709896,
     1232064248
@@ -913,6 +1065,8 @@
    "name": "Phillips 66",
    "x": 18984,
    "y": 16475,
+   "layout": "store",
+   "store": "mart",
    "replaces": [
     665449546,
     665449547,
@@ -922,8 +1076,10 @@
   {
    "kind": "mart",
    "name": "QuikTrip",
-   "x": 18768,
-   "y": 15564,
+   "x": 18778,
+   "y": 15591,
+   "layout": "station",
+   "store": "mart",
    "replaces": [
     325044016,
     854903568
@@ -932,18 +1088,22 @@
   {
    "kind": "mart",
    "name": "JumpStart",
-   "x": 16734,
-   "y": 15486,
+   "x": 16724,
+   "y": 15465,
+   "layout": "station",
+   "store": "mart",
    "replaces": [
     665785489,
     1232812355
    ]
   },
   {
-   "kind": "mart",
+   "kind": "gas",
    "name": "Kwik Shop",
-   "x": 15451,
-   "y": 15444,
+   "x": 15470,
+   "y": 15455,
+   "layout": "station",
+   "store": "cel:mint",
    "replaces": [
     665785594
    ]
@@ -951,8 +1111,10 @@
   {
    "kind": "mart",
    "name": "Casey's General Store",
-   "x": 15442,
-   "y": 15482,
+   "x": 15437,
+   "y": 15479,
+   "layout": "station",
+   "store": "mart",
    "replaces": [
     665785595,
     665785596
@@ -961,18 +1123,22 @@
   {
    "kind": "mart",
    "name": "QuikTrip",
-   "x": 21825,
-   "y": 8434,
+   "x": 21821,
+   "y": 8432,
+   "layout": "station",
+   "store": "mart",
    "replaces": [
     138270945,
     138270955
    ]
   },
   {
-   "kind": "mart",
+   "kind": "gas",
    "name": "Casey's General Store",
-   "x": 12829,
-   "y": 7788,
+   "x": 12835,
+   "y": 7825,
+   "layout": "station",
+   "store": "cel:beige",
    "replaces": [
     1234677903,
     1234677904
@@ -982,7 +1148,9 @@
    "kind": "mart",
    "name": "Dillons",
    "x": 12218,
-   "y": 9053,
+   "y": 9051,
+   "layout": "station",
+   "store": "mart",
    "replaces": [
     1234707161,
     1234707162,
@@ -994,6 +1162,8 @@
    "name": "QuikTrip",
    "x": 16697,
    "y": 14174,
+   "layout": "store",
+   "store": "mart",
    "replaces": [
     665986255
    ]
@@ -1001,8 +1171,10 @@
   {
    "kind": "mart",
    "name": "Quick Gas",
-   "x": 16097,
-   "y": 14151,
+   "x": 16081,
+   "y": 14135,
+   "layout": "station",
+   "store": "mart",
    "replaces": [
     1234755753,
     1234755754
@@ -1011,8 +1183,10 @@
   {
    "kind": "mart",
    "name": "Kwik Shop",
-   "x": 16062,
-   "y": 13551,
+   "x": 16047,
+   "y": 13573,
+   "layout": "station",
+   "store": "mart",
    "replaces": [
     665785580,
     665785581
@@ -1021,18 +1195,22 @@
   {
    "kind": "mart",
    "name": "JumpStart",
-   "x": 17112,
-   "y": 13533,
+   "x": 17121,
+   "y": 13514,
+   "layout": "station",
+   "store": "mart",
    "replaces": [
     665986371,
     665986373
    ]
   },
   {
-   "kind": "mart",
+   "kind": "gas",
    "name": "QuikTrip",
-   "x": 17346,
-   "y": 13550,
+   "x": 17325,
+   "y": 13549,
+   "layout": "station",
+   "store": "cel:beige",
    "replaces": [
     665785565,
     1234770962
@@ -1043,6 +1221,8 @@
    "name": "Casey's General Store",
    "x": 15412,
    "y": 12531,
+   "layout": "store",
+   "store": "mart",
    "replaces": [
     574135102,
     574135104
@@ -1051,8 +1231,10 @@
   {
    "kind": "mart",
    "name": "Kwik Shop",
-   "x": 17337,
-   "y": 12861,
+   "x": 17360,
+   "y": 12864,
+   "layout": "station",
+   "store": "mart",
    "replaces": [
     1234775603,
     1234775604
@@ -1063,6 +1245,8 @@
    "name": "JumpStart",
    "x": 16716,
    "y": 12870,
+   "layout": "store",
+   "store": "mart",
    "replaces": [
     668250171,
     668250172
@@ -1071,8 +1255,10 @@
   {
    "kind": "mart",
    "name": "Conoco",
-   "x": 14744,
-   "y": 12381,
+   "x": 14776,
+   "y": 12395,
+   "layout": "station",
+   "store": "mart",
    "replaces": [
     1234790766,
     1234790767,
@@ -1080,10 +1266,12 @@
    ]
   },
   {
-   "kind": "mart",
+   "kind": "gas",
    "name": "QuikTrip",
    "x": 17853,
-   "y": 12369,
+   "y": 12368,
+   "layout": "station",
+   "store": "cel:brick",
    "replaces": [
     854566632
    ]
@@ -1091,8 +1279,10 @@
   {
    "kind": "mart",
    "name": "JumpStart",
-   "x": 16069,
-   "y": 11910,
+   "x": 16065,
+   "y": 11908,
+   "layout": "station",
+   "store": "mart",
    "replaces": [
     577710762,
     577710763,
@@ -1103,7 +1293,9 @@
    "kind": "mart",
    "name": "Kwik Shop",
    "x": 18629,
-   "y": 11973,
+   "y": 11971,
+   "layout": "station",
+   "store": "mart",
    "replaces": [
     854258434,
     1235021166
@@ -1112,8 +1304,10 @@
   {
    "kind": "mart",
    "name": "Phamily Express",
-   "x": 17087,
-   "y": 11657,
+   "x": 17083,
+   "y": 11655,
+   "layout": "station",
+   "store": "mart",
    "replaces": [
     853984339,
     853984340,
@@ -1125,7 +1319,9 @@
    "kind": "mart",
    "name": "JumpStart",
    "x": 17252,
-   "y": 11684,
+   "y": 11683,
+   "layout": "station",
+   "store": "mart",
    "replaces": [
     853984348,
     853984349
@@ -1134,8 +1330,10 @@
   {
    "kind": "mart",
    "name": "Phillips 66",
-   "x": 16081,
-   "y": 11577,
+   "x": 16077,
+   "y": 11556,
+   "layout": "station",
+   "store": "mart",
    "replaces": [
     332040998,
     332041020,
@@ -1147,47 +1345,57 @@
   {
    "kind": "mart",
    "name": "KC Gas & Groceries",
-   "x": 16966,
-   "y": 11334,
+   "x": 16965,
+   "y": 11327,
+   "layout": "station",
+   "store": "mart",
    "replaces": [
     1235085723,
     1235085724
    ]
   },
   {
-   "kind": "mart",
+   "kind": "gas",
    "name": "QuikTrip",
-   "x": 13968,
-   "y": 9695,
+   "x": 13958,
+   "y": 9675,
+   "layout": "station",
+   "store": "cel:brick",
    "replaces": [
     1235187016,
     1235187017
    ]
   },
   {
-   "kind": "mart",
+   "kind": "gas",
    "name": "JumpStart",
-   "x": 14833,
-   "y": 8403,
+   "x": 14829,
+   "y": 8401,
+   "layout": "station",
+   "store": "cel:beige",
    "replaces": [
     668025273,
     1235193347
    ]
   },
   {
-   "kind": "mart",
+   "kind": "gas",
    "name": "QuikTrip",
-   "x": 14772,
-   "y": 9057,
+   "x": 14771,
+   "y": 9043,
+   "layout": "station",
+   "store": "cel:beige",
    "replaces": [
     692472008
    ]
   },
   {
-   "kind": "mart",
+   "kind": "gas",
    "name": "Conoco",
-   "x": 14774,
-   "y": 9490,
+   "x": 14739,
+   "y": 9464,
+   "layout": "station",
+   "store": "cel:brick",
    "replaces": [
     854026984,
     1235214365
@@ -1197,7 +1405,9 @@
    "kind": "mart",
    "name": "JumpStart",
    "x": 14785,
-   "y": 10563,
+   "y": 10561,
+   "layout": "station",
+   "store": "mart",
    "replaces": [
     1235219152,
     1235219153,
@@ -1207,18 +1417,22 @@
   {
    "kind": "mart",
    "name": "Casey's General Store",
-   "x": 14740,
-   "y": 10507,
+   "x": 14747,
+   "y": 10530,
+   "layout": "station",
+   "store": "mart",
    "replaces": [
     1235219154,
     1235219155
    ]
   },
   {
-   "kind": "mart",
+   "kind": "gas",
    "name": "QuikTrip",
    "x": 19885,
-   "y": 11441,
+   "y": 11438,
+   "layout": "station",
+   "store": "cel:beige",
    "replaces": [
     1235255095,
     1235255096
@@ -1227,18 +1441,22 @@
   {
    "kind": "mart",
    "name": "Phillips 66",
-   "x": 18589,
-   "y": 11327,
+   "x": 18585,
+   "y": 11325,
+   "layout": "station",
+   "store": "mart",
    "replaces": [
     1235279391,
     1235279392
    ]
   },
   {
-   "kind": "mart",
+   "kind": "gas",
    "name": "QuikTrip",
    "x": 21184,
-   "y": 9745,
+   "y": 9743,
+   "layout": "station",
+   "store": "cel:mint",
    "replaces": [
     544655736,
     1235504253,
@@ -1246,10 +1464,12 @@
    ]
   },
   {
-   "kind": "mart",
+   "kind": "gas",
    "name": "Phillips 66",
    "x": 19897,
    "y": 11001,
+   "layout": "store",
+   "store": "cel:beige",
    "replaces": [
     669583601,
     669583602,
@@ -1262,6 +1482,8 @@
    "name": "Kwik Shop",
    "x": 20533,
    "y": 8444,
+   "layout": "store",
+   "store": "mart",
    "replaces": [
     667824874,
     667824875,
@@ -1271,8 +1493,10 @@
   {
    "kind": "mart",
    "name": "Phillips 66",
-   "x": 19846,
-   "y": 7515,
+   "x": 19842,
+   "y": 7513,
+   "layout": "station",
+   "store": "mart",
    "replaces": [
     577372213,
     667914444,
@@ -1284,25 +1508,31 @@
    "name": "QuikTrip",
    "x": 18602,
    "y": 7343,
+   "layout": "store",
+   "store": "mart",
    "replaces": [
     1212952460
    ]
   },
   {
-   "kind": "mart",
+   "kind": "gas",
    "name": "Kwik Shop",
-   "x": 15421,
-   "y": 7119,
+   "x": 15417,
+   "y": 7117,
+   "layout": "station",
+   "store": "cel:mint",
    "replaces": [
     123497982,
     123497984
    ]
   },
   {
-   "kind": "mart",
+   "kind": "gas",
    "name": "Quick Pick",
-   "x": 16318,
-   "y": 7176,
+   "x": 16316,
+   "y": 7173,
+   "layout": "station",
+   "store": "cel:beige",
    "replaces": [
     668101723,
     668101724
@@ -1311,8 +1541,10 @@
   {
    "kind": "mart",
    "name": "Erie's Corner",
-   "x": 17804,
-   "y": 8425,
+   "x": 17810,
+   "y": 8407,
+   "layout": "station",
+   "store": "mart",
    "replaces": [
     1236338505,
     1236338506,
@@ -1320,10 +1552,12 @@
    ]
   },
   {
-   "kind": "mart",
+   "kind": "gas",
    "name": "Petro America",
-   "x": 15676,
-   "y": 8013,
+   "x": 15673,
+   "y": 7998,
+   "layout": "station",
+   "store": "cel:beige",
    "replaces": [
     1236351699,
     1236351700,
@@ -1333,8 +1567,10 @@
   {
    "kind": "mart",
    "name": "Kwik Shop",
-   "x": 16313,
-   "y": 7767,
+   "x": 16302,
+   "y": 7770,
+   "layout": "station",
+   "store": "mart",
    "replaces": [
     1236347182,
     1236347183
@@ -1343,8 +1579,10 @@
   {
    "kind": "mart",
    "name": "PP Station",
-   "x": 16631,
-   "y": 8124,
+   "x": 16613,
+   "y": 8134,
+   "layout": "station",
+   "store": "mart",
    "replaces": [
     853987212,
     1236347195
@@ -1353,8 +1591,10 @@
   {
    "kind": "mart",
    "name": "Super Express",
-   "x": 15248,
-   "y": 9046,
+   "x": 15267,
+   "y": 9044,
+   "layout": "station",
+   "store": "mart",
    "replaces": [
     692471934,
     692471935,
@@ -1362,10 +1602,12 @@
    ]
   },
   {
-   "kind": "mart",
+   "kind": "gas",
    "name": "Petro America",
-   "x": 15252,
-   "y": 9647,
+   "x": 15248,
+   "y": 9645,
+   "layout": "station",
+   "store": "cel:brick",
    "replaces": [
     852731918,
     852731919,
@@ -1375,8 +1617,10 @@
   {
    "kind": "mart",
    "name": "Valero",
-   "x": 15391,
-   "y": 10614,
+   "x": 15371,
+   "y": 10625,
+   "layout": "station",
+   "store": "mart",
    "replaces": [
     854011038,
     854011039
@@ -1386,7 +1630,9 @@
    "kind": "mart",
    "name": "Stop & Shop",
    "x": 15754,
-   "y": 9082,
+   "y": 9080,
+   "layout": "station",
+   "store": "mart",
    "replaces": [
     1236416136
    ]
@@ -1394,8 +1640,10 @@
   {
    "kind": "mart",
    "name": "Phillips 66",
-   "x": 16029,
-   "y": 9874,
+   "x": 16007,
+   "y": 9872,
+   "layout": "station",
+   "store": "mart",
    "replaces": [
     669358045,
     852731897,
@@ -1404,20 +1652,24 @@
    ]
   },
   {
-   "kind": "mart",
+   "kind": "gas",
    "name": "QuikTrip",
-   "x": 16067,
-   "y": 10942,
+   "x": 16038,
+   "y": 10941,
+   "layout": "station",
+   "store": "cel:mint",
    "replaces": [
     669368339,
     1236417916
    ]
   },
   {
-   "kind": "mart",
+   "kind": "gas",
    "name": "Sinclair",
-   "x": 19225,
-   "y": 8399,
+   "x": 19250,
+   "y": 8409,
+   "layout": "station",
+   "store": "cel:brick",
    "replaces": [
     1236434614,
     1236434615
@@ -1426,18 +1678,22 @@
   {
    "kind": "mart",
    "name": "Valero",
-   "x": 17435,
-   "y": 8428,
+   "x": 17428,
+   "y": 8426,
+   "layout": "station",
+   "store": "mart",
    "replaces": [
     712776330,
     1236439747
    ]
   },
   {
-   "kind": "mart",
+   "kind": "gas",
    "name": "Kwik Shop",
-   "x": 18602,
-   "y": 8399,
+   "x": 18632,
+   "y": 8403,
+   "layout": "station",
+   "store": "cel:brick",
    "replaces": [
     1236437923
    ]
@@ -1445,18 +1701,22 @@
   {
    "kind": "mart",
    "name": "QuikTrip",
-   "x": 16354,
-   "y": 8433,
+   "x": 16349,
+   "y": 8431,
+   "layout": "station",
+   "store": "mart",
    "replaces": [
     668030169,
     677202876
    ]
   },
   {
-   "kind": "mart",
+   "kind": "gas",
    "name": "JumpStart",
-   "x": 19223,
-   "y": 10678,
+   "x": 19232,
+   "y": 10662,
+   "layout": "station",
+   "store": "cel:beige",
    "replaces": [
     854288896,
     854288897,
@@ -1467,7 +1727,9 @@
    "kind": "mart",
    "name": "Phillips 66",
    "x": 18626,
-   "y": 9108,
+   "y": 9106,
+   "layout": "station",
+   "store": "mart",
    "replaces": [
     691248428,
     691248430,
@@ -1475,10 +1737,12 @@
    ]
   },
   {
-   "kind": "mart",
+   "kind": "gas",
    "name": "Kwik Shop",
    "x": 19225,
-   "y": 9102,
+   "y": 9059,
+   "layout": "station",
+   "store": "cel:brick",
    "replaces": [
     1236635574,
     1236635575
@@ -1489,6 +1753,8 @@
    "name": "QuikTrip",
    "x": 18608,
    "y": 11042,
+   "layout": "store",
+   "store": "mart",
    "replaces": [
     1236643084
    ]
@@ -1498,6 +1764,8 @@
    "name": "Dillons",
    "x": 18909,
    "y": 10993,
+   "layout": "store",
+   "store": "mart",
    "replaces": [
     1236643085
    ]
@@ -1507,6 +1775,8 @@
    "name": "QuikTrip",
    "x": 17925,
    "y": 10476,
+   "layout": "store",
+   "store": "mart",
    "replaces": [
     669152618,
     1236645698
@@ -1515,8 +1785,10 @@
   {
    "kind": "mart",
    "name": "Petro America",
-   "x": 16665,
-   "y": 9264,
+   "x": 16623,
+   "y": 9237,
+   "layout": "station",
+   "store": "mart",
    "replaces": [
     853986667,
     853986670,
@@ -1526,28 +1798,34 @@
   {
    "kind": "mart",
    "name": "Phillips 66",
-   "x": 16606,
-   "y": 10313,
+   "x": 16601,
+   "y": 10311,
+   "layout": "station",
+   "store": "mart",
    "replaces": [
     853985400,
     1236753914
    ]
   },
   {
-   "kind": "mart",
+   "kind": "gas",
    "name": "QuikTrip",
-   "x": 17284,
-   "y": 10723,
+   "x": 17281,
+   "y": 10720,
+   "layout": "station",
+   "store": "cel:mint",
    "replaces": [
     1236754626,
     1236754627
    ]
   },
   {
-   "kind": "mart",
+   "kind": "gas",
    "name": "American Gas",
-   "x": 17276,
-   "y": 11033,
+   "x": 17312,
+   "y": 11008,
+   "layout": "station",
+   "store": "cel:mint",
    "replaces": [
     1236754956,
     1236754957,
@@ -1562,8 +1840,10 @@
   {
    "kind": "mart",
    "name": "Gas station",
-   "x": 14771,
-   "y": 9045,
+   "x": 14765,
+   "y": 9042,
+   "layout": "station",
+   "store": "mart",
    "replaces": [
     575215428
    ]
@@ -1573,6 +1853,8 @@
    "name": "Gas station",
    "x": 18012,
    "y": 11052,
+   "layout": "store",
+   "store": "mart",
    "replaces": [
     854286726,
     854286727
@@ -1581,8 +1863,10 @@
   {
    "kind": "mart",
    "name": "QuikTrip",
-   "x": 19262,
-   "y": 8452,
+   "x": 19259,
+   "y": 8450,
+   "layout": "station",
+   "store": "mart",
    "replaces": [
     1318791663
    ]
@@ -1591,7 +1875,9 @@
    "kind": "mart",
    "name": "Cenex",
    "x": 12519,
-   "y": 9687,
+   "y": 9685,
+   "layout": "station",
+   "store": "mart",
    "replaces": [
     638351252,
     638351254,
@@ -1600,20 +1886,24 @@
    ]
   },
   {
-   "kind": "mart",
+   "kind": "gas",
    "name": "Gas station",
    "x": 9018,
-   "y": 11110,
+   "y": 11108,
+   "layout": "station",
+   "store": "cel:mint",
    "replaces": [
     1533896834,
     1533896835
    ]
   },
   {
-   "kind": "mart",
+   "kind": "gas",
    "name": "Walmart Fuel Station",
-   "x": 15298,
-   "y": 5799,
+   "x": 15294,
+   "y": 5776,
+   "layout": "station",
+   "store": "cel:beige",
    "replaces": []
   }
  ]
