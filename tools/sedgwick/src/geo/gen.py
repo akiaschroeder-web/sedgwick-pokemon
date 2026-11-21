@@ -457,11 +457,13 @@ class Gen:
         x0, x1 = h['x'] + h['w'] + 1, x - 1
         top = edge - 12
         self.no_infill.append((x0, top, x1, edge))
-        L = (x1 - x0 + 1) / n
+        L = min(9, (x1 - x0 + 1) / n)            # ordinary lot width, starting right next door
         for k in range(n):
             ax = int(x0 + L * (k + 0.5))
             hs = h32('nbr', k, h['x'])
-            self.place_house(ax, edge - 4, 's', 5, max(5, min(7, int(L) - 2)), 1, hs, f'#{ax},{edge}')
+            width = 6 + hs % 2
+            if not self.place_house(ax, edge - 4, 's', 5, width, 2 if hs % 5 == 0 else 1, hs, f'#{ax},{edge}'):
+                self.place_house(ax, edge - 4, 's', 5, 5, 1, hs, f'#{ax},{edge}')
 
     def pass_infill(self):
         """Houses on empty residential frontage where the address data has gaps.

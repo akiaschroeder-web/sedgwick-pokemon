@@ -141,9 +141,6 @@ def front_tree(G, hrec):
         return
     bottom = y + rows - 1
     tx = x - 3 if hrec.get('garage') == 'r' else x + w + 1
-    if st:
-        # the owner's lot: only the trees they described, no grove spilling into the side yards
-        G.occupied[max(0, y - 9):edge, max(0, x - 1):min(G.W, x + w + 8)] = True
     if st.get('front_tree') == 'e':
         # east of the driveway, in the front yard
         tx = (hrec['gar'][0] + 2) if hrec['gar'] else x + w - 2
