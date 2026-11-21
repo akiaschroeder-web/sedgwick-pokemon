@@ -652,7 +652,7 @@ class Gen:
             hs = h32('metro', x + self.ox, y + self.oy)
             kind = hs % 3
             if kind == 0:
-                plan = saffron.house_plan(1 + (hs >> 3) % 3, (hs >> 5) % 3)
+                plan = saffron.house_plan(1 + (hs >> 3) % 3, None)
             else:
                 plan = saffron.apt_plan(1 + (hs >> 3) % 3, 1 + (hs >> 6) % 3)
             pw, ph = len(plan[0]), len(plan)
@@ -671,36 +671,42 @@ class Gen:
                     self.put(x + c, top + r, METRO, f'sf_{m:03x}', m in saffron.DOORS)
             self.occupied[top - 1:bottom + 1, x:x + pw + 1] = True
             n += 1
-        # then pack the rest of each block in rows, Saffron style
+        # then pack every remaining gap: rows of buildings set shoulder to shoulder, a
+        # one-tile walk between rows; the biggest piece that fits goes first, then smaller
         H, W = self.H, self.W
         bad = self.blocked | self.occupied | ~self.metro
         for (x_, y_) in self.obj:
             bad[y_, x_] = True
-        for phase in (0, 4):
+        for phase in (0, 2, 4, 6, 1, 3, 5, 7):
             for bottom in range(10 + phase, H - 1, 8):
                 if not self.metro[bottom].any():
                     continue
-                x = 0
-                while x < W - 6:
+                x = 1
+                while x < W - 5:
                     if bad[bottom, x]:
                         x += 1
                         continue
                     hs = h32('fill', x + self.ox, bottom + self.oy)
-                    if hs % 4 == 0:
-                        plan = saffron.house_plan(1 + (hs >> 3) % 2, (hs >> 5) % 2)
-                    else:
-                        plan = saffron.apt_plan(1 + (hs >> 3) % 2, 1 + (hs >> 6) % 2)
-                    pw, ph = len(plan[0]), len(plan)
-                    top = bottom - ph + 1
-                    if top >= 1 and x + pw < W and not bad[top - 1:bottom + 2, x - 1 if x else 0:x + pw + 1].any():
-                        for r, row in enumerate(plan):
-                            for c, m in enumerate(row):
-                                self.put(x + c, top + r, METRO, f'sf_{m:03x}', m in saffron.DOORS)
-                        bad[top - 1:bottom + 2, max(0, x - 1):x + pw + 1] = True
-                        self.occupied[top - 1:bottom + 2, max(0, x - 1):x + pw + 1] = True
-                        n += 1
-                        x += pw + 1
-                    else:
+                    options = [saffron.apt_plan(3, 1 + (hs >> 6) % 3), saffron.apt_plan(2, 1 + (hs >> 7) % 2),
+                               saffron.house_plan(2, None), saffron.apt_plan(1, 1 + (hs >> 8) % 2),
+                               saffron.house_plan(1, None)]
+                    if hs % 3 == 0:
+                        options = options[2:3] + options
+                    placed = False
+                    for plan in options:
+                        pw, ph = len(plan[0]), len(plan)
+                        top = bottom - ph + 1
+                        if top >= 2 and x + pw < W and not bad[top - 1:bottom + 2, x:x + pw].any():
+                            for r, row in enumerate(plan):
+                                for c, m in enumerate(row):
+                                    self.put(x + c, top + r, METRO, f'sf_{m:03x}', False)
+                            bad[top - 1:bottom + 2, x:x + pw] = True
+                            self.occupied[top - 1:bottom + 2, x:x + pw] = True
+                            n += 1
+                            x += pw
+                            placed = True
+                            break
+                    if not placed:
                         x += 1
         self.stats['metro_infill'] = n
 

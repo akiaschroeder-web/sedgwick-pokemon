@@ -50,10 +50,11 @@ DOORS = {HOUSE_DOOR, TOWER_DOOR}
 
 
 def house_plan(units, door_unit=0):
+    """door_unit=None for a filler building with no way in."""
     rows = [[] for _ in range(5)]
     for u in range(units):
         for r in range(5):
-            src = HOUSE_DOOR_ROWS[r - 3] if (u == door_unit and r >= 3) else HOUSE[r]
+            src = HOUSE_DOOR_ROWS[r - 3] if (door_unit is not None and u == door_unit and r >= 3) else HOUSE[r]
             rows[r] += src
     return rows
 
