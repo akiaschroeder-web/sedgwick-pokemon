@@ -119,6 +119,14 @@ def girl_fixes(g):
                 g[y][x] = 11
             elif v == 4:
                 g[y][x] = 7
+    # face: both eyes and a small mouth, like the boy's
+    for y in range(14, 18):
+        for x in range(26, 34):
+            g[y][x] = 14 if x in (26, 33) else 15
+    for x, y in ((27, 14), (28, 14), (27, 15), (31, 14), (32, 14), (31, 15)):
+        g[y][x] = 1
+    g[15][28] = g[15][32] = 12
+    g[17][29] = g[17][30] = 13
     for x, y in ((21, 36), (22, 36), (21, 37), (22, 37)):     # Poke Ball emblem on the flap
         if g[y][x] not in (0, 1):
             g[y][x] = 9 if y == 36 else 12
