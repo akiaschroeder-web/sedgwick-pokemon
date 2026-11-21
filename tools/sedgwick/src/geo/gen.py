@@ -15,7 +15,7 @@ from PIL import Image, ImageDraw
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 TSDIR = os.path.join(HERE, '..', '..')
-TILESETS = ['sedgwick_residential', 'sedgwick_rural']
+TILESETS = ['sedgwick_residential', 'sedgwick_rural', 'sedgwick_commercial', 'sedgwick_downtown']
 RES, RUR = 0, 1
 
 # ground classes
@@ -67,6 +67,8 @@ class Gen:
         self.occupied = np.zeros((H, W), bool)       # footprint reservations
         self.signs = []
         self.stats = {}
+        self.houses = []
+        self.civic_done = []
 
     # ------------------------------------------------------------ helpers
     def local(self, p):
@@ -251,7 +253,7 @@ class Gen:
                 return True
         return False
 
-    def free(self, x, y, w, h):
+    def free(self, x, y, w=1, h=1):
         if x < 0 or y < 0 or x + w > self.W or y + h > self.H:
             return False
         return not (self.occupied[y:y + h, x:x + w].any() or self.blocked[y:y + h, x:x + w].any())
@@ -272,6 +274,8 @@ class Gen:
                     door = (x + c, y + r)
         self.occupied[y - 1:y + len(rows) + 1, x - 1:x + width + 1] = True
         bottom = y + len(rows) - 1
+        self.houses.append({'x': x, 'y': y, 'w': width, 'rows': len(rows), 'd': d, 'edge': edge,
+                            'gar': gar_cols, 'garage': garage, 'hs': h32(address)})
         if d == 's':
             mx = x + width + 1 if garage != 'r' else x - 2
             if gar_cols:
@@ -294,7 +298,39 @@ class Gen:
         if 0 <= x < self.W and 0 <= y < self.H and (x, y) not in self.obj and not self.blocked[y, x]:
             self.put(x, y, RES, 'mailbox', False)
             self.occupied[y, x] = True
-            self.signs.append((x, y, address))
+            if not address.startswith('#'):
+                self.signs.append((x, y, address))
+
+    def pass_infill(self):
+        """Houses on empty residential frontage where the address data has gaps.
+        Real address points were placed first, so these only take what's left."""
+        core = (self.road == R_STREET)
+        ok = self.zone & (self.ground == G_LAWN)
+        H, W = self.H, self.W
+        n = 0
+        cand = []
+        for y, x in zip(*np.nonzero(core)):
+            if x % 3 and y % 3:
+                continue
+            if y > 6 and not self.road[y - 1, x] and core[y, x]:
+                cand.append((x, y - 5, 's', 5))
+            if y < H - 6 and not self.road[y + 1, x]:
+                cand.append((x, y + 5, 'n', 5))
+            if x > 6 and not self.road[y, x - 1]:
+                cand.append((x - 5, y, 'e', 5))
+            if x < W - 6 and not self.road[y, x + 1]:
+                cand.append((x + 5, y, 'w', 5))
+        for ax, ay, d, dist in cand:
+            if not (0 <= ax < W and 0 <= ay < H) or not ok[ay, ax]:
+                continue
+            hs = h32('infill', ax + self.ox, ay + self.oy)
+            if hs % 6 == 0:
+                continue                      # leave the odd empty lot
+            width = 5 + hs % 3
+            storeys = 2 if hs % 7 == 0 else 1
+            if self.place_house(ax, ay, d, dist, width, storeys, hs, f'#{ax},{ay}'):
+                n += 1
+        self.stats['infill'] = n
 
     # ------------------------------------------------------------ other buildings
     def pass_buildings(self):
@@ -354,7 +390,7 @@ class Gen:
             for x in range(0, self.W - 1, 2):
                 g = self.ground[y, x]
                 hs = h32(x + self.ox, y + self.oy)
-                want = (g == G_WOOD and hs % 4 != 0) or (g == G_LAWN and self.zone[y, x] and hs % 23 == 0) \
+                want = (g == G_WOOD and hs % 4 != 0) or (g == G_LAWN and self.zone[y, x] and hs % 41 == 0) \
                     or (g == G_PARK and hs % 17 == 0) or (g == G_CEMETERY and hs % 9 == 0)
                 if want and free[y:y + 2, x:x + 2].all() and all((x + i, y + j) not in self.obj for i in range(2) for j in range(2)):
                     for (i, j), m in zip(((0, 0), (1, 0), (0, 1), (1, 1)), ('1d4', '1d5', '1e4', '1e5')):
@@ -520,7 +556,23 @@ class Gen:
     def run(self):
         self.pass_ground()
         self.pass_roads()
+        from geo import civic
+        roads = self.road_ring()
+        self.blocked = roads | self.rail | (self.ground == G_WATER)
+        civic.pass_downtown(self)
+        civic.pass_civic(self)
         self.pass_houses()
+        self.pass_infill()
+        from geo import detail
+        for h in self.houses:
+            detail.driveway(self, h)
+            detail.street_car(self, h)
+        for h in self.houses:
+            detail.backyard(self, h)
+            detail.front_tree(self, h)
         self.pass_buildings()
+        detail.farmsteads(self)
         self.pass_trees()
-        return self.resolve()
+        tsg, names, walk = self.resolve()
+        detail.furniture(self, tsg, names)
+        return tsg, names, walk

@@ -303,8 +303,16 @@ def driveways():
                 if 3 <= y <= 4 and ((side == 'l' and x > 4) or (side == 'r' and x < 11)):
                     g[y][x] = CC          # driveway concrete runs over the sidewalk edge
         return g
-    return {'drive_l': body('l'), 'drive_r': body('r'),
-            'drive_apron_l': apron('l'), 'drive_apron_r': apron('r')}
+    T = lambda g: [list(r) for r in zip(*g)]          # transpose: N-S piece -> E-W piece
+    out = {'drive_l': body('l'), 'drive_r': body('r'),
+           'drive_apron_l': apron('l'), 'drive_apron_r': apron('r')}
+    # E-W driveways (houses beside a N-S street): top / bottom halves
+    out['drive_t'], out['drive_b'] = T(out['drive_l']), T(out['drive_r'])
+    # aprons in the other three sidewalks (flips cost no tile memory, the transposes do)
+    out['drive_apron_s_l'], out['drive_apron_s_r'] = vflip(out['drive_apron_l']), vflip(out['drive_apron_r'])
+    out['drive_apron_w_t'], out['drive_apron_w_b'] = T(out['drive_apron_l']), T(out['drive_apron_r'])
+    out['drive_apron_e_t'], out['drive_apron_e_b'] = hflip(out['drive_apron_w_t']), hflip(out['drive_apron_w_b'])
+    return out
 
 
 def metatiles():
