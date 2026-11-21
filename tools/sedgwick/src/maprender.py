@@ -22,17 +22,22 @@ def load_tiles(p):
     im=Image.open(p); w,h=im.size; px=im.load()
     return [[[px[tx*8+x,ty*8+y]&15 for x in range(8)] for y in range(8)] for ty in range(h//8) for tx in range(w//8)]
 
-def render_layout(layout_id, out, scale=1):
+def render_layout(layout_id, out, scale=1, grid=None):
+    """grid: optional rows of raw block values to draw with this layout's tilesets."""
     L=json.load(open(f'{EXP}/data/layouts/layouts.json'))['layouts']
-    lay=[l for l in L if l.get('id')==layout_id][0]
+    lay=dict([l for l in L if l.get('id')==layout_id][0])
     frlg = 'Frlg' in lay['primary_tileset'] or 'frlg' in lay['primary_tileset'].lower()
     NT,NM,NP = (640,640,7) if frlg else (512,512,6)
     P=ts_dir(lay['primary_tileset']); S=ts_dir(lay['secondary_tileset'])
     tiles=load_tiles(P+'/tiles.png'); tilesS=load_tiles(S+'/tiles.png')
     pals=[load_jasc(f'{P if i<NP else S}/palettes/{i:02d}.pal') for i in range(13)]
     mtP=open(P+'/metatiles.bin','rb').read(); mtS=open(S+'/metatiles.bin','rb').read()
-    W,H=lay['width'],lay['height']
-    blk=open(f"{EXP}/{lay['blockdata_filepath']}",'rb').read()
+    if grid is not None:
+        W,H=len(grid[0]),len(grid)
+        blk=b''.join(struct.pack('<H',v) for row in grid for v in row)
+    else:
+        W,H=lay['width'],lay['height']
+        blk=open(f"{EXP}/{lay['blockdata_filepath']}",'rb').read()
     img=Image.new('RGB',(W*16,H*16)); px=img.load()
     for i in range(W*H):
         m=struct.unpack('<H',blk[i*2:i*2+2])[0]&0x3ff

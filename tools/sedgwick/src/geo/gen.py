@@ -519,6 +519,7 @@ class Gen:
         self.occupied[y - 1:y + len(rows) + 1, x - 1:x + width + 1] = True
         bottom = y + len(rows) - 1
         self.houses.append({'x': x, 'y': y, 'w': width, 'rows': len(rows), 'd': d, 'edge': edge,
+                            'door': door, 'address': address,
                             'gar': gar_cols, 'garage': garage, 'hs': h32(address),
                             'style': getattr(self, '_hstyle', {}) or {}})
         if d == 's':
@@ -540,6 +541,7 @@ class Gen:
                 self.put(dx, yy, RES, 'sidewalk', True)
             self.put(dx, y - 1, RES, 'porch_mat', True)
             self.doors.append((dx, y - 1, 'mat', address))
+            self.houses[-1]['door'] = (dx, y - 1)
             self.occupied[edge + 1:y, dx] = True
             self.mailbox(dx + 1, edge + 1, address)
         elif d == 'e':

@@ -1,0 +1,602 @@
+[
+ {
+  "map": "MAP_SEDGWICK_HOUSE001",
+  "name": "SedgwickHouse001",
+  "w": 11,
+  "h": 8
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE002",
+  "name": "SedgwickHouse002",
+  "w": 9,
+  "h": 8
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE003",
+  "name": "SedgwickHouse003",
+  "w": 9,
+  "h": 8
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE004",
+  "name": "SedgwickHouse004",
+  "w": 10,
+  "h": 7
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE005",
+  "name": "SedgwickHouse005",
+  "w": 12,
+  "h": 8
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE006",
+  "name": "SedgwickHouse006",
+  "w": 11,
+  "h": 7
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE007",
+  "name": "SedgwickHouse007",
+  "w": 9,
+  "h": 9
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE008",
+  "name": "SedgwickHouse008",
+  "w": 12,
+  "h": 9
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE009",
+  "name": "SedgwickHouse009",
+  "w": 10,
+  "h": 8
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE010",
+  "name": "SedgwickHouse010",
+  "w": 12,
+  "h": 9
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE011",
+  "name": "SedgwickHouse011",
+  "w": 11,
+  "h": 7
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE012",
+  "name": "SedgwickHouse012",
+  "w": 12,
+  "h": 9
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE013",
+  "name": "SedgwickHouse013",
+  "w": 8,
+  "h": 7
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE014",
+  "name": "SedgwickHouse014",
+  "w": 11,
+  "h": 7
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE015",
+  "name": "SedgwickHouse015",
+  "w": 11,
+  "h": 9
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE016",
+  "name": "SedgwickHouse016",
+  "w": 10,
+  "h": 7
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE017",
+  "name": "SedgwickHouse017",
+  "w": 8,
+  "h": 8
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE018",
+  "name": "SedgwickHouse018",
+  "w": 10,
+  "h": 9
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE019",
+  "name": "SedgwickHouse019",
+  "w": 8,
+  "h": 9
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE020",
+  "name": "SedgwickHouse020",
+  "w": 9,
+  "h": 7
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE021",
+  "name": "SedgwickHouse021",
+  "w": 8,
+  "h": 8
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE022",
+  "name": "SedgwickHouse022",
+  "w": 12,
+  "h": 8
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE023",
+  "name": "SedgwickHouse023",
+  "w": 9,
+  "h": 8
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE024",
+  "name": "SedgwickHouse024",
+  "w": 8,
+  "h": 8
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE025",
+  "name": "SedgwickHouse025",
+  "w": 11,
+  "h": 7
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE026",
+  "name": "SedgwickHouse026",
+  "w": 10,
+  "h": 8
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE027",
+  "name": "SedgwickHouse027",
+  "w": 9,
+  "h": 8
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE028",
+  "name": "SedgwickHouse028",
+  "w": 10,
+  "h": 8
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE029",
+  "name": "SedgwickHouse029",
+  "w": 9,
+  "h": 7
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE030",
+  "name": "SedgwickHouse030",
+  "w": 10,
+  "h": 9
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE031",
+  "name": "SedgwickHouse031",
+  "w": 8,
+  "h": 7
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE032",
+  "name": "SedgwickHouse032",
+  "w": 8,
+  "h": 7
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE033",
+  "name": "SedgwickHouse033",
+  "w": 10,
+  "h": 8
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE034",
+  "name": "SedgwickHouse034",
+  "w": 8,
+  "h": 8
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE035",
+  "name": "SedgwickHouse035",
+  "w": 9,
+  "h": 9
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE036",
+  "name": "SedgwickHouse036",
+  "w": 10,
+  "h": 8
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE037",
+  "name": "SedgwickHouse037",
+  "w": 12,
+  "h": 7
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE038",
+  "name": "SedgwickHouse038",
+  "w": 10,
+  "h": 9
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE039",
+  "name": "SedgwickHouse039",
+  "w": 11,
+  "h": 9
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE040",
+  "name": "SedgwickHouse040",
+  "w": 12,
+  "h": 7
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE041",
+  "name": "SedgwickHouse041",
+  "w": 12,
+  "h": 9
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE042",
+  "name": "SedgwickHouse042",
+  "w": 11,
+  "h": 8
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE043",
+  "name": "SedgwickHouse043",
+  "w": 8,
+  "h": 7
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE044",
+  "name": "SedgwickHouse044",
+  "w": 12,
+  "h": 9
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE045",
+  "name": "SedgwickHouse045",
+  "w": 8,
+  "h": 8
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE046",
+  "name": "SedgwickHouse046",
+  "w": 8,
+  "h": 8
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE047",
+  "name": "SedgwickHouse047",
+  "w": 10,
+  "h": 7
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE048",
+  "name": "SedgwickHouse048",
+  "w": 11,
+  "h": 8
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE049",
+  "name": "SedgwickHouse049",
+  "w": 10,
+  "h": 9
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE050",
+  "name": "SedgwickHouse050",
+  "w": 9,
+  "h": 8
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE051",
+  "name": "SedgwickHouse051",
+  "w": 10,
+  "h": 7
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE052",
+  "name": "SedgwickHouse052",
+  "w": 10,
+  "h": 9
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE053",
+  "name": "SedgwickHouse053",
+  "w": 10,
+  "h": 8
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE054",
+  "name": "SedgwickHouse054",
+  "w": 8,
+  "h": 7
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE055",
+  "name": "SedgwickHouse055",
+  "w": 10,
+  "h": 8
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE056",
+  "name": "SedgwickHouse056",
+  "w": 10,
+  "h": 7
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE057",
+  "name": "SedgwickHouse057",
+  "w": 10,
+  "h": 9
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE058",
+  "name": "SedgwickHouse058",
+  "w": 11,
+  "h": 9
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE059",
+  "name": "SedgwickHouse059",
+  "w": 10,
+  "h": 8
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE060",
+  "name": "SedgwickHouse060",
+  "w": 12,
+  "h": 8
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE061",
+  "name": "SedgwickHouse061",
+  "w": 12,
+  "h": 9
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE062",
+  "name": "SedgwickHouse062",
+  "w": 11,
+  "h": 7
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE063",
+  "name": "SedgwickHouse063",
+  "w": 9,
+  "h": 7
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE064",
+  "name": "SedgwickHouse064",
+  "w": 11,
+  "h": 8
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE065",
+  "name": "SedgwickHouse065",
+  "w": 8,
+  "h": 9
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE066",
+  "name": "SedgwickHouse066",
+  "w": 9,
+  "h": 7
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE067",
+  "name": "SedgwickHouse067",
+  "w": 8,
+  "h": 8
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE068",
+  "name": "SedgwickHouse068",
+  "w": 9,
+  "h": 8
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE069",
+  "name": "SedgwickHouse069",
+  "w": 9,
+  "h": 9
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE070",
+  "name": "SedgwickHouse070",
+  "w": 8,
+  "h": 7
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE071",
+  "name": "SedgwickHouse071",
+  "w": 12,
+  "h": 9
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE072",
+  "name": "SedgwickHouse072",
+  "w": 12,
+  "h": 8
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE073",
+  "name": "SedgwickHouse073",
+  "w": 10,
+  "h": 9
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE074",
+  "name": "SedgwickHouse074",
+  "w": 12,
+  "h": 8
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE075",
+  "name": "SedgwickHouse075",
+  "w": 10,
+  "h": 8
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE076",
+  "name": "SedgwickHouse076",
+  "w": 11,
+  "h": 9
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE077",
+  "name": "SedgwickHouse077",
+  "w": 11,
+  "h": 7
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE078",
+  "name": "SedgwickHouse078",
+  "w": 9,
+  "h": 9
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE079",
+  "name": "SedgwickHouse079",
+  "w": 9,
+  "h": 9
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE080",
+  "name": "SedgwickHouse080",
+  "w": 9,
+  "h": 9
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE081",
+  "name": "SedgwickHouse081",
+  "w": 12,
+  "h": 9
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE082",
+  "name": "SedgwickHouse082",
+  "w": 11,
+  "h": 7
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE083",
+  "name": "SedgwickHouse083",
+  "w": 10,
+  "h": 8
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE084",
+  "name": "SedgwickHouse084",
+  "w": 10,
+  "h": 8
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE085",
+  "name": "SedgwickHouse085",
+  "w": 10,
+  "h": 9
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE086",
+  "name": "SedgwickHouse086",
+  "w": 8,
+  "h": 9
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE087",
+  "name": "SedgwickHouse087",
+  "w": 11,
+  "h": 8
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE088",
+  "name": "SedgwickHouse088",
+  "w": 9,
+  "h": 7
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE089",
+  "name": "SedgwickHouse089",
+  "w": 9,
+  "h": 9
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE090",
+  "name": "SedgwickHouse090",
+  "w": 8,
+  "h": 7
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE091",
+  "name": "SedgwickHouse091",
+  "w": 12,
+  "h": 7
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE092",
+  "name": "SedgwickHouse092",
+  "w": 12,
+  "h": 9
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE093",
+  "name": "SedgwickHouse093",
+  "w": 10,
+  "h": 9
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE094",
+  "name": "SedgwickHouse094",
+  "w": 11,
+  "h": 8
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE095",
+  "name": "SedgwickHouse095",
+  "w": 10,
+  "h": 9
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE096",
+  "name": "SedgwickHouse096",
+  "w": 11,
+  "h": 8
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE097",
+  "name": "SedgwickHouse097",
+  "w": 8,
+  "h": 7
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE098",
+  "name": "SedgwickHouse098",
+  "w": 11,
+  "h": 7
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE099",
+  "name": "SedgwickHouse099",
+  "w": 11,
+  "h": 7
+ },
+ {
+  "map": "MAP_SEDGWICK_HOUSE100",
+  "name": "SedgwickHouse100",
+  "w": 11,
+  "h": 7
+ }
+]

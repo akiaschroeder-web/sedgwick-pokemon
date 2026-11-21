@@ -3,7 +3,9 @@
   colors.json    average colour per metatile (for zoomed-out drawing)
   r_IJ.png       region tile indices: index = R + 256*G
   county.png     1/8-scale overview
-  signs.json     [[x, y, text], ...] world tile coords, every mailbox / address sign
+  signs.json     [[x, y, text, interior], ...] world tile coords, every mailbox / address sign,
+                 with the house interior (1-100, house_rooms) its door opens into, 0 if none
+  interiors.png  the 100 simple house interiors, 192x144 cells, 10 per row
   spots.json     [{cat, name, x, y}, ...] places to jump to: every gym, plus ../spots.json
   meta.json      grid, region size, map size"""
 import glob, json, os, sys
@@ -16,6 +18,19 @@ from geo.tilerender import ts as load_ts
 
 DST = sys.argv[1] if len(sys.argv) > 1 else '/home/claude/viewer'
 ATLAS_COLS = 32
+
+
+def interiors_atlas():
+    import maprender, house_rooms
+    meta = json.load(open(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), '..', 'house_rooms.json')))
+    at = Image.new('RGB', (192 * 10, 144 * ((len(meta) + 9) // 10)), (20, 20, 24))
+    tmp = os.path.join(DST, '_room.png')
+    for k, m in enumerate(meta):
+        maprender.render_layout('LAYOUT_' + m['map'][4:], tmp)
+        im = Image.open(tmp).convert('RGB')
+        at.paste(im, ((k % 10) * 192 + (192 - im.width) // 2, (k // 10) * 144 + (144 - im.height) // 2))
+    os.remove(tmp)
+    at.save(f'{DST}/interiors.png', optimize=True)
 
 
 def spots(doors):
@@ -50,6 +65,7 @@ def main():
     regions = []
     signs = []
     doors = {}
+    rooms = {}
     for f in files:
         i, j = int(f[-9:-7]), int(f[-6:-4])
         d = np.load(f, allow_pickle=True)
@@ -71,6 +87,9 @@ def main():
         js = json.load(open(f[:-4] + '.json'))
         for x, y, s in js['signs']:
             signs.append([int(i * REGION + x), int(j * REGION + y), s])
+        for gx, gy, room, addr in js.get('houses', []):
+            if addr:
+                rooms[addr] = room
         for g in js.get('gyms', []):
             doors[g['id']] = (int(i * REGION + g['door'][0]), int(j * REGION + g['door'][1]))
     # atlas + average colours
@@ -89,7 +108,10 @@ def main():
     atlas.save(f'{DST}/atlas.png', optimize=True)
     json.dump({'colors': cols, 'names': names}, open(f'{DST}/colors.json', 'w'))
     Image.open(f'{OUT}/county.png').save(f'{DST}/county.png', optimize=True)
+    for sg in signs:
+        sg.append(rooms.get(sg[2], 0))
     json.dump(signs, open(f'{DST}/signs.json', 'w'), separators=(',', ':'))
+    interiors_atlas()
     json.dump(spots(doors), open(f'{DST}/spots.json', 'w'), indent=0)
     gx, gy = grid()
     json.dump({'region': REGION, 'gx': gx, 'gy': gy, 'width': extract.WIDTH, 'height': extract.HEIGHT,

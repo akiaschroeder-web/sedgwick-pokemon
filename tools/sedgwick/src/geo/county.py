@@ -96,7 +96,19 @@ def run_region(raw, cty, warps, ring, i, j, land_cache=None):
              if MARGIN <= x < MARGIN + REGION and MARGIN <= y < MARGIN + REGION]
     gyms = [dict(g, door=(g['door'][0] - MARGIN, g['door'][1] - MARGIN)) for g in getattr(G, 'gyms', [])
             if g.get('door') and MARGIN <= g['door'][0] < MARGIN + REGION and MARGIN <= g['door'][1] < MARGIN + REGION]
-    json.dump({'signs': signs, 'gyms': gyms, 'stats': G.stats}, open(f'{OUT}/r_{i:02d}_{j:02d}.json', 'w'))
+    # every house door and the simple interior it opens into (house_rooms)
+    import house_rooms
+    from geo.gen import RUR
+    hd = [(h['door'], h.get('address', '')) for h in G.houses if h.get('door')]
+    hd += [((x, y), '') for (x, y), (ts, name, wk) in G.obj.items() if ts == RUR and name.startswith('h_wall_door')]
+    houses = []
+    for (x, y), addr in hd:
+        if MARGIN <= x < MARGIN + REGION and MARGIN <= y < MARGIN + REGION:
+            gx, gy = i * REGION + x - MARGIN, j * REGION + y - MARGIN
+            key = addr if addr and not addr.startswith('#') else f'{int(gx)},{int(gy)}'
+            houses.append([int(gx), int(gy), house_rooms.interior_for(key), addr if not addr.startswith('#') else ''])
+    G.stats['house_doors'] = len(houses)
+    json.dump({'signs': signs, 'gyms': gyms, 'houses': houses, 'stats': G.stats}, open(f'{OUT}/r_{i:02d}_{j:02d}.json', 'w'))
     thumb(idx, inside, list(table), f'{OUT}/t_{i:02d}_{j:02d}.png')
     return G.stats
 
