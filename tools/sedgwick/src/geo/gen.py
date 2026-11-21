@@ -16,7 +16,8 @@ from PIL import Image, ImageDraw
 HERE = os.path.dirname(os.path.abspath(__file__))
 TSDIR = os.path.join(HERE, '..', '..')
 TILESETS = ['sedgwick_residential', 'sedgwick_rural', 'sedgwick_commercial', 'sedgwick_downtown', 'sedgwick_metro',
-            'sedgwick_landmarks', 'sedgwick_aviation', 'sedgwick_city', 'sedgwick_retail', 'sedgwick_confluence']
+            'sedgwick_landmarks', 'sedgwick_aviation', 'sedgwick_city', 'sedgwick_retail', 'sedgwick_confluence',
+            'sedgwick_western']
 METRO = 4
 RES, RUR = 0, 1
 
@@ -1034,9 +1035,12 @@ class Gen:
         from geo import env
         env.terraces(self)
         env.ponds(self)
+        from geo import extras
+        self.used_buildings = getattr(self, 'used_buildings', set())
+        extras.cowtown(self)
         from geo import civic
         roads = self.road_ring()
-        self.blocked = roads | self.rail | (self.ground == G_WATER) | self.reserved
+        self.blocked = roads | self.rail | (self.ground == G_WATER) | self.reserved | getattr(self, 'cowtown', False)
         from geo import gyms
         gyms.build(self)
         self.blocked |= self.apron              # nothing else builds on airport concrete

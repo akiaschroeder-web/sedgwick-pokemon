@@ -502,6 +502,31 @@ def landmarks_ts():
     return ts
 
 
+def western_ts():
+    """Old Cowtown: western storefronts, cabins, the entrance hall, boardwalk, dirt and props."""
+    import western
+    ts = Tileset('sedgwick_western')
+    P_STREET = 6
+    ts.palettes[P_STREET] = street.PAL_STREET
+    slots = {v: 7 + i for i, v in enumerate(western.VARIANTS)}
+    for v, sl in slots.items():
+        ts.palettes[sl] = western.palette(v)
+    ts.add('lawn', GRASS_BOTTOM, P_STREET)
+    for name, g in western.ground().items():
+        ts.add(name, g, slots['brown'])
+    dirt = western.ground()['wdirt']
+    for name, g in western.props().items():
+        ts.add(name, GRASS_BOTTOM, P_STREET, g, slots['brown'], layer='COVERED')
+        ts.add(name + '_dirt', dirt, slots['brown'], g, slots['brown'], layer='COVERED')
+    doors = {f'{k}_{c}{r}' for k, (_, _, ds) in western.BUILDINGS.items() for c, r in ds}
+    for name, g in western.building_pieces().items():
+        kind = name.rsplit('_', 1)[0]
+        for v, sl in slots.items():
+            ts.add(f'{kind}_{v}_{name[-2:]}', GRASS_BOTTOM, P_STREET, g, sl, layer='NORMAL',
+                   beh='MB_NON_ANIMATED_DOOR' if name in doors else 'MB_NORMAL')
+    return ts
+
+
 def register_downtown_doors(ts):
     """Rustboro tower/tan doors and the Battle Dome door keep their own animations."""
     C = camel(ts.name)
@@ -789,6 +814,12 @@ if __name__ == '__main__':
     json.dump(index, open(os.path.join(here, '..', f'{ts.name}_metatiles.json'), 'w'), indent=1)
     print(f'{ts.name}: {ntiles} tiles, {len(ts.metatiles)} metatiles, palettes {sorted(ts.palettes)}')
     ts = landmarks_ts()
+    ntiles, index = ts.write()
+    register(ts, ntiles)
+    write_labels(ts, index)
+    json.dump(index, open(os.path.join(here, '..', f'{ts.name}_metatiles.json'), 'w'), indent=1)
+    print(f'{ts.name}: {ntiles} tiles, {len(ts.metatiles)} metatiles, palettes {sorted(ts.palettes)}')
+    ts = western_ts()
     ntiles, index = ts.write()
     register(ts, ntiles)
     write_labels(ts, index)

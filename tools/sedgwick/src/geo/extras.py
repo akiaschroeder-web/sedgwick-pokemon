@@ -862,3 +862,151 @@ def _gate(G, names, tsg, walk, placed, x, y):
                     names[y, gx], tsg[y, gx], walk[y, gx] = 'gate_arm', AV, False
                 return True
     return False
+
+
+# ---------------------------------------------------------------- Old Cowtown (future Elite Four)
+WEST = 10
+# property in county tiles: east of the museum parking lot, between Sim Park Drive / Museum
+# Boulevard and McLean Boulevard (OSM maps only the museum point, so the outline is set here)
+COWTOWN = (15662, 9700, 15868, 9758)
+
+
+def cowtown(G):
+    """Fenced 1870s town: entrance hall on the north fence line (a gatehouse: back doorway from
+    the street, front doors into town), Main Street and Second Street of dirt with boardwalks and
+    false-front stores, cabins along a south lane, a farm corral, a church."""
+    from geo.gen import RUR, G_LAWN
+    X0, Y0, X1, Y1 = (COWTOWN[0] - G.ox, COWTOWN[1] - G.oy, COWTOWN[2] - G.ox, COWTOWN[3] - G.oy)
+    if X1 < -10 or Y1 < -10 or X0 > G.W + 10 or Y0 > G.H + 10:
+        return
+    W, H = X1 - X0, Y1 - Y0
+    ys, xs = slice(max(0, Y0 - 5), min(G.H, Y1 + 1)), slice(max(0, X0), min(G.W, X1 + 1))
+    # the museum grounds replace whatever OSM drew there
+    inside = np.zeros((G.H, G.W), bool)
+    inside[max(0, Y0):min(G.H, Y1 + 1), max(0, X0):min(G.W, X1 + 1)] = True
+    G.road[inside] = 0
+    G.ground[inside & (G.ground != G_WATER)] = G_LAWN
+    G.zone[inside] = True
+    G.metro[inside] = False
+    for b in G.F['buildings']:
+        cx = sum(p[0] for p in b['poly']) / len(b['poly']) - G.ox
+        cy = sum(p[1] for p in b['poly']) / len(b['poly']) - G.oy
+        if X0 - 6 <= cx <= X1 and Y0 - 6 <= cy <= Y1:
+            G.used_buildings = getattr(G, 'used_buildings', set()); G.used_buildings.add(b['id'])
+    G.cowtown = inside
+    hs = lambda *a: h32('cowtown', *a)
+
+    def P(x, y, ts, name, walk=False):
+        if 0 <= X0 + x < G.W and 0 <= Y0 + y < G.H:
+            G.obj[(X0 + x, Y0 + y)] = (ts, name, walk)
+            G.occupied[Y0 + y, X0 + x] = True
+
+    def dirt(x0, y0, x1, y1):
+        for y in range(y0, y1 + 1):
+            for x in range(x0, x1 + 1):
+                P(x, y, WEST, 'wdirt', True)
+
+    def bld(kind, v, x, y, w, h, doors):
+        for r in range(h):
+            for c in range(w):
+                P(x + c, y + r, WEST, f'{kind}_{v}_{c}{r}', (c, r) in doors)
+
+    # fence all round, broken only by the entrance hall
+    ex = 4                                   # entrance hall columns ex .. ex+7, rows -4 .. 0
+    for x in range(0, W + 1):
+        if not (ex <= x <= ex + 7):
+            P(x, 0, RUR, 'corral_h')
+        P(x, H, RUR, 'corral_h')
+    for y in range(1, H):
+        P(0, y, RUR, 'corral_v'); P(W, y, RUR, 'corral_v')
+    bld('wentry', 'red', ex, -4, 8, 5, {(3, 4), (4, 4), (3, 0), (4, 0)})
+    G.doors.append((X0 + ex + 3, Y0 - 4, 'cowtown_gate', 'Old Cowtown'))
+    G.doors.append((X0 + ex + 3, Y0, 'cowtown_hall', 'Old Cowtown'))
+    # walk from the street-side doorway north to the street
+    for c in (3, 4):
+        y = -5
+        while Y0 + y > 0 and not G.road[Y0 + y, X0 + ex + c] and y > -40:
+            P(ex + c, y, RES, 'sidewalk', True)
+            y -= 1
+    # streets: a lane from the hall's front doors down to Main Street, then Main and Second
+    MAIN, SECOND, LANE = 11, 29, 46
+    dirt(ex + 3, 1, ex + 4, MAIN)
+    dirt(1, MAIN, W - 1, MAIN + 2)
+    dirt(1, SECOND, W - 1, SECOND + 2)
+    dirt(1, LANE, W - 1, LANE + 1)
+    for x in (44, 96, 148, W - 12):
+        dirt(x, MAIN, x + 1, LANE)
+    # Main Street: false-front stores on the north side, boardwalk in front
+    n_store = 0
+    church_done = False
+    x = ex + 9
+    while x + 4 < W - 2:
+        if x in range(43, 46) or x in range(95, 98) or x in range(147, 150):
+            x += 3
+            continue
+        k = hs(x, 'main')
+        if not church_done and x > W // 2 and x + 8 < W - 2:
+            church_done = True
+            from geo.civic import church
+            church(G, X0 + x, Y0 + MAIN - 7, 8, 'brown', 'white')
+            x += 10
+            continue
+        v = VARIANTS_W[k % len(VARIANTS_W)]
+        bld('wstore', v, x, MAIN - 5, 4, 4, {(2, 3)})
+        for c in range(4):
+            P(x + c, MAIN - 1, WEST, 'wwalk', True)
+        G.doors.append((X0 + x + 2, Y0 + MAIN - 2, 'cowtown_store', 'Old Cowtown'))
+        n_store += 1
+        x += 5 if k % 3 else 6
+    # props along the street edge
+    for x in range(ex + 9, W - 2, 7):
+        if (X0 + x, Y0 + MAIN + 3) not in G.obj or G.obj[(X0 + x, Y0 + MAIN + 3)][1] == 'wdirt':
+            pass
+        P(x, MAIN + 2, WEST, ('whitch_dirt', 'wbarrel_dirt', 'wtrough_dirt')[hs(x, 'prop') % 3], False)
+    # Second Street: stores and cabins facing it
+    x = 3
+    while x + 4 < W - 2:
+        if any(a - 4 <= x <= a + 1 for a in (44, 96, 148, W - 12)):
+            x += 2
+            continue
+        k = hs(x, 'second')
+        v = VARIANTS_W[k % len(VARIANTS_W)]
+        if k % 2:
+            bld('wstore', v, x, SECOND - 5, 4, 4, {(2, 3)})
+            for c in range(4):
+                P(x + c, SECOND - 1, WEST, 'wwalk', True)
+            G.doors.append((X0 + x + 2, Y0 + SECOND - 2, 'cowtown_store', 'Old Cowtown'))
+            n_store += 1
+        else:
+            bld('wcabin', v, x, SECOND - 3, 4, 3, {(1, 2)})
+            G.doors.append((X0 + x + 1, Y0 + SECOND - 1, 'cowtown_cabin', 'Old Cowtown'))
+        x += 6
+    # the south lane: homesteads west, the farm corral east
+    x = 3
+    n_cabin = 0
+    while x + 4 < W * 0.6:
+        if any(a - 4 <= x <= a + 1 for a in (44, 96, 148)):
+            x += 2
+            continue
+        v = VARIANTS_W[hs(x, 'lane') % len(VARIANTS_W)]
+        bld('wcabin', v, x, LANE - 3, 4, 3, {(1, 2)})
+        G.doors.append((X0 + x + 1, Y0 + LANE - 1, 'cowtown_cabin', 'Old Cowtown'))
+        n_cabin += 1
+        x += 8
+    cx0, cx1, cy0, cy1 = int(W * 0.62), W - 16, LANE + 3, H - 3
+    for xx in range(cx0, cx1 + 1):
+        P(xx, cy0, RUR, 'corral_h'); P(xx, cy1, RUR, 'corral_h')
+    for yy in range(cy0 + 1, cy1):
+        P(cx0, yy, RUR, 'corral_v'); P(cx1, yy, RUR, 'corral_v')
+    G.occupied[max(0, Y0 + cy0):max(0, Y0 + cy1), max(0, X0 + cx0):max(0, X0 + cx1)] = True     # open pasture
+    for k in range(8):
+        cx, cy = cx0 + 3 + hs(k, 'cx') % max(1, cx1 - cx0 - 5), cy0 + 2 + hs(k, 'cy') % max(1, cy1 - cy0 - 3)
+        P(cx, cy, RUR, 'cow_angus' if k % 2 else 'cow_holstein')
+    P(cx0 - 3, LANE + 3, WEST, 'wwagon_00'); P(cx0 - 2, LANE + 3, WEST, 'wwagon_10')
+    # everything not drawn stays open grass (trees may grow there); nothing else builds inside
+    # (gen adds G.cowtown to G.blocked)
+    G.stats['cowtown_stores'] = n_store
+    G.stats['cowtown_cabins'] = n_cabin
+
+
+VARIANTS_W = ('weathered', 'red', 'ochre', 'white', 'brown')

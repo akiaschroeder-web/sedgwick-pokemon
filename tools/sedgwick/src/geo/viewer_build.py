@@ -28,6 +28,8 @@ def spots(doors):
         out.append({'cat': 'Gyms', 'name': g['name'], 'x': int(x), 'y': int(y)})
     from geo import services
     for s in services.load():
+        if s['kind'] == 'lab':
+            out.append({'cat': 'Landmarks', 'name': s['name'], 'x': s['x'] + 3, 'y': s['y'] + 4})
         if s['kind'] == 'pc':
             out.append({'cat': 'Pokémon Centers', 'name': s['name'].replace(' Pokémon Center', ''),
                         'x': s['x'] + services.PC_DOOR[0], 'y': s['y'] + services.PC_DOOR[1]})

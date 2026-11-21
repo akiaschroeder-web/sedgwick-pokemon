@@ -1905,6 +1905,13 @@
    "layout": "station",
    "store": "cel:beige",
    "replaces": []
+  },
+  {
+   "kind": "lab",
+   "name": "Professor's Lab",
+   "x": 8177,
+   "y": 11002,
+   "near": "Kwik Shop"
   }
  ]
 }

@@ -438,3 +438,6 @@ const u16 gMetatileAttributes_SedgwickMetro[] = INCBIN_U16("data/tilesets/second
 
 const u16 gMetatiles_SedgwickLandmarks[] = INCBIN_U16("data/tilesets/secondary/sedgwick_landmarks/metatiles.bin");
 const u16 gMetatileAttributes_SedgwickLandmarks[] = INCBIN_U16("data/tilesets/secondary/sedgwick_landmarks/metatile_attributes.bin");
+
+const u16 gMetatiles_SedgwickWestern[] = INCBIN_U16("data/tilesets/secondary/sedgwick_western/metatiles.bin");
+const u16 gMetatileAttributes_SedgwickWestern[] = INCBIN_U16("data/tilesets/secondary/sedgwick_western/metatile_attributes.bin");

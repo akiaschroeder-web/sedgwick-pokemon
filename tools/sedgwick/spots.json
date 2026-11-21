@@ -1,4 +1,17 @@
 {
   "_doc": "Extra places for the map viewer's jump list (gyms come from gyms.json automatically). Each: cat (group heading), name, lon, lat.",
-  "spots": []
+  "spots": [
+    {
+      "cat": "Landmarks",
+      "name": "Old Cowtown (Elite Four)",
+      "lon": -97.36361,
+      "lat": 37.6938
+    },
+    {
+      "cat": "Landmarks",
+      "name": "Keeper of the Plains",
+      "lon": -97.34968,
+      "lat": 37.69138
+    }
+  ]
 }
