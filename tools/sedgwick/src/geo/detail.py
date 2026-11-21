@@ -185,6 +185,10 @@ def farmsteads(G):
         X0, Y0, w, h = x - 10, y - 7, 26, 14
         if not ok(G, X0, Y0, w, h):
             continue
+        # mowed farmyard under everything
+        for yy in range(Y0, Y0 + h):
+            for xx in range(X0, X0 + w):
+                G.put(xx, yy, RUR, 'lawn', True)
         # windbreak along the north edge
         for tx in range(X0, X0 + w - 1, 2):
             tree(G, tx, Y0, RUR)
