@@ -58,6 +58,18 @@ def nlcd_grids(bb, warp=None):
     return (land if cover > 0 else None), (canopy if cover > 0 else None)
 
 
+def add_featured(F, bb):
+    """Hand-placed addresses (featured.json): placed before all others, with a fixed look."""
+    import json
+    path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), '..', 'featured.json')
+    for a in json.load(open(path))['addresses']:
+        x, y = extract.proj(a['lon'], a['lat'])
+        if bb[0] <= x <= bb[2] and bb[1] <= y <= bb[3]:
+            F['addresses'] = [q for q in F['addresses'] if not (q['num'] == a['num'] and q['street'] == a['street'])]
+            F['addresses'].append({'x': x, 'y': y, 'num': a['num'], 'street': a['street'], 'tags': {},
+                                   'featured': True, 'style': a.get('style', {})})
+
+
 def run(rel_id, name, margin=250):
     raw = pickle.load(open('/home/claude/osm_in/raw.pkl', 'rb'))
     n, w, r = raw
@@ -66,6 +78,7 @@ def run(rel_id, name, margin=250):
     bb = (int(min(xs)) - margin, int(min(ys)) - margin, int(max(xs)) + margin, int(max(ys)) + margin)
     F = extract.extract(raw, bb)
     F['bbox'] = bb
+    add_featured(F, bb)
     del raw
     F, info = rectify.apply(F, town)
     if info:

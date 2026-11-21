@@ -1,0 +1,8 @@
+{
+  "_doc": "Addresses placed first, at an exact spot, with an optional fixed look. lon/lat from address-grid interpolation when OSM has no point.",
+  "addresses": [
+    {"num": "208", "street": "West Autumn Blaze Street", "city": "Goddard",
+     "lon": -97.57670, "lat": 37.66832, "source": "interpolated from Goddard's 200-block numbering (W Swanee Dr 202 / 207, W Richard Rd 215); even numbers on the north side",
+     "style": {}}
+  ]
+}

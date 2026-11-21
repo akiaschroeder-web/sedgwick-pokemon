@@ -99,6 +99,7 @@ class Gen:
         self.signs = []
         self.stats = {}
         self.houses = []
+        self.featured = []
         self.doors = []              # (x, y, kind, address): door / mat cells for warps
         self.land, self.canopy = land, canopy        # NLCD grids on this map's tiles (or None)
         self.civic_done = []
@@ -301,7 +302,7 @@ class Gen:
         self.used_buildings = set()
         placed = skipped = 0
         norm = lambda s: s.lower().replace('north ', '').replace('south ', '').replace('east ', '').replace('west ', '')
-        for a in sorted(self.F['addresses'], key=lambda a: (a['y'], a['x'])):
+        for a in sorted(self.F['addresses'], key=lambda a: (not a.get('featured'), a['y'], a['x'])):
             t = a['tags']
             if any(k in t for k in ('amenity', 'shop', 'office', 'leisure', 'craft')):
                 continue
@@ -325,6 +326,11 @@ class Gen:
             hs = h32(a['num'], a['street'])
             width = max(5, min(9, int(round(fw)) if fw else 6 + hs % 2))
             storeys = 2 if hs % 5 == 0 else 1
+            st = a.get('style') or {}
+            width, storeys = st.get('width', width), st.get('storeys', storeys)
+            self.style = st
+            if a.get('featured'):
+                self.featured.append((x, y, f"{a['num']} {a['street']}"))
             if self.place_house(x, y, d, dirs[d][0], width, storeys, hs, f"{a['num']} {a['street']}"):
                 placed += 1
             elif self.place_house(x, y, d, dirs[d][0], 5, 1, hs, f"{a['num']} {a['street']}"):
@@ -336,9 +342,11 @@ class Gen:
 
     def place_house(self, ax, ay, d, dist, width, storeys, hs, address):
         rows = 3 if storeys == 1 else 5
-        roof = ('red', 'brown', 'charcoal')[hs % 3]
-        wall = ('white', 'tan')[(hs >> 3) % 2]
-        garage = 'l' if (hs >> 5) % 2 else 'r'
+        st = getattr(self, 'style', {}) or {}
+        self.style = {}
+        roof = st.get('roof', ('red', 'brown', 'charcoal')[hs % 3])
+        wall = st.get('wall', ('white', 'tan')[(hs >> 3) % 2])
+        garage = st.get('garage', 'l' if (hs >> 5) % 2 else 'r')
         setback = 3 + (hs >> 7) % 2
         # position the house box (x0, y0, width, rows) relative to the street
         if d == 's':        # street below: wall row faces it

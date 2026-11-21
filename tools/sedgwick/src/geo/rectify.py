@@ -119,6 +119,45 @@ def axis_line(r):
     return ('y', sum(ys) / len(ys), min(xs), max(xs))
 
 
+def apply_known(F, f):
+    """Apply a precomputed warp f (county runs share one warp per town)."""
+    pins = [axis_line(r) for r in F['roads'] if pinned(r)]
+    _warp_all(F, f, pins)
+    return F, None
+
+
+def _warp_all(F, f, pins):
+    for r in F['roads']:
+        if pinned(r):
+            continue
+        orig = list(r['pts'])
+        r['pts'] = [f(p) for p in r['pts']]
+        for end, nxt in ((0, 1), (-1, -2)):
+            if len(orig) < 2:
+                break
+            ox, oy = orig[end]
+            for ax, c, lo, hi in pins:
+                on = (abs(ox - c) <= 3 and lo - 3 <= oy <= hi + 3) if ax == 'x' else (abs(oy - c) <= 3 and lo - 3 <= ox <= hi + 3)
+                if not on:
+                    continue
+                (x1, y1), (x0, y0) = r['pts'][nxt], r['pts'][end]
+                if ax == 'x' and x0 != x1:
+                    t = (c - x1) / (x0 - x1)
+                    r['pts'][end] = (c, y1 + (y0 - y1) * t)
+                elif ax == 'y' and y0 != y1:
+                    t = (c - y1) / (y0 - y1)
+                    r['pts'][end] = (x1 + (x0 - x1) * t, c)
+                break
+    for r in F['rail']:
+        r['pts'] = [f(p) for p in r['pts']]
+    for b in F['buildings'] + F['areas']:
+        b['poly'] = [f(p) for p in b['poly']]
+        if b.get('holes'):
+            b['holes'] = [[f(p) for p in h] for h in b['holes']]
+    for a in F['addresses'] + F['pois'] + F.get('turns', []):
+        a['x'], a['y'] = f((a['x'], a['y']))
+
+
 def apply(F, extra_rings=()):
     det = detect(F)
     if not det:

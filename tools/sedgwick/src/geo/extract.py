@@ -29,6 +29,9 @@ UNPAVED = {'gravel', 'unpaved', 'dirt', 'compacted', 'fine_gravel', 'ground', 's
 
 def road_class(t):
     h = t.get('highway')
+    if h == 'construction':                       # OSM lags: treat as built
+        h = t.get('construction', 'residential')
+        t = dict(t, highway=h)
     s = t.get('surface', '')
     if h in ('motorway', 'motorway_link'):
         return 'motorway'
