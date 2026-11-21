@@ -992,6 +992,9 @@ class Gen:
     def run(self):
         self.pass_ground()
         self.pass_roads()
+        from geo import env
+        env.terraces(self)
+        env.ponds(self)
         from geo import civic
         roads = self.road_ring()
         self.blocked = roads | self.rail | (self.ground == G_WATER) | self.reserved
@@ -1010,6 +1013,11 @@ class Gen:
         self.pass_buildings()
         self.metro_infill()
         detail.farmsteads(self)
+        env.prepare(self)
+        env.shelterbelts(self)
+        env.field_life(self)
+        env.pasture_life(self)
+        env.flowers(self)
         self.pass_trees()
         tsg, names, walk = self.resolve()
         detail.furniture(self, tsg, names)
